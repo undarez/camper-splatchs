@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 
 // Dynamic loading of the map
 const Map = dynamic(
-  () => import("@/app/components/Map/page").then((mod) => mod.default),
+  () => import("@/app/components/Map").then((mod) => mod.default),
   {
     ssr: false,
     loading: () => (
