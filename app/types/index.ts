@@ -11,6 +11,8 @@ export type HighPressureType =
 export type ElectricityType = "NONE" | "AMP_8" | "AMP_15";
 export type PaymentMethodType = "JETON" | "ESPECES" | "CARTE_BANCAIRE";
 
+export type { ServiceType };
+
 export interface StationServices {
   id?: string;
   highPressure: HighPressureType;
