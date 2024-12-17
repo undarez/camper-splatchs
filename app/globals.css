@@ -2,13 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Variables de base */
 :root {
-  --splash-primary: #2abed9; /* Bleu clair/turquoise du logo */
-  --splash-secondary: #1b4b82; /* Bleu foncé du logo */
-  --splash-accent: #ffd700; /* Jaune/doré des étoiles */
-  --splash-water: #a5e9ff; /* Bleu très clair des gouttes d'eau */
+  --splash-primary: #2abed9;
+  --splash-secondary: #1b4b82;
+  --splash-accent: #ffd700;
+  --splash-water: #a5e9ff;
 }
 
+/* Styles de base */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -95,52 +97,325 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
+/* Composants */
 @layer components {
   .leaflet-container {
-    @apply w-full h-full rounded-lg overflow-hidden;
+    @apply w-full h-full rounded-lg overflow-hidden z-[1];
   }
 
   .leaflet-popup-content-wrapper {
-    @apply bg-background border border-border rounded-lg shadow-lg;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
   .leaflet-popup-content {
-    @apply m-0 p-0;
+    margin: 0;
+    padding: 0;
   }
 
   .leaflet-popup-tip {
-    @apply bg-background border border-border;
+    background-color: var(--background);
+    border: 1px solid var(--border);
   }
 
   .leaflet-control-zoom {
-    @apply border border-border rounded-lg overflow-hidden;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
   }
 
   .leaflet-control-zoom-in,
   .leaflet-control-zoom-out {
-    @apply bg-background text-foreground hover:bg-accent border-border;
+    background-color: var(--background);
+    color: var(--foreground);
+    border-color: var(--border);
+  }
+
+  .leaflet-control-zoom-in:hover,
+  .leaflet-control-zoom-out:hover {
+    background-color: var(--accent);
   }
 
   .leaflet-control-attribution {
-    @apply bg-background/80 text-muted-foreground text-xs;
+    background-color: rgba(var(--background), 0.8);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+
+  .leaflet-control-container {
+    z-index: 2;
+  }
+
+  .address-search-container {
+    z-index: 40;
+    position: relative;
+  }
+
+  /* Styles pour la sidebar */
+  [data-state="open"] ~ * {
+    pointer-events: none;
+  }
+
+  [data-state="open"] ~ * .map-container,
+  [data-state="open"] ~ * .search-bar-container {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (min-width: 768px) {
+    [data-state="open"] ~ * {
+      pointer-events: auto;
+    }
+
+    [data-state="open"] ~ * .map-container,
+    [data-state="open"] ~ * .search-bar-container {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  /* Styles pour la carte */
+  .map-container {
+    @apply relative z-[1] w-full transition-all duration-300 block;
+    height: calc(100vh - 200px);
+  }
+
+  @media (min-width: 768px) {
+    .map-container {
+      margin-left: 250px;
+      width: calc(100% - 250px);
+    }
+  }
+
+  /* Styles pour la barre de recherche */
+  .search-bar-container {
+    position: absolute;
+    z-index: 1000;
+    pointer-events: auto;
+    width: calc(100% - 20px);
+    max-width: 400px;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  @media (min-width: 768px) {
+    .search-bar-container {
+      left: calc(50% + 125px);
+    }
+  }
+
+  .geoapify-geocoder-container {
+    @apply relative z-[1000] w-full max-w-[400px] mx-auto bg-white rounded-lg shadow-md;
+  }
+
+  .geoapify-geocoder-container input {
+    @apply w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary;
+  }
+
+  .geoapify-geocoder-container input:focus {
+    outline: none !important;
+    border-color: var(--ring) !important;
+    box-shadow: 0 0 0 2px rgba(var(--ring), 0.2) !important;
+  }
+
+  @media (min-width: 768px) {
+    .geoapify-geocoder-container {
+      margin: 0 !important;
+    }
+  }
+
+  /* Style pour le bouton burger */
+  .burger-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: white;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .burger-button:hover {
+    background: var(--accent);
+    transform: scale(1.05);
+  }
+
+  @media (min-width: 768px) {
+    .burger-button {
+      display: none;
+    }
+  }
+
+  /* Styles pour les tooltips des stations */
+  .leaflet-tooltip {
+    background: white !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 0.5rem !important;
+    padding: 0.75rem !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+    font-size: 0.875rem !important;
+    max-width: 250px !important;
+    white-space: normal !important;
+  }
+
+  @media (max-width: 768px) {
+    .leaflet-tooltip {
+      max-width: 200px !important;
+      font-size: 0.75rem !important;
+      padding: 0.5rem !important;
+    }
+
+    .station-tooltip {
+      background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    .station-popup {
+      max-width: 200px !important;
+    }
+  }
+
+  /* Amélioration de la visibilité des tooltips */
+  .leaflet-tooltip-top:before {
+    border-top-color: #e2e8f0 !important;
+  }
+
+  .leaflet-tooltip-bottom:before {
+    border-bottom-color: #e2e8f0 !important;
+  }
+
+  .leaflet-tooltip-left:before {
+    border-left-color: #e2e8f0 !important;
+  }
+
+  .leaflet-tooltip-right:before {
+    border-right-color: #e2e8f0 !important;
+  }
+
+  /* Styles de base */
+  .leaflet-control-zoom-in,
+  .leaflet-control-zoom-out {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .leaflet-control-zoom-in:hover,
+  .leaflet-control-zoom-out:hover {
+    background-color: var(--accent);
+  }
+
+  .leaflet-control-attribution {
+    background-color: rgba(var(--background), 0.8);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+
+  /* Styles pour la sidebar et la carte */
+  [data-state="open"] ~ * {
+    pointer-events: none;
+  }
+
+  .map-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: calc(100vh - 200px);
+    transition: all 0.3s ease-in-out;
+    display: block !important;
+  }
+
+  /* Styles pour la barre de recherche */
+  .geoapify-geocoder-container {
+    position: relative !important;
+    z-index: 1000 !important;
+    width: 100% !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    background: white !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .geoapify-geocoder-container input {
+    border: 1px solid var(--border) !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+    font-size: 14px !important;
+  }
+
+  .geoapify-geocoder-container input:focus {
+    outline: none !important;
+    border-color: var(--ring) !important;
+    box-shadow: 0 0 0 2px rgba(var(--ring), 0.2) !important;
+  }
+
+  @media (min-width: 768px) {
+    .geoapify-geocoder-container {
+      margin: 0 !important;
+    }
+  }
+
+  /* Animation des vagues */
+  .animate-wave1 {
+    animation: wave1 8s ease-in-out infinite;
+  }
+
+  .animate-wave2 {
+    animation: wave2 6s ease-in-out infinite;
+  }
+
+  /* États de la carte */
+  .map-hidden {
+    @apply opacity-0 pointer-events-none transition-opacity duration-300;
+  }
+
+  .map-visible {
+    @apply opacity-100 pointer-events-auto transition-opacity duration-300;
   }
 }
 
+/* Animations */
+@keyframes wave1 {
+  0%, 100% {
+    transform: translateY(0%);
+  }
+  50% {
+    transform: translateY(5%);
+  }
+}
+
+@keyframes wave2 {
+  0%, 100% {
+    transform: translateY(5%);
+  }
+  50% {
+    transform: translateY(0%);
+  }
+}
+
+/* Media queries */
 @media (max-width: 768px) {
   .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    @apply px-4;
   }
 
   .grid {
@@ -154,17 +429,109 @@
   }
 }
 
-/* Ajustements responsives */
-@media (max-width: 768px) {
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-}
-
-/* Support du scroll sur mobile */
+/* Support iOS */
 @supports (-webkit-touch-callout: none) {
   .min-h-screen {
     min-height: -webkit-fill-available;
+  }
+}
+
+/* Styles pour les contrôles de zoom Leaflet */
+.leaflet-control-zoom {
+  margin-right: 20px !important;
+  margin-top: 20px !important;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.leaflet-control-zoom button {
+  width: 30px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+  color: #666 !important;
+  background-color: white !important;
+  border: 1px solid #e2e8f0 !important;
+  cursor: pointer !important;
+  display: block !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  font-size: 18px !important;
+}
+
+.leaflet-control-zoom button:hover {
+  background-color: #f8fafc !important;
+  color: #1a1a1a !important;
+}
+
+.leaflet-control-zoom-in {
+  border-radius: 4px 4px 0 0 !important;
+}
+
+.leaflet-control-zoom-out {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.leaflet-control-zoom-out:hover {
+  background-color: var(--accent);
+}
+
+/* Style pour la barre de recherche Geoapify */
+.geoapify-autocomplete-input {
+  width: 100% !important;
+  padding: 0.75rem !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: white !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  position: relative !important;
+}
+
+.geoapify-autocomplete-items {
+  position: absolute !important;
+  background: white !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+  margin-top: 4px !important;
+  z-index: 9999 !important;
+  width: 100% !important;
+}
+
+.geoapify-autocomplete-item {
+  padding: 0.75rem !important;
+  cursor: pointer !important;
+}
+
+.geoapify-autocomplete-item:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Style pour le bouton burger */
+.burger-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: white;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.burger-button:hover {
+  background: var(--accent);
+  transform: scale(1.05);
+}
+
+@media (min-width: 768px) {
+  .burger-button {
+    display: none;
   }
 }

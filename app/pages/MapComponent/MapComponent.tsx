@@ -5,11 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import type { LatLngTuple } from "leaflet";
 import { icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import {
-  MapComponentProps,
-  IconType,
-  CamperWashStation,
-} from "../../types/typesGeoapify";
+import { MapComponentProps, IconType, CamperWashStation } from "@/app/types";
 
 const ICON_COLORS: Record<IconType, string> = {
   default: "blue",
@@ -138,5 +134,3 @@ export function MapComponent({
     </div>
   );
 }
-
-export default MapComponent;

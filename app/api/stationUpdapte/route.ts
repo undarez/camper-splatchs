@@ -52,8 +52,8 @@ export async function POST(req: Request) {
       data: {
         name: data.name,
         address: data.address,
-        latitude: data.lat,
-        longitude: data.lng,
+        latitude: data.latitude || data.lat,
+        longitude: data.longitude || data.lng,
         images: data.images,
         status: data.status as StationStatus,
         authorId: user.id,

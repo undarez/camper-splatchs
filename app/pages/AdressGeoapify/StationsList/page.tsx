@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CamperWashStation, SERVICE_LABELS } from "@/app/types/typesGeoapify";
+import { CamperWashStation, SERVICE_LABELS } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import Image from "next/image";
-import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/page";
+import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButtonWrapper";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";

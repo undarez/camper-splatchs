@@ -1,47 +1,89 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { authOptions } from "@/lib/AuthOptions";
 
-export async function GET() {
+export const dynamic = "force-dynamic";
+
+export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (
-      !session?.user?.email ||
-      session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    ) {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    // Récupérer les statistiques
-    const [totalStations, activeStations, pendingStations, analytics] =
-      await Promise.all([
-        prisma.station.count(),
-        prisma.station.count({ where: { status: "active" } }),
-        prisma.station.count({ where: { status: "en_attente" } }),
-        prisma.analytics.findMany({
-          where: {
-            timestamp: {
-              gte: new Date(new Date().setDate(new Date().getDate() - 30)), // Dernier mois
-            },
-          },
-        }),
-      ]);
+    const totalStations = await prisma.station.count();
+    const activeStations = await prisma.station.count({
+      where: { status: "active" },
+    });
+    const pendingStations = await prisma.station.count({
+      where: { status: "en_attente" },
+    });
+    const inactiveStations = await prisma.station.count({
+      where: { status: "inactive" },
+    });
 
-    // Calculer les visites hebdomadaires
-    const weekAgo = new Date(new Date().setDate(new Date().getDate() - 7));
-    const weeklyVisits = analytics.filter((a) => a.timestamp >= weekAgo).length;
+    const services = await prisma.service.findMany({
+      select: {
+        highPressure: true,
+        tirePressure: true,
+        vacuum: true,
+        handicapAccess: true,
+        wasteWater: true,
+      },
+    });
 
-    // Calculer les visites mensuelles
-    const monthlyVisits = analytics.length;
+    const stationsPerService = [
+      {
+        name: "Haute pression",
+        count: services.filter((s) => s.highPressure !== "NONE").length,
+      },
+      {
+        name: "Gonflage pneus",
+        count: services.filter((s) => s.tirePressure).length,
+      },
+      {
+        name: "Aspirateur",
+        count: services.filter((s) => s.vacuum).length,
+      },
+      {
+        name: "Accès PMR",
+        count: services.filter((s) => s.handicapAccess).length,
+      },
+      {
+        name: "Eaux usées",
+        count: services.filter((s) => s.wasteWater).length,
+      },
+    ];
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentStations = await prisma.station.findMany({
+      where: {
+        createdAt: {
+          gte: thirtyDaysAgo,
+        },
+      },
+      select: {
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const recentActivity = recentStations.map((station) => ({
+      date: station.createdAt.toISOString().split("T")[0],
+      count: 1,
+      type: "creation" as const,
+    }));
 
     return NextResponse.json({
       totalStations,
       activeStations,
       pendingStations,
-      weeklyVisits,
-      monthlyVisits,
+      inactiveStations,
+      stationsPerService,
+      recentActivity,
     });
   } catch (error) {
     console.error("Erreur lors de la récupération des statistiques:", error);

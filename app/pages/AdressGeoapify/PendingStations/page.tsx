@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CamperWashStation } from "@/app/types/typesGeoapify";
+import { CamperWashStation } from "@/app/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Image from "next/image";

@@ -1,6 +1,6 @@
 import { icon } from "leaflet";
 import type { Icon } from "leaflet";
-import { IconType } from "./typesGeoapify";
+import { IconType } from "@/app/types";
 
 export const createIcon = (color: string): Icon => {
   return icon({

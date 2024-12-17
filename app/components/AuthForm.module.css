@@ -1,0 +1,21 @@
+.instagramBtn {
+  background: linear-gradient(
+    45deg,
+    #f09433 0%,
+    #e6683c 25%,
+    #dc2743 50%,
+    #cc2366 75%,
+    #bc1888 100%
+  );
+}
+
+.instagramBtn:hover {
+  background: linear-gradient(
+    45deg,
+    #e88a2e 0%,
+    #d85f37 25%,
+    #cc233d 50%,
+    #bb205d 75%,
+    #ab167c 100%
+  );
+}

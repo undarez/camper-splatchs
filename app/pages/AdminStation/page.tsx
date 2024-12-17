@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CamperWashStation } from "@/app/types/typesGeoapify";
+import { CamperWashStation } from "@/app/types";
 
 const AdminStations = () => {
   const { data: session } = useSession();

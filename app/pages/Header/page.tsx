@@ -22,16 +22,14 @@ const Header = () => {
         <div className="flex justify-between items-center h-24">
           {" "}
           {/* Augmenté la hauteur à h-24 */}
-          <Link href="/" className="flex-shrink-0 mg-10 relative z-50">
-            {" "}
-            {/* Ajout de margin bottom négative */}
+          <Link href="/" className="flex-shrink-0 relative z-50">
             <Image
               src="/images/logo.png"
               alt="logo"
-              width={200}
-              height={200}
+              width={150}
+              height={150}
               priority
-              className="hover:scale-105 transition-transform duration-200 translate-y-4"
+              className="hover:scale-105 transition-transform duration-200"
             />
           </Link>
           <Menubar className="flex bg-transparent border-none">

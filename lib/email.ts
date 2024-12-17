@@ -1,6 +1,21 @@
 import { google } from "googleapis";
 import * as nodemailer from "nodemailer";
 
+const requiredEnvVars = [
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "GMAIL_REFRESH_TOKEN",
+  "EMAIL_USER",
+  "NEXT_PUBLIC_APP_URL",
+] as const;
+
+// Vérification des variables d'environnement requises
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    throw new Error(`La variable d'environnement ${envVar} est manquante`);
+  }
+}
+
 const OAuth2 = google.auth.OAuth2;
 
 const oauth2Client = new OAuth2(
@@ -46,14 +61,15 @@ const createTransporter = async () => {
 
 export const sendNewStationNotification = async (
   stationName: string,
-  address: string
+  address: string,
+  adminEmail: string
 ) => {
   try {
     const transporter = await createTransporter();
 
     await transporter.sendMail({
       from: `"CamperWash" <${process.env.EMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL,
+      to: adminEmail,
       subject: "Nouvelle station ajoutée",
       html: `
         <div style="background-color: #f9fafb; padding: 20px;">
@@ -95,23 +111,17 @@ export const sendContactEmail = async (
   try {
     const transporter = await createTransporter();
 
-    // Template commun pour l'en-tête et le pied de page
     const emailTemplate = (content: string) => `
       <div style="background-color: #f8fafc; padding: 20px; font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
-          <!-- En-tête avec logo -->
           <div style="background: linear-gradient(to right, #2ABED9, #1B4B82); padding: 20px; text-align: center;">
             <img src="${
               process.env.NEXT_PUBLIC_APP_URL
             }/images/logo.png" alt="CamperWash Logo" style="height: 60px; margin: 0 auto;" />
           </div>
-          
-          <!-- Contenu -->
           <div style="padding: 30px;">
             ${content}
           </div>
-          
-          <!-- Pied de page -->
           <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 14px;">
             <p>© ${new Date().getFullYear()} CamperWash. Tous droits réservés.</p>
           </div>
@@ -119,10 +129,9 @@ export const sendContactEmail = async (
       </div>
     `;
 
-    // Email à l'administrateur
     await transporter.sendMail({
       from: `"CamperWash Contact" <${process.env.EMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL,
+      to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
       subject: `Nouveau message: ${subject}`,
       html: emailTemplate(`
         <h1 style="color: #1e293b; margin-bottom: 20px;">Nouveau message de contact</h1>
@@ -136,7 +145,6 @@ export const sendContactEmail = async (
     });
     console.log("Email admin envoyé avec succès");
 
-    console.log("Envoi de la confirmation à l'utilisateur...");
     await transporter.sendMail({
       from: `"CamperWash" <${process.env.EMAIL_USER}>`,
       to: email,

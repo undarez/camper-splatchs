@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import ConnectYou from "../auth/connect-you/page";
 import { useSession } from "next-auth/react";
-import NavigationButton from "../MapComponent/NavigationGpsButton/page";
+import NavigationButton from "../MapComponent/NavigationGpsButton/NavigationButtonWrapper";
 
 interface StationWithDetails extends Station {
   services: Service;
@@ -131,6 +131,7 @@ const ValidatedStations = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const stationsPerPage = 6;
 
   useEffect(() => {
     async function fetchStations() {
@@ -139,7 +140,7 @@ const ValidatedStations = () => {
         const data = await response.json();
         if (data.success) {
           setStations(data.stations);
-          setTotalPages(Math.ceil(data.stations.length / 6));
+          setTotalPages(Math.ceil(data.stations.length / stationsPerPage));
           setLoading(false);
         } else {
           console.error(
@@ -155,6 +156,14 @@ const ValidatedStations = () => {
     fetchStations();
   }, []);
 
+  // Calculer les stations à afficher pour la page courante
+  const indexOfLastStation = currentPage * stationsPerPage;
+  const indexOfFirstStation = indexOfLastStation - stationsPerPage;
+  const currentStations = stations.slice(
+    indexOfFirstStation,
+    indexOfLastStation
+  );
+
   if (loading) {
     return <div>Chargement...</div>;
   }
@@ -164,7 +173,7 @@ const ValidatedStations = () => {
       <h1 className="text-3xl font-bold mb-8">Stations validées</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stations.map((station) => (
+        {currentStations.map((station) => (
           <StationCard key={station.id} station={station} />
         ))}
       </div>
@@ -177,7 +186,7 @@ const ValidatedStations = () => {
             className={`px-4 py-2 rounded ${
               currentPage === i + 1
                 ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
           >
             {i + 1}

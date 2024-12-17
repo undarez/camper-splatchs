@@ -1,16 +1,10 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { LockIcon } from "lucide-react";
+import { AuthForm } from "@/app/components/AuthForm";
 
 export default function ConnectYou() {
-  const router = useRouter();
-
-  const handleSignIn = () => {
-    router.push("/signin");
-  };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="w-full max-w-md">
@@ -25,10 +19,8 @@ export default function ConnectYou() {
             Veuillez vous connecter pour accéder à cette page
           </p>
         </CardHeader>
-        <CardContent className="flex justify-center">
-          <Button onClick={handleSignIn} className="w-full max-w-xs" size="lg">
-            Se connecter
-          </Button>
+        <CardContent>
+          <AuthForm />
         </CardContent>
       </Card>
     </div>
