@@ -59,6 +59,10 @@ export interface CamperWashStation {
   images?: string[];
   reviews?: Review[];
   rating?: number;
+  author?: {
+    name: string | null;
+    email: string;
+  };
 }
 
 export interface Review {

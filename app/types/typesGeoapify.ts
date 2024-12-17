@@ -34,6 +34,9 @@ export interface StationServices {
   vacuum: boolean;
   handicapAccess: boolean;
   wasteWater: boolean;
+  waterPoint: boolean;
+  wasteWaterDisposal: boolean;
+  blackWaterDisposal: boolean;
   electricity: "NONE" | "AMP_8" | "AMP_15" | null;
   paymentMethods: ("JETON" | "ESPECES" | "CARTE_BANCAIRE")[];
   maxVehicleLength: number | null;
@@ -51,18 +54,9 @@ export interface CamperWashStation {
   address: string;
   lat: number;
   lng: number;
-  images: string[];
-  services: {
-    highPressure: string;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    electricity: string;
-    paymentMethods: string[];
-    maxVehicleLength: number;
-  };
-  status: string;
+  images?: string[];
+  services: StationServices;
+  status: StationStatus;
   author: {
     name: string | null;
     email: string;

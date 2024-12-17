@@ -18,12 +18,13 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { GeoapifyResult, CamperWashStation } from "@/app/types/typesGeoapify";
+import { GeoapifyResult } from "@/app/types/typesGeoapify";
+import { CamperWashStation } from "@/app/types";
 import { Input } from "@/components/ui/input";
 
 // Dynamic loading of the map
 const Map = dynamic(
-  () => import("@/app/pages/MapComponent/page").then((mod) => mod.MapComponent),
+  () => import("@/app/components/Map/page").then((mod) => mod.default),
   {
     ssr: false,
     loading: () => (
@@ -94,6 +95,9 @@ const AdressGeoapify = ({
         vacuum: false,
         handicapAccess: false,
         wasteWater: false,
+        waterPoint: false,
+        wasteWaterDisposal: false,
+        blackWaterDisposal: false,
         electricity: "NONE",
         paymentMethods: [],
         maxVehicleLength: 0,
@@ -103,7 +107,7 @@ const AdressGeoapify = ({
         name: null,
         email: "",
       },
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     });
     onAddressSelect?.(formatted, lat, lon);
   };
