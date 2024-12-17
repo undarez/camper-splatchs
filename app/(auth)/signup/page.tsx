@@ -52,6 +52,15 @@ export default function SignUpPage() {
               <p className="text-sm text-muted-foreground">
                 Inscrivez-vous avec Google, Facebook ou Instagram
               </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                En créant un compte, vous acceptez notre{" "}
+                <Link
+                  href="/pages/Juridique/PolitiqueConfidentialiter"
+                  className="underline hover:text-primary"
+                >
+                  politique de confidentialité
+                </Link>
+              </p>
             </div>
             <AuthForm />
           </div>

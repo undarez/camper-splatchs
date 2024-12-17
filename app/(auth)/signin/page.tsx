@@ -52,6 +52,15 @@ export default function SignInPage() {
               <p className="text-sm text-muted-foreground">
                 Connectez-vous avec Google, Facebook ou Instagram
               </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                En vous connectant, vous acceptez notre{" "}
+                <Link
+                  href="/pages/Juridique/PolitiqueConfidentialiter"
+                  className="underline hover:text-primary"
+                >
+                  politique de confidentialité
+                </Link>
+              </p>
             </div>
             <AuthForm />
           </div>

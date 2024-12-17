@@ -38,6 +38,14 @@ export default function RootLayout({
     <SessionsWrapper>
       <html lang="fr">
         <head>
+          <meta property="fb:app_id" content="893594792366674" />
+          <meta property="og:url" content="https://camper-ten.vercel.app" />
+          <meta property="og:type" content="website" />
+          <meta property="og:title" content="CamperWash" />
+          <meta
+            property="og:description"
+            content="Trouvez les meilleures stations de lavage pour camping-car"
+          />
           <Script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"

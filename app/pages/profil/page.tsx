@@ -100,6 +100,15 @@ const Profil = () => {
                   Modifier le profil
                 </Button>
               </Link>
+
+              <Link href="/pages/profil/delete-account" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full text-red-600 hover:text-red-700"
+                >
+                  Supprimer mon compte
+                </Button>
+              </Link>
             </div>
           </div>
         </CardContent>
