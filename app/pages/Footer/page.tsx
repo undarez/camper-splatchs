@@ -29,7 +29,7 @@ const Footer = () => {
                   href="/pages/Juridique/PolitiqueConfidentialiter"
                   className="text-[#A5E9FF] hover:text-white transition-colors text-sm md:text-base"
                 >
-                  Politique de confidentialité
+                  Règles de confidentialité
                 </Link>
                 <Link
                   href="/pages/Juridique/ConditionUtilisation"

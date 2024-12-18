@@ -6,7 +6,7 @@ const Privacy = () => {
           {/* En-tête */}
           <div className="border-b border-blue-100 pb-8 mb-8">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] bg-clip-text text-transparent">
-              Politique de Confidentialité
+              Règles de Confidentialité
             </h1>
             <p className="mt-4 text-gray-600">
               Dernière mise à jour : {new Date().toLocaleDateString("fr-FR")}
@@ -16,7 +16,7 @@ const Privacy = () => {
           {/* Introduction */}
           <div className="mb-8 p-6 bg-gradient-to-r from-[#2ABED9]/5 to-transparent rounded-xl">
             <p className="text-gray-700 leading-relaxed">
-              Chez CamperWash, nous accordons une grande importance à la
+              Chez SplashCamper, nous accordons une grande importance à la
               protection de vos données personnelles. Cette politique détaille
               comment nous collectons, utilisons et protégeons vos informations.
             </p>
@@ -45,16 +45,7 @@ const Privacy = () => {
                     <strong className="text-[#1B4B82]">
                       Données de profil :
                     </strong>{" "}
-                    type de véhicule, département
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3 mt-2"></div>
-                  <span>
-                    <strong className="text-[#1B4B82]">
-                      Données de localisation :
-                    </strong>{" "}
-                    uniquement avec votre consentement
+                    type de véhicule, département pas obligatoire
                   </span>
                 </li>
               </ul>
