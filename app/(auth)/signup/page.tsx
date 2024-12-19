@@ -4,10 +4,64 @@ import Image from "next/image";
 import Link from "next/link";
 import AuthWrapper from "@/app/components/AuthWrapper";
 import { AuthForm } from "@/app/components/AuthForm";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const privacyAccepted = localStorage.getItem("privacyAccepted");
+    if (!privacyAccepted) {
+      setShowModal(true);
+    }
+  }, []);
+
+  const handleAccept = () => {
+    localStorage.setItem("privacyAccepted", "true");
+    setShowModal(false);
+  };
+
+  const handleViewPrivacy = () => {
+    router.push("/pages/Juridique/regles-de-confidentialite");
+  };
+
   return (
     <AuthWrapper>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Règles de Confidentialité</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>
+              Avant de continuer, veuillez prendre connaissance de nos règles de
+              confidentialité. Ces règles expliquent comment nous utilisons et
+              protégeons vos données personnelles.
+            </p>
+            <p>
+              En acceptant, vous confirmez avoir lu et compris nos règles de
+              confidentialité.
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={handleViewPrivacy}>
+              Lire les règles de confidentialité
+            </Button>
+            <Button onClick={handleAccept}>Accepter et continuer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
           <div className="absolute inset-0 bg-primary" />
