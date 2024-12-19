@@ -16,10 +16,44 @@ const MentionsLegales = () => {
               Propriété intellectuelle
             </h2>
             <p className="prose prose-lg text-gray-700">
-              Cette application est la propriété exclusive de [Votre nom]. Tous
-              les droits de reproduction sont réservés, y compris pour les
+              Cette application est la propriété exclusive de Florian Billard.
+              Tous les droits de reproduction sont réservés, y compris pour les
               documents téléchargeables et les représentations iconographiques.
             </p>
+          </section>
+
+          {/* Éditeur du site */}
+          <section className="bg-gradient-to-r from-blue-50 to-transparent p-8 rounded-xl mb-8">
+            <h2 className="text-2xl font-semibold text-[#1B4B82] mb-6">
+              Éditeur du site
+            </h2>
+            <div className="prose prose-lg text-gray-700">
+              <p>
+                <strong>Nom :</strong> Florian Billard
+                <br />
+                <strong>Adresse email :</strong> fortuna77320@gmail.com
+                <br />
+                <strong>Site web :</strong> https://splashcamper.vercel.app
+              </p>
+            </div>
+          </section>
+
+          {/* Hébergement */}
+          <section className="bg-gradient-to-r from-blue-50 to-transparent p-8 rounded-xl mb-8">
+            <h2 className="text-2xl font-semibold text-[#1B4B82] mb-6">
+              Hébergement
+            </h2>
+            <div className="prose prose-lg text-gray-700">
+              <p>
+                Ce site est hébergé par Vercel Inc.
+                <br />
+                440 N Barranca Ave #4133
+                <br />
+                Covina, CA 91723
+                <br />
+                États-Unis
+              </p>
+            </div>
           </section>
 
           {/* Protection des Données */}

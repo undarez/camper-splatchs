@@ -55,7 +55,7 @@ export default function SignInPage() {
               <p className="text-xs text-muted-foreground mt-1">
                 En vous connectant, vous acceptez notre{" "}
                 <Link
-                  href="/pages/Juridique/PolitiqueConfidentialiter"
+                  href="/pages/Juridique/regles-de-confidentialite"
                   className="underline hover:text-primary"
                 >
                   politique de confidentialité

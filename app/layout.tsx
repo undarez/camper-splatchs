@@ -46,6 +46,12 @@ export default function RootLayout({
             property="og:description"
             content="Trouvez les meilleures stations de lavage pour camping-car"
           />
+          <meta name="author" content="Florian Billard" />
+          <meta name="owner" content="Florian Billard" />
+          <meta name="copyright" content="© 2024 SplashCamper" />
+          <meta name="robots" content="index, follow" />
+          <meta name="googlebot" content="index, follow" />
+          <link rel="canonical" href="https://splashcamper.vercel.app" />
           <Script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"

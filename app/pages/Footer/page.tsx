@@ -26,7 +26,7 @@ const Footer = () => {
                   Qui sommes-nous
                 </Link>
                 <Link
-                  href="/pages/Juridique/PolitiqueConfidentialiter"
+                  href="/pages/Juridique/regles-de-confidentialite"
                   className="text-[#A5E9FF] hover:text-white transition-colors text-sm md:text-base"
                 >
                   Règles de confidentialité
