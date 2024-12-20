@@ -35,25 +35,27 @@ model Session {
 }
 
 model User {
-  id                   String      @id @default(cuid()) @db.Text
-  name                 String?     @db.Text
-  department           String?     @db.Text
+  id                   String         @id @default(cuid()) @db.Text
+  name                 String?        @db.Text
+  department           String?        @db.Text
   age                  Int?
-  camperModel          String?     @db.Text
-  email                String?     @unique @db.Text
+  camperModel          String?        @db.Text
+  email                String?        @unique @db.Text
   emailVerified        DateTime?
   image                String?
   accounts             Account[]
   sessions             Session[]
   stations             Station[]
-  role                 Role        @default(USER)
+  role                 Role           @default(USER)
   reviews              Review[]
   analytics            Analytics[]
-  encryptionVersion    Int         @default(1)
-  encryptedName        String?     @db.Text
-  encryptedEmail       String?     @db.Text
-  encryptedDepartment  String?     @db.Text
-  encryptedCamperModel String?     @db.Text
+  encryptionVersion    Int            @default(1)
+  encryptedName        String?        @db.Text
+  encryptedEmail       String?        @db.Text
+  encryptedDepartment  String?        @db.Text
+  encryptedCamperModel String?        @db.Text
+  UserActivity         UserActivity[]
+  visits               Visit[]
 }
 
 enum StationStatus {
@@ -80,6 +82,7 @@ model Station {
   reviews          Review[]
   encryptedName    String?       @db.Text
   encryptedAddress String?       @db.Text
+  visits           Visit[]
 }
 
 model Review {
@@ -155,4 +158,24 @@ enum EventType {
   PAGE_VIEW
   STATION_CREATION
   USER_REGISTRATION
+}
+
+model UserActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String // 'visit', 'station_view', etc.
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Visit {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  stationId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  station   Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
 }

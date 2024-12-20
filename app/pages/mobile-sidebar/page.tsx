@@ -1,12 +1,22 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { Home, Info, Mail, MapPin, Map, Settings, Users } from "lucide-react";
-import { useState, useEffect } from "react";
+import {
+  Home,
+  Info,
+  Mail,
+  MapPin,
+  Map,
+  Settings,
+  Users,
+  LogOut,
+} from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   { href: "/", label: "Accueil", icon: Home },
@@ -29,75 +39,44 @@ const MobileSidebar = () => {
   const { data: session } = useSession();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Effet pour gérer la visibilité de la carte
-  useEffect(() => {
-    const mapContainer = document.querySelector(".leaflet-container");
-    if (mapContainer) {
-      if (open) {
-        mapContainer.classList.add("map-hidden");
-        mapContainer.classList.remove("map-visible");
-      } else {
-        mapContainer.classList.add("map-visible");
-        mapContainer.classList.remove("map-hidden");
-      }
-    }
-  }, [open]);
-
-  // Gestion du chargement lors du changement de page
   const handleNavigation = (href: string) => {
-    if (href !== pathname) {
-      setIsLoading(true);
-      setOpen(false);
-    }
+    setOpen(false);
   };
 
-  // Réinitialiser le chargement après le changement de route
-  useEffect(() => {
-    setIsLoading(false);
-    setOpen(false);
-  }, [pathname]);
-
-  // Gestionnaire pour les événements clavier
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Escape") {
       setOpen(false);
     }
   };
 
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+    setOpen(false);
+  };
+
   return (
     <>
       <button
-        aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-        className={cn(
-          "fixed z-[60] md:hidden flex flex-col items-center justify-center w-8 h-8 bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] rounded-lg shadow-lg transition-all duration-300",
-          open
-            ? "top-2 right-4 scale-90 hover:scale-100"
-            : "top-2 left-4 scale-75 hover:scale-90"
-        )}
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen(true)}
+        className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        aria-label="Ouvrir le menu"
       >
-        <div className="flex flex-col justify-center items-center gap-1">
-          <span
-            className={`block h-0.5 w-5 bg-white transform transition-all duration-300 ${
-              open ? "rotate-45 translate-y-1.5" : ""
-            }`}
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
           />
-          <span
-            className={`block h-0.5 w-5 bg-white transform transition-all duration-300 ${
-              open ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-5 bg-white transform transition-all duration-300 ${
-              open ? "-rotate-45 -translate-y-1.5" : ""
-            }`}
-          />
-        </div>
+        </svg>
       </button>
 
-      {/* Overlay sombre avec gestion de l'accessibilité */}
       {open && (
         <div
           role="presentation"
@@ -118,7 +97,6 @@ const MobileSidebar = () => {
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Fond avec animation de vague améliorée */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#2ABED9] to-[#1B4B82] overflow-hidden">
           <div className="absolute inset-0">
             <div className="absolute inset-0 animate-wave1">
@@ -203,7 +181,15 @@ const MobileSidebar = () => {
             )}
           </nav>
 
-          <div className="p-4">
+          <div className="p-4 space-y-4">
+            <Button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Se déconnecter</span>
+            </Button>
+
             <div className="rounded-lg bg-white/10 p-4 text-white text-sm">
               <p className="font-medium">Version 1.0.0</p>
               <p className="mt-1 text-white/80">© 2024 CamperWash</p>
@@ -211,20 +197,6 @@ const MobileSidebar = () => {
           </div>
         </div>
       </div>
-
-      {/* Écran de chargement */}
-      {isLoading && (
-        <div
-          role="alert"
-          aria-live="polite"
-          className="fixed inset-0 bg-gradient-to-b from-[#2ABED9] to-[#1B4B82] z-[70] flex items-center justify-center"
-        >
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-white text-lg font-medium">Chargement...</p>
-          </div>
-        </div>
-      )}
     </>
   );
 };
