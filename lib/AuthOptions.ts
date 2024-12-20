@@ -24,8 +24,9 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
       authorization: {
         params: {
+          display: "popup",
           auth_type: "rerequest",
-          scope: "email,public_profile",
+          access_type: "online",
         },
       },
     }),
