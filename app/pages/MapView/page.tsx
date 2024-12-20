@@ -1,22 +1,33 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { map, tileLayer, geoJSON, marker, icon, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Station } from "@prisma/client";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
-interface MapViewProps {
-  stations: Station[];
-}
-
-const MapView = ({ stations }: MapViewProps) => {
+export default function MapView() {
   const mapRef = useRef<Map | null>(null);
-  const router = useRouter();
+  // const router = useRouter();
+  const [stations, setStations] = useState<Station[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Charger les stations
+    fetch("/api/stations")
+      .then((res) => res.json())
+      .then((data) => {
+        setStations(data);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Erreur lors du chargement des stations:", error);
+        setIsLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     if (!mapRef.current) {
-      // Initialiser la carte centrée sur la France
       const mapInstance = map("map", {
         scrollWheelZoom: true,
         dragging: true,
@@ -25,7 +36,6 @@ const MapView = ({ stations }: MapViewProps) => {
 
       mapRef.current = mapInstance;
 
-      // Ajouter le fond de carte personnalisé
       tileLayer(
         "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
         {
@@ -36,7 +46,7 @@ const MapView = ({ stations }: MapViewProps) => {
         }
       ).addTo(mapInstance);
 
-      // Ajouter les limites des régions françaises (GeoJSON)
+      // Charger les régions françaises
       fetch("/france-regions.geojson")
         .then((response) => response.json())
         .then((data) => {
@@ -52,38 +62,39 @@ const MapView = ({ stations }: MapViewProps) => {
         });
     }
 
-    // Ajouter les marqueurs pour chaque station
-    stations.forEach((station) => {
-      const markerInstance = marker([station.latitude, station.longitude], {
-        icon: icon({
-          iconUrl: "/images/marker-icon.png",
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowUrl: "/images/marker-shadow.png",
-          shadowSize: [41, 41],
-        }),
-      }).addTo(mapRef.current!);
+    // Ajouter les marqueurs si les stations sont chargées
+    if (!isLoading && mapRef.current) {
+      stations.forEach((station) => {
+        const markerInstance = marker([station.latitude, station.longitude], {
+          icon: icon({
+            iconUrl: "/images/marker-icon.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowUrl: "/images/marker-shadow.png",
+            shadowSize: [41, 41],
+          }),
+        }).addTo(mapRef.current!);
 
-      // Ajouter une popup avec les informations de la station
-      markerInstance.bindPopup(
-        `
-        <div class="p-4 min-w-[200px]">
-          <h3 class="text-lg font-bold mb-2 text-blue-600">${station.name}</h3>
-          <p class="text-gray-600 mb-3">${station.address}</p>
-          <button
-            class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm font-medium shadow-sm"
-            onclick="window.location.href='/pages/StationDetail/${station.id}'"
-          >
-            Voir les détails
-          </button>
-        </div>
-      `,
-        {
-          className: "rounded-lg shadow-xl",
-        }
-      );
-    });
+        markerInstance.bindPopup(
+          `
+          <div class="p-4 min-w-[200px]">
+            <h3 class="text-lg font-bold mb-2 text-blue-600">${station.name}</h3>
+            <p class="text-gray-600 mb-3">${station.address}</p>
+            <button
+              class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm font-medium shadow-sm"
+              onclick="window.location.href='/pages/StationDetail/${station.id}'"
+            >
+              Voir les détails
+            </button>
+          </div>
+        `,
+          {
+            className: "rounded-lg shadow-xl",
+          }
+        );
+      });
+    }
 
     return () => {
       if (mapRef.current) {
@@ -91,9 +102,15 @@ const MapView = ({ stations }: MapViewProps) => {
         mapRef.current = null;
       }
     };
-  }, [stations, router]);
+  }, [stations, isLoading]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        Chargement de la carte...
+      </div>
+    );
+  }
 
   return <div id="map" className="w-full h-full rounded-xl shadow-inner" />;
-};
-
-export default MapView;
+}
