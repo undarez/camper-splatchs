@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
-const MapView = dynamic(() => import("@/app/pages/MapView/page"), {
+const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
   ssr: false,
   loading: () => <Skeleton className="h-[600px] w-full rounded-lg" />,
 });

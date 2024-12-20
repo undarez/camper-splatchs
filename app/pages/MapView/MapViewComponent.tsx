@@ -3,13 +3,25 @@
 import { useEffect, useRef } from "react";
 import { map, tileLayer, geoJSON, marker, icon, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Station } from "@prisma/client";
 
-interface MapViewProps {
+interface Station {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  validatedAt: Date | null;
+  validatedBy: string;
+  encryptedAddress: string | null;
+}
+
+interface MapViewComponentProps {
   stations: Station[];
 }
 
-export function MapViewComponent({ stations }: MapViewProps) {
+export function MapViewComponent({ stations }: MapViewComponentProps) {
   const mapRef = useRef<Map | null>(null);
 
   useEffect(() => {

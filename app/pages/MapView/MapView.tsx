@@ -2,24 +2,44 @@
 
 import { useEffect, useState } from "react";
 import { MapViewComponent } from "./MapViewComponent";
-import { Station } from "@prisma/client";
 
-export default function MapView() {
-  const [stations, setStations] = useState<Station[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface Station {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  validatedAt: Date | null;
+  validatedBy: string;
+  encryptedAddress: string | null;
+}
+
+interface MapViewProps {
+  stations?: Station[];
+}
+
+export default function MapView({
+  stations: initialStations,
+}: MapViewProps = {}) {
+  const [stations, setStations] = useState<Station[]>(initialStations || []);
+  const [isLoading, setIsLoading] = useState(!initialStations);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stations`)
-      .then((res) => res.json())
-      .then((data) => {
-        setStations(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erreur lors du chargement des stations:", error);
-        setIsLoading(false);
-      });
-  }, []);
+    if (!initialStations) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stations`)
+        .then((res) => res.json())
+        .then((data) => {
+          setStations(data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Erreur lors du chargement des stations:", error);
+          setIsLoading(false);
+        });
+    }
+  }, [initialStations]);
 
   if (isLoading) {
     return (
