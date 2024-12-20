@@ -1,30 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { map, tileLayer, geoJSON, marker, icon, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Station } from "@prisma/client";
-// import { useRouter } from "next/navigation";
 
-export default function MapView() {
+interface MapViewProps {
+  stations: Station[];
+}
+
+export default function MapView({ stations }: MapViewProps) {
   const mapRef = useRef<Map | null>(null);
-  // const router = useRouter();
-  const [stations, setStations] = useState<Station[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Charger les stations
-    fetch("/api/stations")
-      .then((res) => res.json())
-      .then((data) => {
-        setStations(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erreur lors du chargement des stations:", error);
-        setIsLoading(false);
-      });
-  }, []);
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -62,8 +48,8 @@ export default function MapView() {
         });
     }
 
-    // Ajouter les marqueurs si les stations sont chargées
-    if (!isLoading && mapRef.current) {
+    // Ajouter les marqueurs pour les stations
+    if (mapRef.current && stations) {
       stations.forEach((station) => {
         const markerInstance = marker([station.latitude, station.longitude], {
           icon: icon({
@@ -102,15 +88,7 @@ export default function MapView() {
         mapRef.current = null;
       }
     };
-  }, [stations, isLoading]);
-
-  if (isLoading) {
-    return (
-      <div className="w-full h-full flex items-center justify-center">
-        Chargement de la carte...
-      </div>
-    );
-  }
+  }, [stations]);
 
   return <div id="map" className="w-full h-full rounded-xl shadow-inner" />;
 }
