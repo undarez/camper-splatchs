@@ -4,6 +4,11 @@ import prisma from "@/lib/prisma";
 
 async function verifyCaptcha(token: string) {
   try {
+    if (!process.env.RECAPTCHA_SECRET_KEY) {
+      console.error("RECAPTCHA_SECRET_KEY manquante");
+      return false;
+    }
+
     const response = await fetch(
       `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
       {
@@ -11,6 +16,7 @@ async function verifyCaptcha(token: string) {
       }
     );
     const data = await response.json();
+    console.log("Réponse ReCaptcha:", data);
     return data.success;
   } catch (error) {
     console.error("Erreur verification captcha:", error);
@@ -22,54 +28,62 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log("Données reçues:", {
-      email: body.email,
-      captchaToken: !!body.captchaToken,
+      emailPresent: !!body.email,
+      passwordPresent: !!body.password,
+      captchaPresent: !!body.captchaToken,
     });
 
     const { email, password, captchaToken } = body;
 
-    if (!email || !password) {
-      console.log("Email ou mot de passe manquant");
+    // Vérification des champs requis
+    const missingFields = [];
+    if (!email) missingFields.push("email");
+    if (!password) missingFields.push("mot de passe");
+    if (!captchaToken) missingFields.push("captcha");
+
+    if (missingFields.length > 0) {
+      console.log("Champs manquants:", missingFields);
       return NextResponse.json(
-        { error: "Email et mot de passe requis" },
+        {
+          error: `Champs requis manquants: ${missingFields.join(", ")}`,
+          missingFields,
+        },
         { status: 400 }
       );
     }
 
-    if (!captchaToken) {
-      console.log("Token captcha manquant");
-      return NextResponse.json(
-        { error: "Validation du captcha requise" },
-        { status: 400 }
-      );
-    }
-
+    // Validation du captcha
     const isCaptchaValid = await verifyCaptcha(captchaToken);
     console.log("Résultat validation captcha:", isCaptchaValid);
 
     if (!isCaptchaValid) {
       return NextResponse.json(
-        { error: "Validation du captcha invalide" },
+        {
+          error: "La validation du captcha a échoué. Veuillez réessayer.",
+          captchaError: true,
+        },
         { status: 400 }
       );
     }
 
+    // Vérification si l'utilisateur existe déjà
     const existingUser = await prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
 
     if (existingUser) {
       console.log("Email déjà utilisé:", email);
       return NextResponse.json(
-        { error: "Email déjà utilisé" },
+        {
+          error: "Cette adresse email est déjà utilisée",
+          emailTaken: true,
+        },
         { status: 400 }
       );
     }
 
+    // Création de l'utilisateur
     const hashedPassword = await hash(password, 12);
-
     const user = await prisma.user.create({
       data: {
         email,
@@ -80,13 +94,16 @@ export async function POST(request: Request) {
     console.log("Utilisateur créé avec succès:", { email: user.email });
 
     return NextResponse.json(
-      { message: "Utilisateur créé avec succès" },
+      { message: "Compte créé avec succès" },
       { status: 201 }
     );
   } catch (error) {
     console.error("REGISTRATION_ERROR", error);
     return NextResponse.json(
-      { error: "Erreur lors de l'inscription" },
+      {
+        error: "Une erreur est survenue lors de l'inscription",
+        details: error instanceof Error ? error.message : "Erreur inconnue",
+      },
       { status: 500 }
     );
   }

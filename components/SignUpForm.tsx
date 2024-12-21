@@ -54,7 +54,8 @@ export function SignUpForm() {
     if (!recaptchaKey) {
       toast({
         title: "Erreur de configuration",
-        description: "Le service ReCaptcha n'est pas correctement configuré",
+        description:
+          "Le service ReCaptcha n'est pas correctement configuré. Veuillez contacter l'administrateur.",
         variant: "destructive",
       });
       return;
@@ -62,8 +63,8 @@ export function SignUpForm() {
 
     if (!captchaToken) {
       toast({
-        title: "Erreur",
-        description: "Veuillez valider le captcha",
+        title: "Validation requise",
+        description: "Veuillez valider le captcha avant de continuer",
         variant: "destructive",
       });
       return;
@@ -72,7 +73,7 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
-      console.log("Envoi des données:", {
+      console.log("Tentative d'inscription avec:", {
         email: values.email,
         hasCaptcha: !!captchaToken,
       });
@@ -92,6 +93,15 @@ export function SignUpForm() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.emailTaken) {
+          throw new Error("Cette adresse email est déjà utilisée");
+        } else if (data.captchaError) {
+          throw new Error(
+            "La validation du captcha a échoué. Veuillez réessayer."
+          );
+        } else if (data.missingFields) {
+          throw new Error(`Champs manquants: ${data.missingFields.join(", ")}`);
+        }
         throw new Error(data.error || "Erreur lors de l'inscription");
       }
 
