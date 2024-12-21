@@ -15,6 +15,13 @@ import NavigationButton from "../MapComponent/NavigationGpsButton/NavigationButt
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -145,6 +152,7 @@ const ValidatedStations = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
+  const [statusFilter, setStatusFilter] = useState<string>("active");
   const stationsPerPage = 6;
 
   useEffect(() => {
@@ -170,9 +178,13 @@ const ValidatedStations = () => {
     fetchStations();
   }, []);
 
+  const filteredStations = stations.filter(
+    (station) => statusFilter === "all" || station.status === statusFilter
+  );
+
   const indexOfLastStation = currentPage * stationsPerPage;
   const indexOfFirstStation = indexOfLastStation - stationsPerPage;
-  const currentStations = stations.slice(
+  const currentStations = filteredStations.slice(
     indexOfFirstStation,
     indexOfLastStation
   );
@@ -192,34 +204,47 @@ const ValidatedStations = () => {
           <div className="flex items-center gap-3">
             <AdjustmentsHorizontalIcon className="h-6 w-6 text-blue-500" />
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-              Stations validées
+              Stations
             </h1>
           </div>
-          <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
-            <Button
-              onClick={() => setViewMode("cards")}
-              variant={viewMode === "cards" ? "default" : "ghost"}
-              className={`flex items-center gap-2 transition-all duration-200 ${
-                viewMode === "cards"
-                  ? "shadow-md transform scale-105"
-                  : "hover:bg-white/50"
-              }`}
-            >
-              <ViewColumnsIcon className="h-5 w-5" />
-              Vue cartes
-            </Button>
-            <Button
-              onClick={() => setViewMode("map")}
-              variant={viewMode === "map" ? "default" : "ghost"}
-              className={`flex items-center gap-2 transition-all duration-200 ${
-                viewMode === "map"
-                  ? "shadow-md transform scale-105"
-                  : "hover:bg-white/50"
-              }`}
-            >
-              <MapIcon className="h-5 w-5" />
-              Vue carte
-            </Button>
+          <div className="flex gap-4 items-center">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrer par statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="en_attente">En attente</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+              <Button
+                onClick={() => setViewMode("cards")}
+                variant={viewMode === "cards" ? "default" : "ghost"}
+                className={`flex items-center gap-2 transition-all duration-200 ${
+                  viewMode === "cards"
+                    ? "shadow-md transform scale-105"
+                    : "hover:bg-white/50"
+                }`}
+              >
+                <ViewColumnsIcon className="h-5 w-5" />
+                Vue cartes
+              </Button>
+              <Button
+                onClick={() => setViewMode("map")}
+                variant={viewMode === "map" ? "default" : "ghost"}
+                className={`flex items-center gap-2 transition-all duration-200 ${
+                  viewMode === "map"
+                    ? "shadow-md transform scale-105"
+                    : "hover:bg-white/50"
+                }`}
+              >
+                <MapIcon className="h-5 w-5" />
+                Vue carte
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -246,22 +271,28 @@ const ValidatedStations = () => {
               ))}
             </div>
 
-            <div className="flex justify-center mt-8 gap-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <Button
-                  key={i + 1}
-                  onClick={() => setCurrentPage(i + 1)}
-                  variant={currentPage === i + 1 ? "default" : "outline"}
-                  className={`transition-all duration-200 ${
-                    currentPage === i + 1
-                      ? "bg-blue-500 text-white transform scale-105"
-                      : "hover:bg-blue-50"
-                  }`}
-                >
-                  {i + 1}
-                </Button>
-              ))}
-            </div>
+            {filteredStations.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                Aucune station ne correspond au filtre sélectionné
+              </div>
+            ) : (
+              <div className="flex justify-center mt-8 gap-2">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    variant={currentPage === i + 1 ? "default" : "outline"}
+                    className={`transition-all duration-200 ${
+                      currentPage === i + 1
+                        ? "bg-blue-500 text-white transform scale-105"
+                        : "hover:bg-blue-50"
+                    }`}
+                  >
+                    {i + 1}
+                  </Button>
+                ))}
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div
@@ -273,7 +304,7 @@ const ValidatedStations = () => {
             className="bg-white rounded-xl shadow-lg overflow-hidden"
           >
             <div className="h-[600px] rounded-lg overflow-hidden">
-              <MapView stations={stations as unknown as Station[]} />
+              <MapView stations={filteredStations as unknown as Station[]} />
             </div>
           </motion.div>
         )}
