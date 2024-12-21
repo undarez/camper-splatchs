@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import AuthWrapper from "@/app/components/AuthWrapper";
-import { SignUpForm } from "@/components/SignUpForm";
+import { SignUpForm } from "@/app/components/SignUpForm";
 
 export default function SignUpPage() {
   return (
