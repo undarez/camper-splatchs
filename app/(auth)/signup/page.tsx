@@ -63,12 +63,6 @@ export default function SignUpPage() {
               </p>
             </div>
             <SignUpForm />
-            <p className="text-center text-sm text-muted-foreground">
-              Vous avez déjà un compte?{" "}
-              <Link href="/signin" className="underline hover:text-primary">
-                Se connecter
-              </Link>
-            </p>
           </div>
         </div>
       </div>
