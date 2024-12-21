@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -41,6 +41,11 @@ export function SignUpForm() {
   const router = useRouter();
   const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
+  useEffect(() => {
+    // Log pour vérifier si la clé ReCaptcha est définie
+    console.log("ReCaptcha key présente:", !!recaptchaKey);
+  }, [recaptchaKey]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,8 +55,18 @@ export function SignUpForm() {
     },
   });
 
+  const handleCaptchaChange = (token: string | null) => {
+    console.log("Captcha token reçu:", !!token);
+    setCaptchaToken(token);
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Début de la soumission du formulaire");
+    console.log("ReCaptcha key:", recaptchaKey);
+    console.log("Captcha token présent:", !!captchaToken);
+
     if (!recaptchaKey) {
+      console.error("Clé ReCaptcha manquante");
       toast({
         title: "Erreur de configuration",
         description:
@@ -62,6 +77,7 @@ export function SignUpForm() {
     }
 
     if (!captchaToken) {
+      console.error("Token captcha manquant");
       toast({
         title: "Validation requise",
         description: "Veuillez valider le captcha avant de continuer",
@@ -73,9 +89,10 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
-      console.log("Tentative d'inscription avec:", {
+      console.log("Envoi de la requête avec:", {
         email: values.email,
         hasCaptcha: !!captchaToken,
+        captchaLength: captchaToken?.length,
       });
 
       const response = await fetch("/api/auth/signup", {
@@ -91,6 +108,7 @@ export function SignUpForm() {
       });
 
       const data = await response.json();
+      console.log("Réponse du serveur:", data);
 
       if (!response.ok) {
         if (data.emailTaken) {
@@ -112,7 +130,7 @@ export function SignUpForm() {
 
       router.push("/signin");
     } catch (error) {
-      console.error("Erreur d'inscription:", error);
+      console.error("Erreur détaillée:", error);
       toast({
         title: "Erreur",
         description:
@@ -171,7 +189,7 @@ export function SignUpForm() {
         <div className="flex justify-center">
           <ReCaptcha
             sitekey={recaptchaKey || ""}
-            onChange={(token) => setCaptchaToken(token)}
+            onChange={handleCaptchaChange}
           />
         </div>
         <Button
