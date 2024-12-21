@@ -40,7 +40,7 @@ const MobileSidebar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const handleNavigation = (href: string) => {
+  const handleNavigation = () => {
     setOpen(false);
   };
 
@@ -59,7 +59,7 @@ const MobileSidebar = () => {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        className="fixed top-4 left-4 md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors z-50"
         aria-label="Ouvrir le menu"
       >
         <svg
@@ -145,7 +145,7 @@ const MobileSidebar = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => handleNavigation(item.href)}
+                onClick={handleNavigation}
                 className={cn(
                   "flex items-center space-x-3 rounded-lg px-4 py-3 text-white transition-all duration-200",
                   pathname === item.href
@@ -165,7 +165,7 @@ const MobileSidebar = () => {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => handleNavigation(item.href)}
+                    onClick={handleNavigation}
                     className={cn(
                       "flex items-center space-x-3 rounded-lg px-4 py-3 text-white transition-all duration-200",
                       pathname === item.href
