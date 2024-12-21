@@ -5,8 +5,11 @@ import { createTransport } from "nodemailer";
 const transporter = createTransport({
   service: "gmail",
   auth: {
+    type: "OAuth2",
     user: process.env.ADMIN_EMAIL,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.REFRESH_TOKEN,
   },
 });
 
@@ -59,9 +62,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.ADMIN_EMAIL || !process.env.GMAIL_APP_PASSWORD) {
+    // Vérification des variables d'environnement requises
+    const requiredEnvVars = [
+      "ADMIN_EMAIL",
+      "GMAIL_CLIENT_ID",
+      "GMAIL_CLIENT_SECRET",
+      "GMAIL_REFRESH_TOKEN",
+    ];
+
+    const missingEnvVars = requiredEnvVars.filter(
+      (varName) => !process.env[varName]
+    );
+
+    if (missingEnvVars.length > 0) {
+      console.error(
+        "Variables d'environnement manquantes:",
+        missingEnvVars.join(", ")
+      );
       return NextResponse.json(
-        { error: "Configuration email manquante" },
+        {
+          error: "Configuration email incomplète",
+          details: `Variables manquantes: ${missingEnvVars.join(", ")}`,
+        },
         { status: 500 }
       );
     }
