@@ -35,27 +35,25 @@ model Session {
 }
 
 model User {
-  id                String         @id @default(cuid())
-  name              String?
-  email             String?        @unique
-  emailVerified     DateTime?
-  verificationToken String?        @unique
-  hashedPassword    String?
-  image             String?
-  role              Role           @default(USER)
-  department        String?
-  age               Int?
-  camperModel       String?
-  usageFrequency    String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  accounts          Account[]
-  sessions          Session[]
-  stations          Station[]      @relation("StationAuthor")
-  reviews           Review[]       @relation("ReviewAuthor")
-  analytics         Analytics[]
-  activities        UserActivity[]
-  visits            Visit[]
+  id             String         @id @default(cuid())
+  name           String?
+  email          String?        @unique
+  hashedPassword String?
+  image          String?
+  role           Role           @default(USER)
+  department     String?
+  age            Int?
+  camperModel    String?
+  usageFrequency String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  stations       Station[]      @relation("StationAuthor")
+  reviews        Review[]       @relation("ReviewAuthor")
+  analytics      Analytics[]
+  activities     UserActivity[]
+  visits         Visit[]
 }
 
 enum StationStatus {
