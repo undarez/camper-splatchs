@@ -9,7 +9,7 @@ const transporter = createTransport({
     user: process.env.ADMIN_EMAIL,
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
+    refreshToken: process.env.GMAIL_REFRESH_TOKEN,
   },
 });
 
