@@ -55,6 +55,7 @@ export async function POST(request: Request) {
       data: {
         email,
         hashedPassword,
+        verificationToken,
       },
     });
 
