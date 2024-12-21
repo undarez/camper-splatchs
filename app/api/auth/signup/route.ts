@@ -2,34 +2,34 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import prisma from "@/lib/prisma";
 
-async function verifyCaptcha(token: string) {
-  try {
-    if (!process.env.RECAPTCHA_SECRET_KEY) {
-      console.error("RECAPTCHA_SECRET_KEY manquante");
-      return false;
-    }
+// async function verifyCaptcha(token: string) {
+//   try {
+//     if (!process.env.RECAPTCHA_SECRET_KEY) {
+//       console.error("RECAPTCHA_SECRET_KEY manquante");
+//       return false;
+//     }
 
-    const url = "https://www.google.com/recaptcha/api/siteverify";
-    const formData = new URLSearchParams();
-    formData.append("secret", process.env.RECAPTCHA_SECRET_KEY);
-    formData.append("response", token);
+//     const url = "https://www.google.com/recaptcha/api/siteverify";
+//     const formData = new URLSearchParams();
+//     formData.append("secret", process.env.RECAPTCHA_SECRET_KEY);
+//     formData.append("response", token);
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formData.toString(),
-    });
+//     const response = await fetch(url, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/x-www-form-urlencoded",
+//       },
+//       body: formData.toString(),
+//     });
 
-    const data = await response.json();
-    console.log("Réponse ReCaptcha:", data);
-    return data.success;
-  } catch (error) {
-    console.error("Erreur verification captcha:", error);
-    return false;
-  }
-}
+//     const data = await response.json();
+//     console.log("Réponse ReCaptcha:", data);
+//     return data.success;
+//   } catch (error) {
+//     console.error("Erreur verification captcha:", error);
+//     return false;
+//   }
+// }
 
 export async function POST(request: Request) {
   try {
@@ -37,16 +37,16 @@ export async function POST(request: Request) {
     console.log("Données reçues:", {
       emailPresent: !!body.email,
       passwordPresent: !!body.password,
-      captchaPresent: !!body.captchaToken,
+      // captchaPresent: !!body.captchaToken,
     });
 
-    const { email, password, captchaToken } = body;
+    const { email, password } = body;
 
     // Vérification des champs requis
     const missingFields = [];
     if (!email) missingFields.push("email");
     if (!password) missingFields.push("mot de passe");
-    if (!captchaToken) missingFields.push("captcha");
+    // if (!captchaToken) missingFields.push("captcha");
 
     if (missingFields.length > 0) {
       console.log("Champs manquants:", missingFields);
@@ -60,18 +60,18 @@ export async function POST(request: Request) {
     }
 
     // Validation du captcha
-    const isCaptchaValid = await verifyCaptcha(captchaToken);
-    console.log("Résultat validation captcha:", isCaptchaValid);
+    // const isCaptchaValid = await verifyCaptcha(captchaToken);
+    // console.log("Résultat validation captcha:", isCaptchaValid);
 
-    if (!isCaptchaValid) {
-      return NextResponse.json(
-        {
-          error: "La validation du captcha a échoué. Veuillez réessayer.",
-          captchaError: true,
-        },
-        { status: 400 }
-      );
-    }
+    // if (!isCaptchaValid) {
+    //   return NextResponse.json(
+    //     {
+    //       error: "La validation du captcha a échoué. Veuillez réessayer.",
+    //       captchaError: true,
+    //     },
+    //     { status: 400 }
+    //   );
+    // }
 
     // Vérification si l'utilisateur existe déjà
     const existingUser = await prisma.user.findUnique({

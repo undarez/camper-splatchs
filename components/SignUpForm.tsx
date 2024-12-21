@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import ReCaptcha from "react-google-recaptcha";
 
 const formSchema = z
   .object({
@@ -37,23 +36,9 @@ const formSchema = z
 
 type FormData = z.infer<typeof formSchema>;
 
-// Fonction pour obtenir l'URL de base de l'API
-const getBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-  }
-  return ""; // L'URL de base sera relative
-};
-
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
-  const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-  const baseUrl = getBaseUrl();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -64,47 +49,11 @@ export function SignUpForm() {
     },
   });
 
-  useEffect(() => {
-    console.log("Base URL:", baseUrl);
-    console.log("ReCaptcha key présente:", !!recaptchaKey);
-  }, [baseUrl, recaptchaKey]);
-
-  const handleCaptchaChange = (token: string | null) => {
-    console.log("Captcha token reçu:", !!token);
-    setCaptchaToken(token);
-  };
-
   async function onSubmit(values: FormData) {
-    console.log("Début de la soumission du formulaire");
-
-    if (!recaptchaKey) {
-      console.error("Clé ReCaptcha manquante");
-      toast({
-        title: "Erreur de configuration",
-        description:
-          "Le service ReCaptcha n'est pas correctement configuré. Veuillez contacter l'administrateur.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!captchaToken) {
-      console.error("Token captcha manquant");
-      toast({
-        title: "Validation requise",
-        description: "Veuillez valider le captcha avant de continuer",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const apiUrl = `${baseUrl}/api/auth/signup`;
-      console.log("Envoi de la requête à:", apiUrl);
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,22 +61,14 @@ export function SignUpForm() {
         body: JSON.stringify({
           email: values.email,
           password: values.password,
-          captchaToken,
         }),
       });
 
       const data = await response.json();
-      console.log("Réponse du serveur:", data);
 
       if (!response.ok) {
         if (data.emailTaken) {
           throw new Error("Cette adresse email est déjà utilisée");
-        } else if (data.captchaError) {
-          throw new Error(
-            "La validation du captcha a échoué. Veuillez réessayer."
-          );
-        } else if (data.missingFields) {
-          throw new Error(`Champs manquants: ${data.missingFields.join(", ")}`);
         }
         throw new Error(data.error || "Erreur lors de l'inscription");
       }
@@ -195,17 +136,7 @@ export function SignUpForm() {
             </FormItem>
           )}
         />
-        <div className="flex justify-center">
-          <ReCaptcha
-            sitekey={recaptchaKey || ""}
-            onChange={handleCaptchaChange}
-          />
-        </div>
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isLoading || !captchaToken}
-        >
+        <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Inscription en cours..." : "S'inscrire"}
         </Button>
       </form>
