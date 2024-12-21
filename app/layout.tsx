@@ -36,37 +36,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionWrapper>
-      <html lang="fr">
-        <head>
-          <meta property="fb:app_id" content="893594792366674" />
-          <meta property="og:url" content="https://splashcamper.vercel.app" />
-          <meta property="og:type" content="website" />
-          <meta property="og:title" content="SplashCamper" />
-          <meta
-            property="og:description"
-            content="Trouvez les meilleures stations de lavage pour camping-car"
-          />
-          <meta name="author" content="Florian Billard" />
-          <meta name="owner" content="Florian Billard" />
-          <meta name="copyright" content="© 2024 SplashCamper" />
-          <meta name="robots" content="index, follow" />
-          <meta name="googlebot" content="index, follow" />
-          <link rel="canonical" href="https://splashcamper.vercel.app" />
-          <meta
-            name="google-site-verification"
-            content="6eWBLMLxDalDyK7lsjGEkYXqzdw3ULqbrmbees92ves"
-          />
-          <Script
-            async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"
-            strategy="afterInteractive"
-            crossOrigin="anonymous"
-          />
-        </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+    <html lang="fr">
+      <head>
+        <meta property="fb:app_id" content="893594792366674" />
+        <meta property="og:url" content="https://splashcamper.vercel.app" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="SplashCamper" />
+        <meta
+          property="og:description"
+          content="Trouvez les meilleures stations de lavage pour camping-car"
+        />
+        <meta name="author" content="Florian Billard" />
+        <meta name="owner" content="Florian Billard" />
+        <meta name="copyright" content="© 2024 SplashCamper" />
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow" />
+        <link rel="canonical" href="https://splashcamper.vercel.app" />
+        <meta
+          name="google-site-verification"
+          content="6eWBLMLxDalDyK7lsjGEkYXqzdw3ULqbrmbees92ves"
+        />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <SessionWrapper>
           <ClientLayout>
             <div className="flex min-h-screen">
               <MobileSidebar />
@@ -86,9 +86,9 @@ export default function RootLayout({
               </div>
             </div>
           </ClientLayout>
-          <Toaster />
-        </body>
-      </html>
-    </SessionWrapper>
+        </SessionWrapper>
+        <Toaster />
+      </body>
+    </html>
   );
 }
