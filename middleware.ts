@@ -17,6 +17,7 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    // Routes protégées qui nécessitent une authentification
     "/dashboard/:path*",
     "/profile/:path*",
     "/settings/:path*",
