@@ -35,28 +35,27 @@ model Session {
 }
 
 model User {
-  id                   String         @id @default(cuid()) @db.Text
-  name                 String?        @db.Text
-  department           String?        @db.Text
-  age                  Int?
-  camperModel          String?        @db.Text
-  email                String?        @unique @db.Text
-  hashedPassword       String?        @db.Text
-  emailVerified        DateTime?
-  image                String?
-  accounts             Account[]
-  sessions             Session[]
-  stations             Station[]
-  role                 Role           @default(USER)
-  reviews              Review[]
-  analytics            Analytics[]
-  encryptionVersion    Int            @default(1)
-  encryptedName        String?        @db.Text
-  encryptedEmail       String?        @db.Text
-  encryptedDepartment  String?        @db.Text
-  encryptedCamperModel String?        @db.Text
-  UserActivity         UserActivity[]
-  visits               Visit[]
+  id                String         @id @default(cuid())
+  name              String?
+  email             String?        @unique
+  emailVerified     DateTime?
+  verificationToken String?        @unique
+  hashedPassword    String?
+  image             String?
+  accounts          Account[]
+  sessions          Session[]
+  role              String?        @default("USER")
+  department        String?
+  age               Int?
+  camperModel       String?
+  usageFrequency    String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  Station           Station[]
+  Review            Review[]
+  Analytics         Analytics[]
+  UserActivity      UserActivity[]
+  Visit             Visit[]
 }
 
 enum StationStatus {

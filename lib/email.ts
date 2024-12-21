@@ -165,3 +165,43 @@ export const sendContactEmail = async (
     throw error;
   }
 };
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
+
+export async function sendVerificationEmail(email: string, token: string) {
+  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Vérifiez votre adresse email - CamperWash",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #2ABED9;">Bienvenue sur CamperWash!</h1>
+        <p>Merci de vous être inscrit. Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
+        <a href="${verificationUrl}" 
+           style="display: inline-block; padding: 12px 24px; background-color: #2ABED9; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
+          Vérifier mon email
+        </a>
+        <p>Si le bouton ne fonctionne pas, vous pouvez copier et coller ce lien dans votre navigateur :</p>
+        <p style="color: #666;">${verificationUrl}</p>
+        <p>Ce lien expirera dans 24 heures.</p>
+        <p>Si vous n'avez pas créé de compte sur CamperWash, vous pouvez ignorer cet email.</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de l'email:", error);
+    return false;
+  }
+}

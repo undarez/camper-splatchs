@@ -16,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import ReCaptcha from "react-google-recaptcha";
 
 const formSchema = z
   .object({
@@ -35,12 +34,13 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
+type FormData = z.infer<typeof formSchema>;
+
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -49,16 +49,7 @@ export function SignUpForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!captchaToken) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez valider le captcha",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  async function onSubmit(values: FormData) {
     setIsLoading(true);
 
     try {
@@ -70,24 +61,26 @@ export function SignUpForm() {
         body: JSON.stringify({
           email: values.email,
           password: values.password,
-          captchaToken,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Erreur lors de l'inscription");
+        if (data.emailTaken) {
+          throw new Error("Cette adresse email est déjà utilisée");
+        }
+        throw new Error(data.error || "Erreur lors de l'inscription");
       }
 
       toast({
         title: "Inscription réussie!",
-        description: "Vous pouvez maintenant vous connecter.",
+        description: data.message || "Vous pouvez maintenant vous connecter.",
       });
 
-      // Redirection vers la page de connexion
       router.push("/signin");
     } catch (error) {
-      console.error(error);
+      console.error("Erreur détaillée:", error);
       toast({
         title: "Erreur",
         description:
@@ -143,17 +136,7 @@ export function SignUpForm() {
             </FormItem>
           )}
         />
-        <div className="flex justify-center">
-          <ReCaptcha
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
-            onChange={(token) => setCaptchaToken(token)}
-          />
-        </div>
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={isLoading || !captchaToken}
-        >
+        <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Inscription en cours..." : "S'inscrire"}
         </Button>
       </form>
