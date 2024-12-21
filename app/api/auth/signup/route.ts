@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { Role } from "@prisma/client";
 
 const userSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -33,17 +34,26 @@ export async function POST(request: Request) {
       data: {
         email,
         hashedPassword,
+        role: Role.USER,
       },
     });
 
     return NextResponse.json({
+      success: true,
       user: {
         id: user.id,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
     console.error("SIGNUP_ERROR", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Données invalides", details: error.errors },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
       { error: "Une erreur est survenue lors de l'inscription" },
       { status: 500 }
