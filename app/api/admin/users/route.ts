@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/AuthOptions";
 
 export async function GET() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
-    if (
-      !session?.user?.email ||
-      session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    ) {
+    if (!session?.user?.email) {
       return new NextResponse("Non autorisé", { status: 401 });
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (currentUser?.role !== "ADMIN") {
+      return new NextResponse("Non autorisé", { status: 403 });
     }
 
     const users = await prisma.user.findMany({
@@ -19,37 +25,23 @@ export async function GET() {
         name: true,
         email: true,
         role: true,
-        emailVerified: true,
         sessions: {
           orderBy: {
             expires: "desc",
           },
           take: 1,
-          select: {
-            expires: true,
-          },
         },
+        createdAt: true,
       },
-      orderBy: [
-        {
-          emailVerified: "desc",
-        },
-      ],
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
-    const formattedUsers = users.map((user) => ({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      createdAt: user.emailVerified,
-      lastLogin: user.sessions[0]?.expires || user.emailVerified,
-    }));
-
-    return NextResponse.json(formattedUsers);
+    return NextResponse.json(users);
   } catch (error) {
-    console.error("Erreur lors de la récupération des utilisateurs:", error);
-    return new NextResponse("Erreur interne du serveur", { status: 500 });
+    console.error("[USERS_GET]", error);
+    return new NextResponse("Erreur interne", { status: 500 });
   }
 }
 
