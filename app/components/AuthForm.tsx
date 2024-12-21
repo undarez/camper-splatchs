@@ -135,7 +135,7 @@ export function AuthForm() {
           <p>Vous n'avez pas encore de compte ?</p>
         </div>
         <Button variant="outline" className="w-full" asChild>
-          <Link href="/(auth)/signup">Créer un compte</Link>
+          <Link href="/signup">Créer un compte</Link>
         </Button>
       </div>
     </div>
