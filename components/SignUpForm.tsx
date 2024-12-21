@@ -35,18 +35,27 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
+type FormData = z.infer<typeof formSchema>;
+
+// Fonction pour obtenir l'URL de base de l'API
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+  }
+  return ""; // L'URL de base sera relative
+};
+
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
   const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const baseUrl = getBaseUrl();
 
-  useEffect(() => {
-    // Log pour vérifier si la clé ReCaptcha est définie
-    console.log("ReCaptcha key présente:", !!recaptchaKey);
-  }, [recaptchaKey]);
-
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -55,15 +64,18 @@ export function SignUpForm() {
     },
   });
 
+  useEffect(() => {
+    console.log("Base URL:", baseUrl);
+    console.log("ReCaptcha key présente:", !!recaptchaKey);
+  }, [baseUrl, recaptchaKey]);
+
   const handleCaptchaChange = (token: string | null) => {
     console.log("Captcha token reçu:", !!token);
     setCaptchaToken(token);
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: FormData) {
     console.log("Début de la soumission du formulaire");
-    console.log("ReCaptcha key:", recaptchaKey);
-    console.log("Captcha token présent:", !!captchaToken);
 
     if (!recaptchaKey) {
       console.error("Clé ReCaptcha manquante");
@@ -89,13 +101,10 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
-      console.log("Envoi de la requête avec:", {
-        email: values.email,
-        hasCaptcha: !!captchaToken,
-        captchaLength: captchaToken?.length,
-      });
+      const apiUrl = `${baseUrl}/api/auth/signup`;
+      console.log("Envoi de la requête à:", apiUrl);
 
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
