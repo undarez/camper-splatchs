@@ -8,7 +8,7 @@ import ClientLayout from "@/app/components/Loader/ClientLayout/page";
 import MobileSidebar from "@/app/pages/mobile-sidebar/page";
 import Script from "next/script";
 import { Toaster } from "@/components/ui/toaster";
-import SessionProvider from "@/providers/SessionProvider";
+import SessionWrapper from "@/app/components/SessionWrapper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
+    <SessionWrapper>
       <html lang="fr">
         <head>
           <meta property="fb:app_id" content="893594792366674" />
@@ -89,6 +89,6 @@ export default function RootLayout({
           <Toaster />
         </body>
       </html>
-    </SessionProvider>
+    </SessionWrapper>
   );
 }
