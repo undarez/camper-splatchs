@@ -72,6 +72,11 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
+      console.log("Envoi des données:", {
+        email: values.email,
+        hasCaptcha: !!captchaToken,
+      });
+
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -97,7 +102,7 @@ export function SignUpForm() {
 
       router.push("/signin");
     } catch (error) {
-      console.error(error);
+      console.error("Erreur d'inscription:", error);
       toast({
         title: "Erreur",
         description:

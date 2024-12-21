@@ -21,9 +21,15 @@ async function verifyCaptcha(token: string) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("Données reçues:", {
+      email: body.email,
+      captchaToken: !!body.captchaToken,
+    });
+
     const { email, password, captchaToken } = body;
 
     if (!email || !password) {
+      console.log("Email ou mot de passe manquant");
       return NextResponse.json(
         { error: "Email et mot de passe requis" },
         { status: 400 }
@@ -31,6 +37,7 @@ export async function POST(request: Request) {
     }
 
     if (!captchaToken) {
+      console.log("Token captcha manquant");
       return NextResponse.json(
         { error: "Validation du captcha requise" },
         { status: 400 }
@@ -38,6 +45,8 @@ export async function POST(request: Request) {
     }
 
     const isCaptchaValid = await verifyCaptcha(captchaToken);
+    console.log("Résultat validation captcha:", isCaptchaValid);
+
     if (!isCaptchaValid) {
       return NextResponse.json(
         { error: "Validation du captcha invalide" },
@@ -52,6 +61,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
+      console.log("Email déjà utilisé:", email);
       return NextResponse.json(
         { error: "Email déjà utilisé" },
         { status: 400 }
@@ -66,6 +76,8 @@ export async function POST(request: Request) {
         hashedPassword,
       },
     });
+
+    console.log("Utilisateur créé avec succès:", { email: user.email });
 
     return NextResponse.json(
       { message: "Utilisateur créé avec succès" },
