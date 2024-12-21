@@ -42,20 +42,20 @@ model User {
   verificationToken String?        @unique
   hashedPassword    String?
   image             String?
-  accounts          Account[]
-  sessions          Session[]
-  role              String?        @default("USER")
+  role              Role           @default(USER)
   department        String?
   age               Int?
   camperModel       String?
   usageFrequency    String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  Station           Station[]
-  Review            Review[]
-  Analytics         Analytics[]
-  UserActivity      UserActivity[]
-  Visit             Visit[]
+  accounts          Account[]
+  sessions          Session[]
+  stations          Station[]      @relation("StationAuthor")
+  reviews           Review[]       @relation("ReviewAuthor")
+  analytics         Analytics[]
+  activities        UserActivity[]
+  visits            Visit[]
 }
 
 enum StationStatus {
@@ -77,9 +77,9 @@ model Station {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   services         Service?
-  author           User          @relation(fields: [authorId], references: [id])
+  author           User          @relation("StationAuthor", fields: [authorId], references: [id])
   authorId         String
-  reviews          Review[]
+  reviews          Review[]      @relation("StationReviews")
   encryptedName    String?       @db.Text
   encryptedAddress String?       @db.Text
   visits           Visit[]
@@ -90,26 +90,26 @@ model Review {
   content          String   @db.Text
   rating           Int
   createdAt        DateTime @default(now())
-  station          Station  @relation(fields: [stationId], references: [id])
+  station          Station  @relation("StationReviews", fields: [stationId], references: [id])
   stationId        String
-  author           User     @relation(fields: [authorId], references: [id])
+  author           User     @relation("ReviewAuthor", fields: [authorId], references: [id])
   authorId         String
   encryptedContent String?  @db.Text
 }
 
 model Service {
-  id               String            @id @default(cuid())
-  highPressure     HighPressureType? @default(NONE) // Type de haute pression
-  tirePressure     Boolean           @default(false)
-  vacuum           Boolean           @default(false)
-  handicapAccess   Boolean           @default(false)
-  wasteWater       Boolean           @default(false)
-  paymentMethods   PaymentMethod[] // Plusieurs modes de paiement possibles
-  electricity      ElectricityType? // Type d'électricité disponible
-  maxVehicleLength Float? // Longueur maximale en mètres (optionnel)
-  station          Station           @relation(fields: [stationId], references: [id])
-  stationId        String            @unique // Pour garantir la relation one-to-one
-  createdAt        DateTime          @default(now())
+  id               String           @id @default(cuid())
+  highPressure     HighPressureType @default(NONE)
+  tirePressure     Boolean          @default(false)
+  vacuum           Boolean          @default(false)
+  handicapAccess   Boolean          @default(false)
+  wasteWater       Boolean          @default(false)
+  paymentMethods   PaymentMethod[]
+  electricity      ElectricityType  @default(NONE)
+  maxVehicleLength Float?
+  station          Station          @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  stationId        String           @unique
+  createdAt        DateTime         @default(now())
 }
 
 model VerificationToken {
@@ -147,11 +147,11 @@ enum Role {
 model Analytics {
   id        String    @id @default(cuid())
   type      EventType
-  path      String // Pour savoir quelle page a été visitée
-  userId    String? // Optionnel, pour tracker les utilisateurs connectés
+  path      String
+  userId    String?
   user      User?     @relation(fields: [userId], references: [id])
   timestamp DateTime  @default(now())
-  ip        String? // Optionnel, pour différencier les visiteurs uniques
+  ip        String?
 }
 
 enum EventType {
@@ -164,7 +164,7 @@ model UserActivity {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  type      String // 'visit', 'station_view', etc.
+  type      String
   createdAt DateTime @default(now())
 
   @@index([userId])
