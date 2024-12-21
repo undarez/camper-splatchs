@@ -41,6 +41,7 @@ model User {
   age                  Int?
   camperModel          String?        @db.Text
   email                String?        @unique @db.Text
+  hashedPassword       String?        @db.Text
   emailVerified        DateTime?
   image                String?
   accounts             Account[]

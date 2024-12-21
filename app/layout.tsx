@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/app/pages/Header/page";
-import SessionsWrapper from "@/app/pages/SessionsWrapper/page";
 import CookiesConsentModal from "@/app/pages/Juridique/CookiesConsentModal/page";
 import Footer from "@/app/pages/Footer/page";
 import ClientLayout from "@/app/components/Loader/ClientLayout/page";
 import MobileSidebar from "@/app/pages/mobile-sidebar/page";
 import Script from "next/script";
+import { Toaster } from "@/components/ui/toaster";
+import SessionProvider from "@/providers/SessionProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SessionsWrapper>
+    <SessionProvider>
       <html lang="fr">
         <head>
           <meta property="fb:app_id" content="893594792366674" />
@@ -68,10 +69,7 @@ export default function RootLayout({
         >
           <ClientLayout>
             <div className="flex min-h-screen">
-              {/* Sidebar mobile */}
               <MobileSidebar />
-
-              {/* Contenu principal */}
               <div className="flex-1 flex flex-col">
                 <div className="hidden md:block">
                   <Header />
@@ -88,8 +86,9 @@ export default function RootLayout({
               </div>
             </div>
           </ClientLayout>
+          <Toaster />
         </body>
       </html>
-    </SessionsWrapper>
+    </SessionProvider>
   );
 }

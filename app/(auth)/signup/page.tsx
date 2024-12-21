@@ -3,65 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import AuthWrapper from "@/app/components/AuthWrapper";
-import { AuthForm } from "@/app/components/AuthForm";
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { SignUpForm } from "@/components/SignUpForm";
 
 export default function SignUpPage() {
-  const [showModal, setShowModal] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const privacyAccepted = localStorage.getItem("privacyAccepted");
-    if (!privacyAccepted) {
-      setShowModal(true);
-    }
-  }, []);
-
-  const handleAccept = () => {
-    localStorage.setItem("privacyAccepted", "true");
-    setShowModal(false);
-  };
-
-  const handleViewPrivacy = () => {
-    router.push("/pages/Juridique/regles-de-confidentialite");
-  };
-
   return (
     <AuthWrapper>
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Règles de Confidentialité</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <p>
-              Avant de continuer, veuillez prendre connaissance de nos règles de
-              confidentialité. Ces règles expliquent comment nous utilisons et
-              protégeons vos données personnelles.
-            </p>
-            <p>
-              En acceptant, vous confirmez avoir lu et compris nos règles de
-              confidentialité.
-            </p>
-          </div>
-          <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={handleViewPrivacy}>
-              Lire les règles de confidentialité
-            </Button>
-            <Button onClick={handleAccept}>Accepter et continuer</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
           <div className="absolute inset-0 bg-primary" />
@@ -88,11 +34,11 @@ export default function SignUpPage() {
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                Rejoignez notre communauté de camping-caristes
+                Créez votre compte pour accéder à toutes nos fonctionnalités
               </p>
               <p className="text-base">
-                Créez votre compte pour accéder à toutes nos fonctionnalités et
-                partager vos découvertes.
+                Rejoignez notre communauté et partagez vos découvertes de
+                stations de lavage
               </p>
             </blockquote>
           </div>
@@ -104,7 +50,7 @@ export default function SignUpPage() {
                 Créer un compte
               </h1>
               <p className="text-sm text-muted-foreground">
-                Inscrivez-vous avec Google, Facebook ou Instagram
+                Entrez vos informations pour créer votre compte
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 En créant un compte, vous acceptez notre{" "}
@@ -116,7 +62,13 @@ export default function SignUpPage() {
                 </Link>
               </p>
             </div>
-            <AuthForm />
+            <SignUpForm />
+            <p className="text-center text-sm text-muted-foreground">
+              Vous avez déjà un compte?{" "}
+              <Link href="/signin" className="underline hover:text-primary">
+                Se connecter
+              </Link>
+            </p>
           </div>
         </div>
       </div>

@@ -104,7 +104,7 @@ export default function SignInPage() {
                 Connexion à votre compte
               </h1>
               <p className="text-sm text-muted-foreground">
-                Connectez-vous avec Google, Facebook ou Instagram
+                Connectez-vous avec Google ou créez un compte avec votre email
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 En vous connectant, vous acceptez notre{" "}
