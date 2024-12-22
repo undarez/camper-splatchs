@@ -6,6 +6,7 @@ import {
   MapIcon,
   ViewColumnsIcon,
   AdjustmentsHorizontalIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Skeleton } from "@/app/components/ui/skeleton";
@@ -22,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
+import { MoonIcon, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -155,6 +158,7 @@ const ValidatedStations = () => {
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
   const stationsPerPage = 6;
 
   useEffect(() => {
@@ -224,9 +228,9 @@ const ValidatedStations = () => {
   return (
     <div className="relative min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full md:w-auto">
               <Button
                 variant="ghost"
                 className="md:hidden"
@@ -237,16 +241,42 @@ const ValidatedStations = () => {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
                 Stations
               </h1>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Changer le thème</span>
+              </Button>
             </div>
 
             <div
               className={`
-              fixed md:relative top-0 left-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50
-              md:translate-x-0 md:w-auto md:h-auto md:shadow-none md:bg-transparent
-              ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-            `}
+                fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out z-50
+                md:relative md:transform-none md:w-auto md:h-auto md:shadow-none md:bg-transparent md:dark:bg-transparent
+                ${
+                  isSidebarOpen
+                    ? "translate-x-0"
+                    : "-translate-x-full md:translate-x-0"
+                }
+              `}
             >
               <div className="flex flex-col md:flex-row gap-4 p-4 md:p-0">
+                <div className="flex items-center justify-between md:hidden mb-4">
+                  <h2 className="text-lg font-semibold">Filtres</h2>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <XMarkIcon className="h-5 w-5" />
+                  </Button>
+                </div>
+
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Filtrer par statut" />
@@ -258,14 +288,15 @@ const ValidatedStations = () => {
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+
+                <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
                   <Button
                     onClick={() => setViewMode("cards")}
                     variant={viewMode === "cards" ? "default" : "ghost"}
                     className={`flex items-center gap-2 transition-all duration-200 ${
                       viewMode === "cards"
                         ? "shadow-md transform scale-105"
-                        : "hover:bg-white/50"
+                        : "hover:bg-white/50 dark:hover:bg-gray-600/50"
                     }`}
                   >
                     <ViewColumnsIcon className="h-5 w-5" />
@@ -277,7 +308,7 @@ const ValidatedStations = () => {
                     className={`flex items-center gap-2 transition-all duration-200 ${
                       viewMode === "map"
                         ? "shadow-md transform scale-105"
-                        : "hover:bg-white/50"
+                        : "hover:bg-white/50 dark:hover:bg-gray-600/50"
                     }`}
                   >
                     <MapIcon className="h-5 w-5" />
@@ -289,9 +320,10 @@ const ValidatedStations = () => {
           </div>
         </div>
 
+        {/* Overlay pour la sidebar mobile */}
         {isSidebarOpen && (
           <button
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden cursor-pointer"
+            className="fixed inset-0 bg-black/50 z-40 md:hidden cursor-pointer"
             onClick={() => setIsSidebarOpen(false)}
             onKeyDown={(e) => {
               if (e.key === "Escape") setIsSidebarOpen(false);
