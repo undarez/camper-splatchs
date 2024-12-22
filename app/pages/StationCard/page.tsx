@@ -153,6 +153,7 @@ const ValidatedStations = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const stationsPerPage = 6;
 
   useEffect(() => {
@@ -198,18 +199,31 @@ const ValidatedStations = () => {
   }
 
   return (
-    <div className="relative">
-      <div className="fixed inset-0 z-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="flex items-center gap-3">
-                <AdjustmentsHorizontalIcon className="h-6 w-6 text-blue-500" />
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                  Stations
-                </h1>
-              </div>
-              <div className="flex gap-4 items-center">
+    <div className="relative min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                className="md:hidden"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              >
+                <AdjustmentsHorizontalIcon className="h-6 w-6" />
+              </Button>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                Stations
+              </h1>
+            </div>
+
+            <div
+              className={`
+              fixed md:relative top-0 left-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50
+              md:translate-x-0 md:w-auto md:h-auto md:shadow-none md:bg-transparent
+              ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+            `}
+            >
+              <div className="flex flex-col md:flex-row gap-4 p-4 md:p-0">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Filtrer par statut" />
@@ -250,70 +264,81 @@ const ValidatedStations = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          <AnimatePresence mode="wait">
-            {viewMode === "cards" ? (
-              <motion.div
-                key="cards"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {currentStations.map((station, index) => (
-                    <motion.div
-                      key={station.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
+        {isSidebarOpen && (
+          <button
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden cursor-pointer"
+            onClick={() => setIsSidebarOpen(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setIsSidebarOpen(false);
+            }}
+            aria-label="Fermer le menu"
+            tabIndex={0}
+          />
+        )}
+
+        <AnimatePresence mode="wait">
+          {viewMode === "cards" ? (
+            <motion.div
+              key="cards"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="relative z-10"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentStations.map((station, index) => (
+                  <motion.div
+                    key={station.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <StationCard station={station} />
+                  </motion.div>
+                ))}
+              </div>
+
+              {filteredStations.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  Aucune station ne correspond au filtre sélectionné
+                </div>
+              ) : (
+                <div className="flex justify-center mt-8 gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <Button
+                      key={i + 1}
+                      onClick={() => setCurrentPage(i + 1)}
+                      variant={currentPage === i + 1 ? "default" : "outline"}
+                      className={`transition-all duration-200 ${
+                        currentPage === i + 1
+                          ? "bg-blue-500 text-white transform scale-105"
+                          : "hover:bg-blue-50"
+                      }`}
                     >
-                      <StationCard station={station} />
-                    </motion.div>
+                      {i + 1}
+                    </Button>
                   ))}
                 </div>
-
-                {filteredStations.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    Aucune station ne correspond au filtre sélectionné
-                  </div>
-                ) : (
-                  <div className="flex justify-center mt-8 gap-2">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <Button
-                        key={i + 1}
-                        onClick={() => setCurrentPage(i + 1)}
-                        variant={currentPage === i + 1 ? "default" : "outline"}
-                        className={`transition-all duration-200 ${
-                          currentPage === i + 1
-                            ? "bg-blue-500 text-white transform scale-105"
-                            : "hover:bg-blue-50"
-                        }`}
-                      >
-                        {i + 1}
-                      </Button>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="map"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-xl shadow-lg overflow-hidden"
-              >
-                <div className="h-[calc(100vh-200px)] rounded-lg overflow-hidden">
-                  <MapView
-                    stations={filteredStations as unknown as Station[]}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="map"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden relative z-10"
+            >
+              <div className="h-[calc(100vh-200px)] rounded-lg overflow-hidden">
+                <MapView stations={filteredStations as unknown as Station[]} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
