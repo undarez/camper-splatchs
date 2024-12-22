@@ -47,7 +47,144 @@ const Header = () => {
               className="hover:scale-105 transition-transform duration-200"
             />
           </Link>
-          <Menubar className="flex bg-transparent border-none items-center gap-2">
+
+          <div className="flex items-center gap-4">
+            <Menubar className="flex bg-transparent border-none items-center gap-2">
+              <MenubarMenu>
+                <MenubarTrigger asChild>
+                  <Button
+                    className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
+                    variant="ghost"
+                  >
+                    Stations
+                  </Button>
+                </MenubarTrigger>
+                <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                    <Link
+                      href="/components/localisationStation2"
+                      className="flex w-full"
+                      onClick={() =>
+                        router.push("/components/localisationStation2")
+                      }
+                    >
+                      Ajouter une station
+                    </Link>
+                  </MenubarItem>
+                  <MenubarSeparator className="dark:bg-gray-700" />
+                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                    <Link
+                      href="/pages/StationCard"
+                      className="flex w-full"
+                      onClick={() => router.push("/pages/StationCard")}
+                    >
+                      Stations lavage verifier
+                    </Link>
+                  </MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+
+              <MenubarMenu>
+                <MenubarTrigger asChild>
+                  <Button
+                    className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
+                    variant="ghost"
+                  >
+                    About
+                  </Button>
+                </MenubarTrigger>
+                <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                    <Link
+                      href="/pages/About"
+                      className="flex w-full"
+                      onClick={() => router.push("/pages/About")}
+                    >
+                      À propos
+                    </Link>
+                  </MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+
+              {session ? (
+                <MenubarMenu>
+                  <MenubarTrigger asChild>
+                    <Button
+                      className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
+                      variant="ghost"
+                    >
+                      {`Bienvenue, ${session.user?.name}`}
+                    </Button>
+                  </MenubarTrigger>
+                  <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                    <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                      <Link
+                        href="/pages/profil"
+                        className="flex w-full"
+                        onClick={() => router.push("/pages/profil")}
+                      >
+                        Profil
+                      </Link>
+                    </MenubarItem>
+                    {isAdmin && (
+                      <>
+                        <MenubarSeparator className="dark:bg-gray-700" />
+                        <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                          <Link
+                            href="/pages/AdminStation/AdminPage"
+                            className="flex w-full"
+                            onClick={() =>
+                              router.push("/pages/AdminStation/AdminPage")
+                            }
+                          >
+                            Administration
+                          </Link>
+                        </MenubarItem>
+                        <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                          <Link
+                            href="/pages/AdminStation/GestionStations"
+                            className="flex w-full"
+                            onClick={() =>
+                              router.push("/pages/AdminStation/GestionStations")
+                            }
+                          >
+                            Gestion des stations
+                          </Link>
+                        </MenubarItem>
+                        <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
+                          <Link
+                            href="/pages/AdminStation/GestionUtilisateurs"
+                            className="flex w-full"
+                            onClick={() =>
+                              router.push(
+                                "/pages/AdminStation/GestionUtilisateurs"
+                              )
+                            }
+                          >
+                            Gestion des utilisateurs
+                          </Link>
+                        </MenubarItem>
+                      </>
+                    )}
+                    <MenubarSeparator className="dark:bg-gray-700" />
+                    <MenubarItem
+                      onClick={() => signOut()}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
+                    >
+                      Se déconnecter
+                    </MenubarItem>
+                  </MenubarContent>
+                </MenubarMenu>
+              ) : (
+                <Button
+                  className="font-mono text-lg bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFC000] dark:bg-[#FFD700] dark:text-[#0F2B4D] dark:hover:bg-[#FFC000] transition-colors"
+                  onClick={() => router.push("/signin")}
+                >
+                  Se connecter
+                </Button>
+              )}
+            </Menubar>
+
             <Toggle
               variant="outline"
               size="lg"
@@ -68,107 +205,9 @@ const Header = () => {
               </div>
               <span className="sr-only">Toggle theme</span>
             </Toggle>
-
-            <MenubarMenu>
-              <MenubarTrigger asChild>
-                <Button
-                  className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
-                  variant="ghost"
-                >
-                  Stations
-                </Button>
-              </MenubarTrigger>
-              <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
-                <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
-                  <Link
-                    href="/components/localisationStation2"
-                    className="flex w-full"
-                  >
-                    Ajouter une station
-                  </Link>
-                </MenubarItem>
-                <MenubarSeparator className="dark:bg-gray-700" />
-                <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
-                  <Link href="/pages/StationCard" className="flex w-full">
-                    Stations lavage verifier
-                  </Link>
-                </MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
-            <MenubarMenu>
-              <MenubarTrigger asChild>
-                <Button
-                  className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
-                  variant="ghost"
-                >
-                  About
-                </Button>
-              </MenubarTrigger>
-              <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
-                <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
-                  <Link href="/pages/About" className="flex w-full">
-                    À propos
-                  </Link>
-                </MenubarItem>
-              </MenubarContent>
-            </MenubarMenu>
-            {session ? (
-              <MenubarMenu>
-                <MenubarTrigger asChild>
-                  <Button
-                    className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
-                    variant="ghost"
-                  >
-                    {`Bienvenue, ${session.user?.name}`}
-                  </Button>
-                </MenubarTrigger>
-                <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
-                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
-                    <Link href="/pages/profil" className="flex w-full">
-                      Profil
-                    </Link>
-                  </MenubarItem>
-                  {isAdmin && (
-                    <>
-                      <MenubarSeparator className="dark:bg-gray-700" />
-                      <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
-                        <Link
-                          href="/pages/AdminStation/AdminPage"
-                          className="flex w-full"
-                        >
-                          Administration
-                        </Link>
-                      </MenubarItem>
-                    </>
-                  )}
-                  <MenubarSeparator className="dark:bg-gray-700" />
-                  <MenubarItem
-                    onClick={() => signOut()}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
-                  >
-                    Se déconnecter
-                  </MenubarItem>
-                </MenubarContent>
-              </MenubarMenu>
-            ) : (
-              <Button
-                className="font-mono text-lg bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFC000] dark:bg-[#FFD700] dark:text-[#0F2B4D] dark:hover:bg-[#FFC000] transition-colors"
-                onClick={() => router.push("/signin")}
-              >
-                Se connecter
-              </Button>
-            )}
-          </Menubar>
+          </div>
         </div>
       </div>
-      <ins
-        className="adsbygoogle"
-        style={{ display: "block" }}
-        data-ad-client="votre-client-id"
-        data-ad-slot="votre-slot-id"
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
     </header>
   );
 };

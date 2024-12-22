@@ -298,8 +298,8 @@ const ValidatedStations = () => {
                   variant={viewMode === "cards" ? "default" : "ghost"}
                   className={`justify-start w-full ${
                     viewMode === "cards"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+                      ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
                 >
                   <ViewColumnsIcon className="h-4 w-4 mr-2" />
@@ -310,8 +310,8 @@ const ValidatedStations = () => {
                   variant={viewMode === "map" ? "default" : "ghost"}
                   className={`justify-start w-full ${
                     viewMode === "map"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+                      ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                   }`}
                 >
                   <MapIcon className="h-4 w-4 mr-2" />
@@ -347,9 +347,14 @@ const ValidatedStations = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setViewMode("cards")}
-                  className={
-                    viewMode === "cards" ? "bg-primary text-white" : ""
-                  }
+                  className={`
+                    ${
+                      viewMode === "cards"
+                        ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                        : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }
+                    border-gray-200 dark:border-gray-700
+                  `}
                 >
                   Vue cartes
                 </Button>
@@ -357,7 +362,14 @@ const ValidatedStations = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => setViewMode("map")}
-                  className={viewMode === "map" ? "bg-primary text-white" : ""}
+                  className={`
+                    ${
+                      viewMode === "map"
+                        ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                        : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }
+                    border-gray-200 dark:border-gray-700
+                  `}
                 >
                   Vue carte
                 </Button>
@@ -371,16 +383,46 @@ const ValidatedStations = () => {
               }`}
             >
               {viewMode === "cards" ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
-                  {currentStations.map((station) => (
-                    <div
-                      className="w-full max-w-sm transform transition-all duration-200 hover:scale-[1.02]"
-                      key={station.id}
-                    >
-                      <StationCard station={station} />
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+                    {currentStations.map((station) => (
+                      <div
+                        className="w-full max-w-sm transform transition-all duration-200 hover:scale-[1.02]"
+                        key={station.id}
+                      >
+                        <StationCard station={station} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {filteredStations.length > stationsPerPage && (
+                    <div className="flex justify-center mt-8 gap-2">
+                      {Array.from({ length: totalPages }, (_, i) => (
+                        <Button
+                          key={i + 1}
+                          onClick={() => setCurrentPage(i + 1)}
+                          variant={
+                            currentPage === i + 1 ? "default" : "outline"
+                          }
+                          className={`transition-all duration-200 ${
+                            currentPage === i + 1
+                              ? "bg-blue-500 dark:bg-blue-600 text-white transform scale-105 shadow-lg"
+                              : "hover:bg-blue-50 dark:hover:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+                          }`}
+                        >
+                          {i + 1}
+                        </Button>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
+
+                  {filteredStations.length === 0 && (
+                    <div className="text-center py-12 text-gray-500 dark:text-gray-400 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg">
+                      Aucune station ne correspond au filtre sélectionné
+                    </div>
+                  )}
+                </>
               ) : (
                 <div
                   className={`w-full h-[calc(100vh-200px)] rounded-lg overflow-hidden transition-opacity duration-300 ${
