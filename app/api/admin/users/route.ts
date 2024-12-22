@@ -11,11 +11,7 @@ export async function GET() {
       return new NextResponse("Non autorisé", { status: 401 });
     }
 
-    const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (currentUser?.role !== "ADMIN") {
+    if (session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
       return new NextResponse("Non autorisé", { status: 403 });
     }
 

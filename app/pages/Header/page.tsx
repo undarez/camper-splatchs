@@ -131,35 +131,18 @@ const Header = () => {
                         <MenubarSeparator className="dark:bg-gray-700" />
                         <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                           <Link
-                            href="/pages/AdminStation/AdminPage"
+                            href="/pages/AdminStation"
                             className="flex w-full"
-                            onClick={() =>
-                              router.push("/pages/AdminStation/AdminPage")
-                            }
+                            onClick={() => router.push("/pages/AdminStation")}
                           >
                             Administration
                           </Link>
                         </MenubarItem>
                         <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                           <Link
-                            href="/pages/AdminStation/GestionStations"
+                            href="/pages/AdminUsers"
                             className="flex w-full"
-                            onClick={() =>
-                              router.push("/pages/AdminStation/GestionStations")
-                            }
-                          >
-                            Gestion des stations
-                          </Link>
-                        </MenubarItem>
-                        <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
-                          <Link
-                            href="/pages/AdminStation/GestionUtilisateurs"
-                            className="flex w-full"
-                            onClick={() =>
-                              router.push(
-                                "/pages/AdminStation/GestionUtilisateurs"
-                              )
-                            }
+                            onClick={() => router.push("/pages/AdminUsers")}
                           >
                             Gestion des utilisateurs
                           </Link>

@@ -41,16 +41,24 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch("/api/admin/users");
-        if (!response.ok)
-          throw new Error("Erreur lors du chargement des utilisateurs");
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(
+            errorData || "Erreur lors du chargement des utilisateurs"
+          );
+        }
         const data = await response.json();
         setUsers(data);
       } catch (error) {
         console.error("Erreur:", error);
         toast({
           title: "Erreur",
-          description: "Impossible de charger les utilisateurs",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Impossible de charger les utilisateurs",
           variant: "destructive",
         });
       } finally {
@@ -60,6 +68,8 @@ const AdminUsers = () => {
 
     if (session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
       fetchUsers();
+    } else {
+      setIsLoading(false);
     }
   }, [session]);
 
