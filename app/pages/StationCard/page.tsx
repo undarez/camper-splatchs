@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Station, Review, Service } from "@prisma/client";
-import { StarIcon } from "@heroicons/react/24/solid";
+import { StarIcon, MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
-import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import GoogleAdsense from "@/app/components/GoogleAdsense";
 
@@ -161,6 +160,11 @@ const ValidatedStations = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const stationsPerPage = 6;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function fetchStations() {
@@ -230,11 +234,12 @@ const ValidatedStations = () => {
     <div className="relative min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="flex items-center gap-3 w-full md:w-auto">
               <Button
-                variant="ghost"
-                className="md:hidden"
+                variant="outline"
+                size="lg"
+                className="md:hidden p-3 hover:bg-gray-100 dark:hover:bg-gray-700"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               >
                 <AdjustmentsHorizontalIcon className="h-6 w-6" />
@@ -243,78 +248,120 @@ const ValidatedStations = () => {
                 Stations
               </h1>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ml-auto"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                <SunIcon className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <MoonIcon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Changer le thème</span>
-              </Button>
+              {mounted && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="relative w-10 h-10 rounded-full overflow-hidden transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div
+                      className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
+                        theme === "dark"
+                          ? "translate-y-0 opacity-100"
+                          : "translate-y-full opacity-0"
+                      }`}
+                    >
+                      <MoonIcon className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div
+                      className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
+                        theme === "dark"
+                          ? "-translate-y-full opacity-0"
+                          : "translate-y-0 opacity-100"
+                      }`}
+                    >
+                      <SunIcon className="h-5 w-5 text-yellow-500" />
+                    </div>
+                  </div>
+                  <span className="sr-only">
+                    {theme === "dark"
+                      ? "Passer en mode clair"
+                      : "Passer en mode sombre"}
+                  </span>
+                </Button>
+              )}
             </div>
 
             <div
               className={`
-                fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out z-50
+                fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out z-50
                 md:relative md:transform-none md:w-auto md:h-auto md:shadow-none md:bg-transparent md:dark:bg-transparent
                 ${
                   isSidebarOpen
                     ? "translate-x-0"
-                    : "-translate-x-full md:translate-x-0"
+                    : "translate-x-full md:translate-x-0"
                 }
               `}
             >
-              <div className="flex flex-col md:flex-row gap-4 p-4 md:p-0">
-                <div className="flex items-center justify-between md:hidden mb-4">
-                  <h2 className="text-lg font-semibold">Filtres</h2>
+              <div className="flex flex-col gap-6 p-6 md:p-0">
+                <div className="flex items-center justify-between md:hidden">
+                  <h2 className="text-xl font-semibold">Filtres</h2>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsSidebarOpen(false)}
                   >
-                    <XMarkIcon className="h-5 w-5" />
+                    <XMarkIcon className="h-6 w-6" />
                   </Button>
                 </div>
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Filtrer par statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous les statuts</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="en_attente">En attente</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex flex-col md:flex-row gap-4 w-full">
+                  <div className="w-full md:w-auto">
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
+                      <SelectTrigger className="w-full md:w-[200px] h-12 text-lg bg-white dark:bg-gray-800 border-2 hover:border-blue-500 transition-colors">
+                        <SelectValue placeholder="Filtrer par statut" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all" className="text-base py-3">
+                          Tous les statuts
+                        </SelectItem>
+                        <SelectItem value="active" className="text-base py-3">
+                          Active
+                        </SelectItem>
+                        <SelectItem
+                          value="en_attente"
+                          className="text-base py-3"
+                        >
+                          En attente
+                        </SelectItem>
+                        <SelectItem value="inactive" className="text-base py-3">
+                          Inactive
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
-                  <Button
-                    onClick={() => setViewMode("cards")}
-                    variant={viewMode === "cards" ? "default" : "ghost"}
-                    className={`flex items-center gap-2 transition-all duration-200 ${
-                      viewMode === "cards"
-                        ? "shadow-md transform scale-105"
-                        : "hover:bg-white/50 dark:hover:bg-gray-600/50"
-                    }`}
-                  >
-                    <ViewColumnsIcon className="h-5 w-5" />
-                    Vue cartes
-                  </Button>
-                  <Button
-                    onClick={() => setViewMode("map")}
-                    variant={viewMode === "map" ? "default" : "ghost"}
-                    className={`flex items-center gap-2 transition-all duration-200 ${
-                      viewMode === "map"
-                        ? "shadow-md transform scale-105"
-                        : "hover:bg-white/50 dark:hover:bg-gray-600/50"
-                    }`}
-                  >
-                    <MapIcon className="h-5 w-5" />
-                    Vue carte
-                  </Button>
+                  <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg">
+                    <Button
+                      onClick={() => setViewMode("cards")}
+                      variant={viewMode === "cards" ? "default" : "ghost"}
+                      className={`flex-1 md:flex-none items-center gap-2 h-12 text-lg transition-all duration-200 ${
+                        viewMode === "cards"
+                          ? "shadow-md transform scale-105 bg-white dark:bg-gray-800"
+                          : "hover:bg-white/50 dark:hover:bg-gray-600/50"
+                      }`}
+                    >
+                      <ViewColumnsIcon className="h-5 w-5" />
+                      <span className="hidden md:inline">Vue cartes</span>
+                    </Button>
+                    <Button
+                      onClick={() => setViewMode("map")}
+                      variant={viewMode === "map" ? "default" : "ghost"}
+                      className={`flex-1 md:flex-none items-center gap-2 h-12 text-lg transition-all duration-200 ${
+                        viewMode === "map"
+                          ? "shadow-md transform scale-105 bg-white dark:bg-gray-800"
+                          : "hover:bg-white/50 dark:hover:bg-gray-600/50"
+                      }`}
+                    >
+                      <MapIcon className="h-5 w-5" />
+                      <span className="hidden md:inline">Vue carte</span>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -330,7 +377,6 @@ const ValidatedStations = () => {
           />
         </div>
 
-        {/* Overlay pour la sidebar mobile */}
         {isSidebarOpen && (
           <button
             className="fixed inset-0 bg-black/50 z-40 md:hidden cursor-pointer"
