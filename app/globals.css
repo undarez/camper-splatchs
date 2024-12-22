@@ -607,3 +607,61 @@
   min-height: inherit;
   display: block;
 }
+
+/* Styles pour le bouton de thème */
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(42px);
+  }
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(42px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.theme-toggle {
+  position: relative;
+  width: 82px;
+  height: 40px;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-thumb[data-state='checked'] {
+  transform: translateX(42px);
+}
+
+.theme-toggle-thumb[data-state='unchecked'] {
+  transform: translateX(0);
+}
+
+/* Animation des icônes */
+.theme-toggle-icon {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle[data-state='checked'] .theme-toggle-icon {
+  transform: rotate(360deg);
+}
+
+.theme-toggle[data-state='unchecked'] .theme-toggle-icon {
+  transform: rotate(0deg);
+}

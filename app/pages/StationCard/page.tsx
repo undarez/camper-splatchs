@@ -5,7 +5,7 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
-  AdjustmentsHorizontalIcon,
+  Bars3Icon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -238,18 +238,13 @@ const ValidatedStations = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="relative min-h-screen">
+      <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <div
-          className={`
-            fixed md:relative inset-y-0 left-0 w-64 bg-white/90 dark:bg-gray-800/90 shadow-lg transform transition-all duration-300 ease-in-out z-50 md:z-10 backdrop-blur-sm
-            ${
-              isSidebarOpen
-                ? "translate-x-0"
-                : "-translate-x-full md:translate-x-0"
-            }
-          `}
+          className={`fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:relative md:translate-x-0`}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-6 md:hidden">
@@ -327,30 +322,56 @@ const ValidatedStations = () => {
           </div>
         </div>
 
-        {/* Contenu principal */}
-        <div className="flex-1 md:ml-64">
-          {/* Header mobile */}
-          <div className="md:hidden bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-sm p-4 mb-6 mx-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-700 dark:text-gray-300 min-w-[40px]"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              >
-                <AdjustmentsHorizontalIcon className="h-5 w-5" />
-              </Button>
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                Stations
-              </h1>
-            </div>
-          </div>
+        {/* Overlay pour mobile */}
+        {isSidebarOpen && (
+          <button
+            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Fermer la sidebar"
+          />
+        )}
 
-          {/* Contenu */}
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            {viewMode === "cards" ? (
-              <div className="container mx-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+        {/* Contenu principal */}
+        <main className="flex-1 min-h-screen">
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="flex justify-between items-center mb-6">
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                aria-label={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              >
+                <Bars3Icon className="h-6 w-6" />
+              </button>
+              <div className="flex gap-4 ml-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewMode("cards")}
+                  className={
+                    viewMode === "cards" ? "bg-primary text-white" : ""
+                  }
+                >
+                  Vue cartes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewMode("map")}
+                  className={viewMode === "map" ? "bg-primary text-white" : ""}
+                >
+                  Vue carte
+                </Button>
+              </div>
+            </div>
+
+            {/* Contenu de la vue */}
+            <div
+              className={`w-full transition-all duration-300 ${
+                isSidebarOpen ? "md:pl-4" : ""
+              }`}
+            >
+              {viewMode === "cards" ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
                   {currentStations.map((station) => (
                     <div
                       className="w-full max-w-sm transform transition-all duration-200 hover:scale-[1.02]"
@@ -360,69 +381,18 @@ const ValidatedStations = () => {
                     </div>
                   ))}
                 </div>
-              </div>
-            ) : (
-              <div className="container mx-auto">
+              ) : (
                 <div
-                  className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden transition-all duration-300 ${
+                  className={`w-full h-[calc(100vh-200px)] rounded-lg overflow-hidden transition-opacity duration-300 ${
                     isSidebarOpen ? "opacity-0 md:opacity-100" : "opacity-100"
                   }`}
                 >
-                  <div
-                    className={`aspect-[16/9] w-full rounded-lg overflow-hidden relative ${
-                      isSidebarOpen
-                        ? "pointer-events-none md:pointer-events-auto"
-                        : "pointer-events-auto"
-                    }`}
-                  >
-                    <div className="absolute inset-0">
-                      <MapView
-                        stations={filteredStations as unknown as Station[]}
-                      />
-                    </div>
-                  </div>
+                  <MapView stations={stations} />
                 </div>
-              </div>
-            )}
-
-            {filteredStations.length === 0 ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg">
-                Aucune station ne correspond au filtre sélectionné
-              </div>
-            ) : (
-              <div className="flex justify-center mt-8 gap-2">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <Button
-                    key={i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                    variant={currentPage === i + 1 ? "default" : "outline"}
-                    className={`transition-all duration-200 ${
-                      currentPage === i + 1
-                        ? "bg-blue-500 dark:bg-blue-600 text-white transform scale-105 shadow-lg"
-                        : "hover:bg-blue-50 dark:hover:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
-                    }`}
-                  >
-                    {i + 1}
-                  </Button>
-                ))}
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-
-        {/* Overlay pour la sidebar mobile */}
-        {isSidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") setIsSidebarOpen(false);
-            }}
-            aria-label="Fermer le menu"
-          />
-        )}
+        </main>
       </div>
     </div>
   );

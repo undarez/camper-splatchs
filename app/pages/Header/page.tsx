@@ -55,15 +55,18 @@ const Header = () => {
               onPressedChange={(pressed) =>
                 setTheme(pressed ? "dark" : "light")
               }
-              className="relative overflow-hidden group bg-white/10 hover:bg-white/20 dark:bg-gray-800/20 dark:hover:bg-gray-800/40 border-none"
+              className="theme-toggle bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800"
             >
-              <div className="relative z-10 p-2">
-                {theme === "dark" ? (
-                  <MoonIcon className="h-5 w-5 text-yellow-300 transform transition-transform duration-500 rotate-[360deg]" />
-                ) : (
-                  <SunIcon className="h-5 w-5 text-yellow-500 transform transition-transform duration-500 rotate-[360deg]" />
-                )}
+              <div className="theme-toggle-thumb bg-blue-500 dark:bg-gray-800">
+                <div className="absolute inset-0 flex items-center justify-center theme-toggle-icon">
+                  {theme === "dark" ? (
+                    <MoonIcon className="h-5 w-5 text-white" />
+                  ) : (
+                    <SunIcon className="h-5 w-5 text-white" />
+                  )}
+                </div>
               </div>
+              <span className="sr-only">Toggle theme</span>
             </Toggle>
 
             <MenubarMenu>
