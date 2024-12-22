@@ -519,28 +519,46 @@
   border-radius: 0.5rem !important;
   border: 1px solid #e2e8f0 !important;
   background-color: white !important;
+  color: #1a1a1a !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
   position: relative !important;
 }
 
+.dark .geoapify-autocomplete-input {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
 .geoapify-autocomplete-items {
-  position: absolute !important;
   background: white !important;
-  border-radius: 0.5rem !important;
   border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-  margin-top: 4px !important;
-  z-index: 9999 !important;
-  width: 100% !important;
+  border-radius: 0.5rem !important;
+  margin-top: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.dark .geoapify-autocomplete-items {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
 }
 
 .geoapify-autocomplete-item {
   padding: 0.75rem !important;
   cursor: pointer !important;
+  color: #1a1a1a !important;
+}
+
+.dark .geoapify-autocomplete-item {
+  color: #e5e7eb !important;
 }
 
 .geoapify-autocomplete-item:hover {
-  background-color: #f8fafc !important;
+  background-color: #f3f4f6 !important;
+}
+
+.dark .geoapify-autocomplete-item:hover {
+  background-color: #374151 !important;
 }
 
 /* Style pour le bouton burger */

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Station, Review, Service } from "@prisma/client";
+import { Station, Review, Service, PaymentMethod } from "@prisma/client";
 import { StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
@@ -12,7 +12,6 @@ import Link from "next/link";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import ConnectYou from "../auth/connect-you/page";
 import { useSession } from "next-auth/react";
-import NavigationButton from "../MapComponent/NavigationGpsButton/NavigationButtonWrapper";
 import dynamic from "next/dynamic";
 import { Button } from "@/app/components/ui/button";
 import {
@@ -49,100 +48,117 @@ const serviceLabels: { [key: string]: { [key: string]: string } } = {
   },
 };
 
-const renderServiceValue = (
-  key: string,
-  value: string | boolean | string[]
-) => {
-  if (key === "highPressure") {
-    return serviceLabels.highPressure[value as string] || value;
-  }
-  if (key === "electricity") {
-    return serviceLabels.electricity[value as string] || value;
-  }
-  if (key === "paymentMethods" && Array.isArray(value)) {
-    return value
-      .map((method) => {
-        switch (method) {
-          case "JETON":
-            return "Jeton";
-          case "ESPECES":
-            return "Espèces";
-          case "CARTE_BANCAIRE":
-            return "Carte bancaire";
-          default:
-            return method;
-        }
-      })
-      .join(", ");
-  }
-  return value ? "✓" : "✗";
-};
+type ServiceValueType =
+  | string
+  | number
+  | boolean
+  | Date
+  | PaymentMethod[]
+  | null
+  | undefined;
 
 const StationCard = ({ station }: { station: StationWithDetails }) => {
-  const { status } = useSession();
-  const averageRating = station.reviews?.length
-    ? station.reviews.reduce((acc, review) => acc + review.rating, 0) /
-      station.reviews.length
-    : 0;
+  const { data: session } = useSession();
 
-  if (status === "unauthenticated") {
-    return <ConnectYou />;
-  }
+  if (!station) return null;
 
-  if (status === "loading") {
-    return <Skeleton className="h-[200px] rounded-lg" />;
-  }
+  const renderValue = (key: string, value: ServiceValueType): string => {
+    if (value === null || value === undefined) return "";
+
+    switch (key) {
+      case "highPressure":
+        return serviceLabels.highPressure[value as string] || String(value);
+      case "electricity":
+        return serviceLabels.electricity[value as string] || String(value);
+      case "paymentMethods":
+        if (Array.isArray(value)) {
+          return value
+            .map((method) => {
+              switch (method) {
+                case "JETON":
+                  return "Jeton";
+                case "ESPECES":
+                  return "Espèces";
+                case "CARTE_BANCAIRE":
+                  return "Carte bancaire";
+                default:
+                  return method;
+              }
+            })
+            .join(", ");
+        }
+        return String(value);
+      default:
+        return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
+    }
+  };
 
   return (
-    <Link href={`/pages/StationDetail/${station.id}`}>
-      <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4">
-        <h3 className="text-xl font-bold mb-2">{station.name}</h3>
-        <p className="text-gray-600 mb-4">{station.address}</p>
-
-        <div className="services mb-4">
-          <h4 className="font-semibold mb-2">Services disponibles:</h4>
-          <div className="grid grid-cols-1 gap-2">
-            {Object.entries(station.services).map(
-              ([key, value]) =>
-                key !== "id" &&
-                key !== "stationId" && (
-                  <span key={key} className="text-sm">
-                    <span className="font-medium">{key}: </span>
-                    <span className="text-green-600">
-                      {renderServiceValue(
-                        key,
-                        value as string | boolean | string[]
-                      )}
-                    </span>
-                  </span>
-                )
-            )}
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <div className="p-4">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            {station.address}
+          </h3>
+          <div className="flex items-center gap-1">
+            {[...Array(5)].map((_, i) => (
+              <StarIcon
+                key={i}
+                className={`h-5 w-5 ${
+                  i < (station.averageRating || 0)
+                    ? "text-yellow-400"
+                    : "text-gray-300 dark:text-gray-600"
+                }`}
+              />
+            ))}
+            <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+              ({station.reviews?.length || 0} avis)
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <StarIcon
-              key={star}
-              className={`h-5 w-5 ${
-                star <= averageRating ? "text-yellow-400" : "text-gray-300"
-              }`}
-            />
-          ))}
-          <span className="ml-2 text-sm text-gray-600">
-            ({station.reviews?.length || 0} avis)
-          </span>
+        <div className="space-y-2 text-gray-700 dark:text-gray-200">
+          {station.services &&
+            Object.entries(station.services).map(([key, value]) => {
+              if (key === "id" || key === "stationId") return null;
+              const displayValue = renderValue(key, value);
+              return (
+                <div key={key} className="flex items-center gap-2">
+                  <span
+                    className={`${
+                      typeof value === "boolean"
+                        ? value
+                          ? "text-green-500"
+                          : "text-red-500"
+                        : ""
+                    }`}
+                  >
+                    {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
+                  </span>
+                  <span className="text-gray-800 dark:text-gray-200">
+                    {displayValue}
+                  </span>
+                </div>
+              );
+            })}
         </div>
 
-        <div className="mt-4">
-          <NavigationButton
-            lat={station.latitude}
-            lng={station.longitude}
-            address={station.address}
-          />
+        <div className="mt-4 flex justify-end">
+          {session ? (
+            <Link href={`/pages/station/${station.id}`}>
+              <Button
+                className="bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700"
+                size="sm"
+              >
+                Y aller
+              </Button>
+            </Link>
+          ) : (
+            <ConnectYou />
+          )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 
@@ -339,8 +355,18 @@ const ValidatedStations = () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-800/50 rounded-xl shadow-lg overflow-hidden">
-                <div className="h-[50vh] md:h-[calc(100vh-200px)] w-full rounded-lg overflow-hidden relative">
+              <div
+                className={`bg-white dark:bg-gray-800/50 rounded-xl shadow-lg overflow-hidden transition-opacity duration-300 ${
+                  isSidebarOpen ? "opacity-0 md:opacity-100" : "opacity-100"
+                }`}
+              >
+                <div
+                  className={`h-[50vh] md:h-[calc(100vh-200px)] w-full rounded-lg overflow-hidden relative ${
+                    isSidebarOpen
+                      ? "pointer-events-none md:pointer-events-auto"
+                      : "pointer-events-auto"
+                  }`}
+                >
                   <div className="absolute inset-0">
                     <MapView
                       stations={filteredStations as unknown as Station[]}
