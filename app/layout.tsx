@@ -8,7 +8,7 @@ import ClientLayout from "@/app/components/Loader/ClientLayout/page";
 import MobileSidebar from "@/app/pages/mobile-sidebar/page";
 import SessionWrapper from "@/app/components/SessionWrapper";
 import { Toaster } from "./components/ui/toaster";
-import { ThemeProvider } from "@/app/components/theme-provider/page";
+import { ThemeProvider } from "@/app/components/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
