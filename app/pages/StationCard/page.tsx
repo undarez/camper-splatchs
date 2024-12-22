@@ -301,26 +301,26 @@ const ValidatedStations = () => {
                 <Button
                   onClick={() => setViewMode("cards")}
                   variant={viewMode === "cards" ? "default" : "ghost"}
-                  className={`justify-start ${
+                  className={`justify-start w-full ${
                     viewMode === "cards"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      : "text-gray-600 dark:text-gray-400"
+                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
                   }`}
                 >
                   <ViewColumnsIcon className="h-4 w-4 mr-2" />
-                  Vue cartes
+                  <span className="flex-1">Vue cartes</span>
                 </Button>
                 <Button
                   onClick={() => setViewMode("map")}
                   variant={viewMode === "map" ? "default" : "ghost"}
-                  className={`justify-start ${
+                  className={`justify-start w-full ${
                     viewMode === "map"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      : "text-gray-600 dark:text-gray-400"
+                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
                   }`}
                 >
                   <MapIcon className="h-4 w-4 mr-2" />
-                  Vue carte
+                  <span className="flex-1">Vue carte</span>
                 </Button>
               </div>
             </div>
@@ -349,33 +349,37 @@ const ValidatedStations = () => {
           {/* Contenu */}
           <div className="max-w-7xl mx-auto px-4 py-6">
             {viewMode === "cards" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {currentStations.map((station) => (
-                  <div
-                    className="transform transition-all duration-200 hover:scale-[1.02]"
-                    key={station.id}
-                  >
-                    <StationCard station={station} />
-                  </div>
-                ))}
+              <div className="container mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+                  {currentStations.map((station) => (
+                    <div
+                      className="w-full max-w-sm transform transition-all duration-200 hover:scale-[1.02]"
+                      key={station.id}
+                    >
+                      <StationCard station={station} />
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div
-                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden transition-all duration-300 ${
-                  isSidebarOpen ? "opacity-0 md:opacity-100" : "opacity-100"
-                }`}
-              >
+              <div className="container mx-auto">
                 <div
-                  className={`h-[60vh] md:h-[calc(100vh-200px)] w-full rounded-lg overflow-hidden relative ${
-                    isSidebarOpen
-                      ? "pointer-events-none md:pointer-events-auto"
-                      : "pointer-events-auto"
+                  className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden transition-all duration-300 ${
+                    isSidebarOpen ? "opacity-0 md:opacity-100" : "opacity-100"
                   }`}
                 >
-                  <div className="absolute inset-0">
-                    <MapView
-                      stations={filteredStations as unknown as Station[]}
-                    />
+                  <div
+                    className={`aspect-[16/9] w-full rounded-lg overflow-hidden relative ${
+                      isSidebarOpen
+                        ? "pointer-events-none md:pointer-events-auto"
+                        : "pointer-events-auto"
+                    }`}
+                  >
+                    <div className="absolute inset-0">
+                      <MapView
+                        stations={filteredStations as unknown as Station[]}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
