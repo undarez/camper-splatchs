@@ -55,16 +55,17 @@ const Header = () => {
               onPressedChange={(pressed) =>
                 setTheme(pressed ? "dark" : "light")
               }
-              className="relative overflow-hidden group bg-white/10 hover:bg-white/20 dark:bg-gray-800/20 dark:hover:bg-gray-800/40 transition-colors border-none"
+              className="relative overflow-hidden group bg-white/10 hover:bg-white/20 dark:bg-gray-800/20 dark:hover:bg-gray-800/40 transition-all duration-300 ease-in-out border-none"
             >
-              <div className="relative z-10 p-2 transition-transform duration-300 ease-in-out group-hover:scale-110">
+              <div className="relative z-10 p-2 transition-all duration-500 ease-in-out transform group-hover:scale-110">
                 {theme === "dark" ? (
-                  <MoonIcon className="h-5 w-5 text-blue-400 dark:text-yellow-300 transition-transform rotate-90 scale-100" />
+                  <MoonIcon className="h-5 w-5 text-yellow-300 transition-all duration-500 ease-in-out transform rotate-0 scale-100" />
                 ) : (
-                  <SunIcon className="h-5 w-5 text-yellow-500 transition-transform rotate-0 scale-100" />
+                  <SunIcon className="h-5 w-5 text-yellow-500 transition-all duration-500 ease-in-out transform rotate-90 scale-100" />
                 )}
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-blue-500 to-purple-600 opacity-0 group-hover:opacity-20 transition-opacity" />
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-blue-500 to-purple-600 opacity-0 group-hover:opacity-20 transition-opacity duration-500 ease-in-out" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-600 to-yellow-400 opacity-0 group-hover:opacity-20 transition-opacity duration-500 ease-in-out animate-pulse" />
             </Toggle>
 
             <MenubarMenu>
