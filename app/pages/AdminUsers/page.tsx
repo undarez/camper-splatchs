@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,16 +10,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/app/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+} from "@/app/components/ui/select";
+import { Input } from "@/app/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import ConnectYou from "../auth/connect-you/page";
 
 interface User {
@@ -48,7 +48,11 @@ const AdminUsers = () => {
         setUsers(data);
       } catch (error) {
         console.error("Erreur:", error);
-        toast.error("Impossible de charger les utilisateurs");
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les utilisateurs",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -95,10 +99,17 @@ const AdminUsers = () => {
         )
       );
 
-      toast.success("Rôle modifié avec succès");
+      toast({
+        title: "Succès",
+        description: "Rôle modifié avec succès",
+      });
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Impossible de modifier le rôle");
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier le rôle",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -117,10 +128,17 @@ const AdminUsers = () => {
       if (!response.ok) throw new Error("Erreur lors de la suppression");
 
       setUsers(users.filter((user) => user.id !== userId));
-      toast.success("Utilisateur supprimé avec succès");
+      toast({
+        title: "Succès",
+        description: "Utilisateur supprimé avec succès",
+      });
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Impossible de supprimer l'utilisateur");
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'utilisateur",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

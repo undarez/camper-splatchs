@@ -1,8 +1,8 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
+import { Button } from "@/app/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";

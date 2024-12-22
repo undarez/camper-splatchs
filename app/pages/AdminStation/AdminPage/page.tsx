@@ -1,7 +1,12 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/app/components/ui/tabs";
 import AdminDashboard from "@/app/pages/AdminStation/AdminDashboard/page";
 import PendingStations from "@/app/pages/AdressGeoapify/PendingStations/page";
 import { redirect, useRouter } from "next/navigation";

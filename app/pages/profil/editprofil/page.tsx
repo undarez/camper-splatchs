@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { toast } from "@/hooks/use-toast";
 
 const EditProfilePage = () => {
   const router = useRouter();
@@ -55,11 +55,18 @@ const EditProfilePage = () => {
         },
       });
 
-      toast.success("Profil mis à jour avec succès");
+      toast({
+        title: "Succès",
+        description: "Profil mis à jour avec succès",
+      });
       window.location.href = "/pages/profil";
     } catch (error) {
       console.error("Erreur lors de la mise à jour du profil", error);
-      toast.error("Erreur lors de la mise à jour du profil");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la mise à jour du profil",
+        variant: "destructive",
+      });
     }
   };
 

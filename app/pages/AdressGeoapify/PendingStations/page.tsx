@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { CamperWashStation } from "@/app/types";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Button } from "@/app/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/app/components/ui/badge";
 import { Loader2, MapPin, Check, X } from "lucide-react";
 import {
   Card,
@@ -13,7 +13,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/app/components/ui/card";
 
 const PendingStations = () => {
   const [stations, setStations] = useState<CamperWashStation[]>([]);
@@ -33,7 +33,11 @@ const PendingStations = () => {
       );
     } catch (error) {
       console.error("Erreur lors du chargement des stations", error);
-      toast.error("Erreur lors du chargement des stations");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du chargement des stations",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -56,14 +60,20 @@ const PendingStations = () => {
       if (!response.ok) throw new Error();
 
       await fetchPendingStations();
-      toast.success(
-        newStatus === "active"
-          ? "Station validée avec succès"
-          : "Station marquée comme inactive"
-      );
+      toast({
+        title: "Succès",
+        description:
+          newStatus === "active"
+            ? "Station validée avec succès"
+            : "Station marquée comme inactive",
+      });
     } catch (error) {
       console.error("Erreur lors de la mise à jour", error);
-      toast.error("Erreur lors de la mise à jour");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la mise à jour",
+        variant: "destructive",
+      });
     }
   };
 
@@ -78,10 +88,17 @@ const PendingStations = () => {
       if (!response.ok) throw new Error();
 
       await fetchPendingStations();
-      toast.success("Station supprimée avec succès");
+      toast({
+        title: "Succès",
+        description: "Station supprimée avec succès",
+      });
     } catch (error) {
       console.error("Erreur lors de la suppression", error);
-      toast.error("Erreur lors de la suppression");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression",
+        variant: "destructive",
+      });
     }
   };
 

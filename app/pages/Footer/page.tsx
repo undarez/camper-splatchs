@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { Mail, Facebook, Twitter, Instagram } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/app/components/ui/separator";
+import { Input } from "@/app/components/ui/input";
+import { Card, CardContent } from "@/app/components/ui/card";
 const Footer = () => {
   const handleMailTo = () => {
     window.location.href = "/pages/Contact";

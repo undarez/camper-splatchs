@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { Station, Review, Service } from "@prisma/client";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Carousel } from "@/components/ui/carousel";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
+import { Carousel } from "@/app/components/ui/carousel";
+import { Badge } from "@/app/components/ui/badge";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";

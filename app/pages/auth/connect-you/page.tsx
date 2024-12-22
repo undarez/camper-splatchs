@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/app/components/ui/card";
 import { LockIcon } from "lucide-react";
 import { AuthForm } from "@/app/components/AuthForm";
 

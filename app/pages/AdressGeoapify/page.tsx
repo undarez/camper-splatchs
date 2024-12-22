@@ -17,10 +17,10 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/app/components/ui/form";
 import { GeoapifyResult } from "@/app/types/typesGeoapify";
 import { CamperWashStation } from "@/app/types";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/app/components/ui/input";
 
 // Dynamic loading of the map
 const Map = dynamic(

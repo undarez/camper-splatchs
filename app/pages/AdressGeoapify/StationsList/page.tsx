@@ -2,21 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { CamperWashStation, SERVICE_LABELS } from "@/app/types";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import { useSession } from "next-auth/react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButtonWrapper";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/app/components/ui/badge";
 import { Loader2, MapPin, Search, SlidersHorizontal } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/app/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/app/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -24,9 +24,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+} from "@/app/components/ui/sheet";
+import { Checkbox } from "@/app/components/ui/checkbox";
+import { Label } from "@/app/components/ui/label";
 
 type Filters = {
   search: string;
@@ -70,7 +70,11 @@ const StationsList = ({ adminView = false }: StationsListProps) => {
       setStations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Erreur lors du chargement des stations", error);
-      toast.error("Erreur lors du chargement des stations");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du chargement des stations",
+        variant: "destructive",
+      });
       setStations([]);
     } finally {
       setLoading(false);
@@ -92,10 +96,17 @@ const StationsList = ({ adminView = false }: StationsListProps) => {
       if (!response.ok) throw new Error();
 
       await fetchStations();
-      toast.success("Station supprimée avec succès");
+      toast({
+        title: "Succès",
+        description: "Station supprimée avec succès",
+      });
     } catch (error) {
       console.error("Erreur lors de la suppression", error);
-      toast.error("Erreur lors de la suppression");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression",
+        variant: "destructive",
+      });
     }
   };
 

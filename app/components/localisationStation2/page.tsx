@@ -6,8 +6,8 @@ import { useSession } from "next-auth/react";
 import LoadingMap from "@/app/pages/MapComponent/LoadingMap/page";
 import { CamperWashStation, GeoapifyResult } from "@/app/types";
 import AddStationModal from "@/app/pages/MapComponent/AddStation_modal/AddStationModal";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Button } from "@/app/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 import ConnectYou from "@/app/pages/auth/connect-you/page";
 import {
   Select,
@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/app/components/ui/select";
 import {
   GeoapifyContext,
   GeoapifyGeocoderAutocomplete,
@@ -69,7 +69,11 @@ const LocalisationStation = () => {
         }
       } catch (error) {
         console.error("Erreur:", error);
-        toast.error("Impossible de charger les stations");
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les stations",
+          variant: "destructive",
+        });
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +90,11 @@ const LocalisationStation = () => {
         !selectedLocation?.properties?.lat ||
         !selectedLocation?.properties?.lon
       ) {
-        toast.error("Les coordonnées de la station sont manquantes");
+        toast({
+          title: "Erreur",
+          description: "Les coordonnées de la station sont manquantes",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -119,12 +127,19 @@ const LocalisationStation = () => {
 
       const newStation = await response.json();
       setExistingLocations((prev) => [newStation, ...prev]);
-      toast.success("Station ajoutée avec succès");
+      toast({
+        title: "Succès",
+        description: "Station ajoutée avec succès",
+      });
       setIsModalOpen(false);
       setMapKey((prev) => prev + 1);
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Impossible d'ajouter la station");
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la station",
+        variant: "destructive",
+      });
     }
   };
 

@@ -2,7 +2,7 @@
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Menubar,
   MenubarContent,
@@ -10,7 +10,7 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarTrigger,
-} from "@/components/ui/menubar";
+} from "@/app/components/ui/menubar";
 import { useRouter } from "next/navigation";
 const Header = () => {
   const { data: session } = useSession();

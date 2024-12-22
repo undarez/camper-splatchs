@@ -4,7 +4,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,9 +12,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
+} from "@/app/components/ui/form";
+import { Input } from "@/app/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
 const formSchema = z
@@ -75,10 +75,12 @@ export function SignUpForm() {
 
       toast({
         title: "Inscription réussie!",
-        description: data.message || "Vous pouvez maintenant vous connecter.",
+        description:
+          "Veuillez vérifier votre email pour activer votre compte. Un lien de vérification vous a été envoyé.",
+        duration: 6000,
       });
 
-      router.push("/signin");
+      router.push("/signin?registered=true");
     } catch (error) {
       console.error("Erreur détaillée:", error);
       toast({

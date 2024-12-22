@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/app/components/ui/button";
 import {
   Table,
   TableBody,
@@ -10,9 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+} from "@/app/components/ui/table";
+import { Badge } from "@/app/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 import { CamperWashStation } from "@/app/types";
 
 const AdminStations = () => {
@@ -31,7 +31,11 @@ const AdminStations = () => {
       setStations(data);
     } catch (error) {
       console.error("Erreur lors du chargement des stations", error);
-      toast.error("Erreur lors du chargement des stations");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du chargement des stations",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -48,10 +52,17 @@ const AdminStations = () => {
       if (!response.ok) throw new Error("Erreur lors de la mise à jour");
 
       await fetchStations();
-      toast.success("Statut mis à jour avec succès");
+      toast({
+        title: "Succès",
+        description: "Statut mis à jour avec succès",
+      });
     } catch (error) {
       console.error("Erreur lors de la mise à jour du statut", error);
-      toast.error("Erreur lors de la mise à jour du statut");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la mise à jour du statut",
+        variant: "destructive",
+      });
     }
   };
 
@@ -66,10 +77,17 @@ const AdminStations = () => {
       if (!response.ok) throw new Error("Erreur lors de la suppression");
 
       await fetchStations();
-      toast.success("Station supprimée avec succès");
+      toast({
+        title: "Succès",
+        description: "Station supprimée avec succès",
+      });
     } catch (error) {
       console.error("Erreur lors de la suppression de la station", error);
-      toast.error("Erreur lors de la suppression de la station");
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la suppression de la station",
+        variant: "destructive",
+      });
     }
   };
 
