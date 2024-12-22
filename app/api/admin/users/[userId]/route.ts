@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
+import { authOptions } from "@/lib/AuthOptions";
 
 export async function PATCH(
   request: Request,
   { params }: { params: { userId: string } }
 ) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (
       !session?.user?.email ||
@@ -19,9 +20,24 @@ export async function PATCH(
     const body = await request.json();
     const { role } = body;
 
+    if (!["USER", "ADMIN"].includes(role)) {
+      return new NextResponse("Rôle invalide", { status: 400 });
+    }
+
     const updatedUser = await prisma.user.update({
-      where: { id: params.userId },
-      data: { role },
+      where: {
+        id: params.userId,
+      },
+      data: {
+        role: role,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
     });
 
     return NextResponse.json(updatedUser);
@@ -36,7 +52,7 @@ export async function DELETE(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     if (
       !session?.user?.email ||
@@ -46,7 +62,9 @@ export async function DELETE(
     }
 
     await prisma.user.delete({
-      where: { id: params.userId },
+      where: {
+        id: params.userId,
+      },
     });
 
     return new NextResponse(null, { status: 204 });

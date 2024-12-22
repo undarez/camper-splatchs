@@ -96,18 +96,19 @@ const AdminUsers = () => {
       setIsLoading(true);
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role: newRole.toUpperCase() }),
       });
 
-      if (!response.ok)
-        throw new Error("Erreur lors de la modification du rôle");
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || "Erreur lors de la modification du rôle");
+      }
 
-      setUsers(
-        users.map((user) =>
-          user.id === userId ? { ...user, role: newRole } : user
-        )
-      );
+      const updatedUser = await response.json();
+      setUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
 
       toast({
         title: "Succès",
@@ -117,7 +118,10 @@ const AdminUsers = () => {
       console.error("Erreur:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de modifier le rôle",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Impossible de modifier le rôle",
         variant: "destructive",
       });
     } finally {
@@ -214,7 +218,7 @@ const AdminUsers = () => {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <Select
-                    value={user.role}
+                    value={user.role.toLowerCase()}
                     onValueChange={(value) => handleRoleChange(user.id, value)}
                     disabled={isLoading}
                   >
