@@ -151,6 +151,7 @@ const ValidatedStations = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -159,20 +160,25 @@ const ValidatedStations = () => {
   useEffect(() => {
     async function fetchStations() {
       try {
+        setError(null);
         const response = await fetch("/api/traking_User_API");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         if (data.success) {
           setStations(data.stations);
           setTotalPages(Math.ceil(data.stations.length / stationsPerPage));
-          setLoading(false);
         } else {
-          console.error(
-            "Erreur lors de la récupération des stations:",
-            data.error
-          );
+          throw new Error(data.error || "Une erreur est survenue");
         }
       } catch (error) {
         console.error("Erreur lors de la récupération des stations:", error);
+        setError(
+          error instanceof Error ? error.message : "Une erreur est survenue"
+        );
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -194,6 +200,23 @@ const ValidatedStations = () => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-2">Erreur</h3>
+          <p>{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          >
+            Réessayer
+          </button>
+        </div>
       </div>
     );
   }
