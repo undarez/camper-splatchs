@@ -34,7 +34,7 @@ const Header = () => {
   }
 
   return (
-    <header className="w-full bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] shadow-xl">
+    <header className="w-full bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] dark:from-[#1B4B82] dark:to-[#0F2B4D] shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex-shrink-0 relative z-50">
@@ -55,11 +55,11 @@ const Header = () => {
               onPressedChange={(pressed) =>
                 setTheme(pressed ? "dark" : "light")
               }
-              className="relative overflow-hidden group bg-white/10 hover:bg-white/20 transition-colors border-none"
+              className="relative overflow-hidden group bg-white/10 hover:bg-white/20 dark:bg-gray-800/20 dark:hover:bg-gray-800/40 transition-colors border-none"
             >
               <div className="relative z-10 p-2 transition-transform duration-300 ease-in-out group-hover:scale-110">
                 {theme === "dark" ? (
-                  <MoonIcon className="h-5 w-5 text-blue-400 transition-transform rotate-90 scale-100" />
+                  <MoonIcon className="h-5 w-5 text-blue-400 dark:text-yellow-300 transition-transform rotate-90 scale-100" />
                 ) : (
                   <SunIcon className="h-5 w-5 text-yellow-500 transition-transform rotate-0 scale-100" />
                 )}
@@ -70,14 +70,14 @@ const Header = () => {
             <MenubarMenu>
               <MenubarTrigger asChild>
                 <Button
-                  className="font-mono text-lg text-white hover:text-[#FFD700] hover:bg-white/10 transition-colors"
+                  className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
                   variant="ghost"
                 >
                   Stations
                 </Button>
               </MenubarTrigger>
-              <MenubarContent className="bg-white/95 backdrop-blur-sm">
-                <MenubarItem>
+              <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                   <Link
                     href="/components/localisationStation2"
                     className="flex w-full"
@@ -85,8 +85,8 @@ const Header = () => {
                     Ajouter une station
                   </Link>
                 </MenubarItem>
-                <MenubarSeparator />
-                <MenubarItem>
+                <MenubarSeparator className="dark:bg-gray-700" />
+                <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                   <Link href="/pages/StationCard" className="flex w-full">
                     Stations lavage verifier
                   </Link>
@@ -96,14 +96,14 @@ const Header = () => {
             <MenubarMenu>
               <MenubarTrigger asChild>
                 <Button
-                  className="font-mono text-lg text-white hover:text-[#FFD700] hover:bg-white/10 transition-colors"
+                  className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
                   variant="ghost"
                 >
                   About
                 </Button>
               </MenubarTrigger>
-              <MenubarContent className="bg-white/95 backdrop-blur-sm">
-                <MenubarItem>
+              <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                   <Link href="/pages/About" className="flex w-full">
                     À propos
                   </Link>
@@ -114,22 +114,22 @@ const Header = () => {
               <MenubarMenu>
                 <MenubarTrigger asChild>
                   <Button
-                    className="font-mono text-lg text-white hover:text-[#FFD700] hover:bg-white/10 transition-colors"
+                    className="font-mono text-lg text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-colors"
                     variant="ghost"
                   >
                     {`Bienvenue, ${session.user?.name}`}
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-white/95 backdrop-blur-sm">
-                  <MenubarItem>
+                <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                     <Link href="/pages/profil" className="flex w-full">
                       Profil
                     </Link>
                   </MenubarItem>
                   {isAdmin && (
                     <>
-                      <MenubarSeparator />
-                      <MenubarItem>
+                      <MenubarSeparator className="dark:bg-gray-700" />
+                      <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700">
                         <Link
                           href="/pages/AdminStation/AdminPage"
                           className="flex w-full"
@@ -139,10 +139,10 @@ const Header = () => {
                       </MenubarItem>
                     </>
                   )}
-                  <MenubarSeparator />
+                  <MenubarSeparator className="dark:bg-gray-700" />
                   <MenubarItem
                     onClick={() => signOut()}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
                   >
                     Se déconnecter
                   </MenubarItem>
@@ -150,7 +150,7 @@ const Header = () => {
               </MenubarMenu>
             ) : (
               <Button
-                className="font-mono text-lg bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFC000] transition-colors"
+                className="font-mono text-lg bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFC000] dark:bg-[#FFD700] dark:text-[#0F2B4D] dark:hover:bg-[#FFC000] transition-colors"
                 onClick={() => router.push("/signin")}
               >
                 Se connecter

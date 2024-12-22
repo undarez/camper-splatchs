@@ -111,6 +111,7 @@
 @layer components {
   .leaflet-container {
     @apply w-full h-full rounded-lg overflow-hidden z-[1];
+    touch-action: pan-x pan-y;
   }
 
   .leaflet-popup-content-wrapper {
@@ -390,6 +391,40 @@
 
   .map-visible {
     @apply opacity-100 pointer-events-auto transition-opacity duration-300;
+  }
+
+  .leaflet-touch .leaflet-control-zoom {
+    @apply border border-gray-200 dark:border-gray-700 shadow-lg;
+  }
+
+  .leaflet-touch .leaflet-control-zoom-in,
+  .leaflet-touch .leaflet-control-zoom-out {
+    @apply bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300;
+  }
+
+  .leaflet-touch .leaflet-control-zoom-in:hover,
+  .leaflet-touch .leaflet-control-zoom-out:hover {
+    @apply bg-gray-100 dark:bg-gray-700;
+  }
+
+  .leaflet-control-attribution {
+    @apply bg-white/80 dark:bg-gray-800/80 text-xs;
+  }
+
+  /* Styles pour la carte en mode mobile */
+  @media (max-width: 768px) {
+    .leaflet-container {
+      height: 50vh !important;
+      min-height: 300px;
+    }
+
+    .leaflet-touch .leaflet-control-zoom {
+      @apply m-2;
+    }
+
+    .leaflet-control-attribution {
+      @apply text-[10px];
+    }
   }
 }
 
