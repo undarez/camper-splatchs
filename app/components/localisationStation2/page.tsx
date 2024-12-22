@@ -21,6 +21,7 @@ import {
   GeoapifyGeocoderAutocomplete,
 } from "@geoapify/react-geocoder-autocomplete";
 import "@geoapify/geocoder-autocomplete/styles/minimal.css";
+import GoogleAdsense from "@/app/components/GoogleAdsense";
 
 const AdressGeoapifyWithNoSSR = dynamic(
   () =>
@@ -48,6 +49,7 @@ const LocalisationStation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [mapKey, setMapKey] = useState(0);
+  const [showSuccessAd, setShowSuccessAd] = useState(false);
 
   useEffect(() => {
     setIsAdmin(session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL);
@@ -133,6 +135,7 @@ const LocalisationStation = () => {
       });
       setIsModalOpen(false);
       setMapKey((prev) => prev + 1);
+      setShowSuccessAd(true);
     } catch (error) {
       console.error("Erreur:", error);
       toast({
@@ -310,6 +313,32 @@ const LocalisationStation = () => {
           selectedLocation={selectedLocation}
           onAddStation={handleAddStation}
         />
+
+        {showSuccessAd && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full">
+              <h3 className="text-lg font-semibold mb-4 text-center">
+                Station ajoutée avec succès !
+              </h3>
+              <GoogleAdsense
+                slot="votre-slot-id-pour-nouvelle-station"
+                style={{
+                  display: "block",
+                  textAlign: "center",
+                  minHeight: "250px",
+                }}
+                format="fluid"
+                responsive={true}
+              />
+              <Button
+                className="mt-4 w-full"
+                onClick={() => setShowSuccessAd(false)}
+              >
+                Continuer
+              </Button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

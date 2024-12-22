@@ -6,10 +6,8 @@ import CookiesConsentModal from "@/app/pages/Juridique/CookiesConsentModal/page"
 import Footer from "@/app/pages/Footer/page";
 import ClientLayout from "@/app/components/Loader/ClientLayout/page";
 import MobileSidebar from "@/app/pages/mobile-sidebar/page";
-import Script from "next/script";
 import SessionWrapper from "@/app/components/SessionWrapper";
 import { Toaster } from "./components/ui/toaster";
-
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <meta property="fb:app_id" content="893594792366674" />
         <meta property="og:url" content="https://splashcamper.vercel.app" />
@@ -57,10 +55,9 @@ export default function RootLayout({
           name="google-site-verification"
           content="6eWBLMLxDalDyK7lsjGEkYXqzdw3ULqbrmbees92ves"
         />
-        <Script
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"
-          strategy="afterInteractive"
           crossOrigin="anonymous"
         />
       </head>

@@ -535,3 +535,22 @@
     display: none;
   }
 }
+
+/* Styles pour les conteneurs AdSense */
+.adsbygoogle-container {
+  width: 100%;
+  min-height: 100px;
+  margin: 1rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.adsbygoogle-container ins.adsbygoogle {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  display: block;
+}

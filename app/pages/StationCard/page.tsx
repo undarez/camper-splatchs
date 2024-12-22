@@ -25,6 +25,7 @@ import {
 } from "@/app/components/ui/select";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import GoogleAdsense from "@/app/components/GoogleAdsense";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -320,6 +321,15 @@ const ValidatedStations = () => {
           </div>
         </div>
 
+        <div className="mb-8">
+          <GoogleAdsense
+            slot="1234567890"
+            style={{ display: "block" }}
+            format="auto"
+            responsive={true}
+          />
+        </div>
+
         {/* Overlay pour la sidebar mobile */}
         {isSidebarOpen && (
           <button
@@ -356,6 +366,17 @@ const ValidatedStations = () => {
                 ))}
               </div>
 
+              {filteredStations.length > 0 && (
+                <div className="my-8">
+                  <GoogleAdsense
+                    slot="9876543210"
+                    style={{ display: "block" }}
+                    format="auto"
+                    responsive={true}
+                  />
+                </div>
+              )}
+
               {filteredStations.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   Aucune station ne correspond au filtre sélectionné
@@ -390,6 +411,15 @@ const ValidatedStations = () => {
             >
               <div className="h-[calc(100vh-200px)] rounded-lg overflow-hidden">
                 <MapView stations={filteredStations as unknown as Station[]} />
+              </div>
+
+              <div className="mt-8">
+                <GoogleAdsense
+                  slot="5432109876"
+                  style={{ display: "block" }}
+                  format="auto"
+                  responsive={true}
+                />
               </div>
             </motion.div>
           )}
