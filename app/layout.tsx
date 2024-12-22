@@ -8,6 +8,7 @@ import ClientLayout from "@/app/components/Loader/ClientLayout/page";
 import MobileSidebar from "@/app/pages/mobile-sidebar/page";
 import SessionWrapper from "@/app/components/SessionWrapper";
 import { Toaster } from "./components/ui/toaster";
+import { ThemeProvider } from "@/app/components/theme-provider/page";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -64,28 +65,35 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionWrapper>
-          <ClientLayout>
-            <div className="flex min-h-screen">
-              <MobileSidebar />
-              <div className="flex-1 flex flex-col">
-                <div className="hidden md:block">
-                  <Header />
-                </div>
-                <CookiesConsentModal />
-                <main className="flex-1">
-                  <div className="max-w-7xl mx-auto w-full px-4">
-                    {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          storageKey="splash-camper-theme"
+        >
+          <SessionWrapper>
+            <ClientLayout>
+              <div className="flex min-h-screen">
+                <MobileSidebar />
+                <div className="flex-1 flex flex-col">
+                  <div className="hidden md:block">
+                    <Header />
                   </div>
-                </main>
-                <div className="hidden md:block">
-                  <Footer />
+                  <CookiesConsentModal />
+                  <main className="flex-1">
+                    <div className="max-w-7xl mx-auto w-full px-4">
+                      {children}
+                    </div>
+                  </main>
+                  <div className="hidden md:block">
+                    <Footer />
+                  </div>
                 </div>
               </div>
-            </div>
-          </ClientLayout>
-        </SessionWrapper>
-        <Toaster />
+            </ClientLayout>
+          </SessionWrapper>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

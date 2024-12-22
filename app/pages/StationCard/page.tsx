@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Station, Review, Service } from "@prisma/client";
-import { StarIcon, MoonIcon, SunIcon } from "@heroicons/react/24/solid";
+import { StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
@@ -15,7 +15,6 @@ import { useSession } from "next-auth/react";
 import NavigationButton from "../MapComponent/NavigationGpsButton/NavigationButtonWrapper";
 import dynamic from "next/dynamic";
 import { Button } from "@/app/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Select,
   SelectContent,
@@ -23,8 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
-import { useTheme } from "next-themes";
-import GoogleAdsense from "@/app/components/GoogleAdsense";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -158,13 +155,7 @@ const ValidatedStations = () => {
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
   const stationsPerPage = 6;
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     async function fetchStations() {
@@ -231,155 +222,125 @@ const ValidatedStations = () => {
   }
 
   return (
-    <div className="relative min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex items-center gap-3 w-full md:w-auto">
+    <div className="relative min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto px-4 py-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
               <Button
-                variant="outline"
-                size="lg"
-                className="md:hidden p-3 hover:bg-gray-100 dark:hover:bg-gray-700"
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               >
-                <AdjustmentsHorizontalIcon className="h-6 w-6" />
+                <AdjustmentsHorizontalIcon className="h-5 w-5" />
               </Button>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
                 Stations
               </h1>
-
-              {mounted && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="relative w-10 h-10 rounded-full overflow-hidden transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
-                        theme === "dark"
-                          ? "translate-y-0 opacity-100"
-                          : "translate-y-full opacity-0"
-                      }`}
-                    >
-                      <MoonIcon className="h-5 w-5 text-yellow-500" />
-                    </div>
-                    <div
-                      className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
-                        theme === "dark"
-                          ? "-translate-y-full opacity-0"
-                          : "translate-y-0 opacity-100"
-                      }`}
-                    >
-                      <SunIcon className="h-5 w-5 text-yellow-500" />
-                    </div>
-                  </div>
-                  <span className="sr-only">
-                    {theme === "dark"
-                      ? "Passer en mode clair"
-                      : "Passer en mode sombre"}
-                  </span>
-                </Button>
-              )}
             </div>
 
-            <div
-              className={`
-                fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out z-50
-                md:relative md:transform-none md:w-auto md:h-auto md:shadow-none md:bg-transparent md:dark:bg-transparent
-                ${
-                  isSidebarOpen
-                    ? "translate-x-0"
-                    : "translate-x-full md:translate-x-0"
-                }
-              `}
-            >
-              <div className="flex flex-col gap-6 p-6 md:p-0">
-                <div className="flex items-center justify-between md:hidden">
-                  <h2 className="text-xl font-semibold">Filtres</h2>
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex gap-2">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800">
+                    <SelectValue placeholder="Filtrer par statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="en_attente">En attente</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-md">
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsSidebarOpen(false)}
+                    onClick={() => setViewMode("cards")}
+                    variant={viewMode === "cards" ? "default" : "ghost"}
+                    size="sm"
+                    className={`flex items-center gap-2 ${
+                      viewMode === "cards" ? "bg-white dark:bg-gray-800" : ""
+                    }`}
                   >
-                    <XMarkIcon className="h-6 w-6" />
+                    <ViewColumnsIcon className="h-4 w-4" />
+                    <span>Cartes</span>
                   </Button>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-4 w-full">
-                  <div className="w-full md:w-auto">
-                    <Select
-                      value={statusFilter}
-                      onValueChange={setStatusFilter}
-                    >
-                      <SelectTrigger className="w-full md:w-[200px] h-12 text-lg bg-white dark:bg-gray-800 border-2 hover:border-blue-500 transition-colors">
-                        <SelectValue placeholder="Filtrer par statut" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all" className="text-base py-3">
-                          Tous les statuts
-                        </SelectItem>
-                        <SelectItem value="active" className="text-base py-3">
-                          Active
-                        </SelectItem>
-                        <SelectItem
-                          value="en_attente"
-                          className="text-base py-3"
-                        >
-                          En attente
-                        </SelectItem>
-                        <SelectItem value="inactive" className="text-base py-3">
-                          Inactive
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex gap-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg">
-                    <Button
-                      onClick={() => setViewMode("cards")}
-                      variant={viewMode === "cards" ? "default" : "ghost"}
-                      className={`flex-1 md:flex-none items-center gap-2 h-12 text-lg transition-all duration-200 ${
-                        viewMode === "cards"
-                          ? "shadow-md transform scale-105 bg-white dark:bg-gray-800"
-                          : "hover:bg-white/50 dark:hover:bg-gray-600/50"
-                      }`}
-                    >
-                      <ViewColumnsIcon className="h-5 w-5" />
-                      <span className="hidden md:inline">Vue cartes</span>
-                    </Button>
-                    <Button
-                      onClick={() => setViewMode("map")}
-                      variant={viewMode === "map" ? "default" : "ghost"}
-                      className={`flex-1 md:flex-none items-center gap-2 h-12 text-lg transition-all duration-200 ${
-                        viewMode === "map"
-                          ? "shadow-md transform scale-105 bg-white dark:bg-gray-800"
-                          : "hover:bg-white/50 dark:hover:bg-gray-600/50"
-                      }`}
-                    >
-                      <MapIcon className="h-5 w-5" />
-                      <span className="hidden md:inline">Vue carte</span>
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={() => setViewMode("map")}
+                    variant={viewMode === "map" ? "default" : "ghost"}
+                    size="sm"
+                    className={`flex items-center gap-2 ${
+                      viewMode === "map" ? "bg-white dark:bg-gray-800" : ""
+                    }`}
+                  >
+                    <MapIcon className="h-4 w-4" />
+                    <span>Carte</span>
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mb-8">
-          <GoogleAdsense
-            slot="1234567890"
-            style={{ display: "block" }}
-            format="auto"
-            responsive={true}
-          />
+        {/* Sidebar mobile */}
+        <div
+          className={`
+            fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out z-50 md:hidden
+            ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">Filtres</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full bg-white dark:bg-gray-800">
+                  <SelectValue placeholder="Filtrer par statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="en_attente">En attente</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="flex flex-col gap-2">
+                <Button
+                  onClick={() => setViewMode("cards")}
+                  variant={viewMode === "cards" ? "default" : "ghost"}
+                  className="justify-start"
+                >
+                  <ViewColumnsIcon className="h-4 w-4 mr-2" />
+                  Vue cartes
+                </Button>
+                <Button
+                  onClick={() => setViewMode("map")}
+                  variant={viewMode === "map" ? "default" : "ghost"}
+                  className="justify-start"
+                >
+                  <MapIcon className="h-4 w-4 mr-2" />
+                  Vue carte
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Overlay pour la sidebar mobile */}
         {isSidebarOpen && (
           <button
-            className="fixed inset-0 bg-black/50 z-40 md:hidden cursor-pointer"
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setIsSidebarOpen(false)}
             onKeyDown={(e) => {
               if (e.key === "Escape") setIsSidebarOpen(false);
@@ -389,87 +350,45 @@ const ValidatedStations = () => {
           />
         )}
 
-        <AnimatePresence mode="wait">
+        {/* Contenu principal */}
+        <div className="container mx-auto px-4 py-4">
           {viewMode === "cards" ? (
-            <motion.div
-              key="cards"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="relative z-10"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currentStations.map((station, index) => (
-                  <motion.div
-                    key={station.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <StationCard station={station} />
-                  </motion.div>
-                ))}
-              </div>
-
-              {filteredStations.length > 0 && (
-                <div className="my-8">
-                  <GoogleAdsense
-                    slot="9876543210"
-                    style={{ display: "block" }}
-                    format="auto"
-                    responsive={true}
-                  />
-                </div>
-              )}
-
-              {filteredStations.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  Aucune station ne correspond au filtre sélectionné
-                </div>
-              ) : (
-                <div className="flex justify-center mt-8 gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <Button
-                      key={i + 1}
-                      onClick={() => setCurrentPage(i + 1)}
-                      variant={currentPage === i + 1 ? "default" : "outline"}
-                      className={`transition-all duration-200 ${
-                        currentPage === i + 1
-                          ? "bg-blue-500 text-white transform scale-105"
-                          : "hover:bg-blue-50"
-                      }`}
-                    >
-                      {i + 1}
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </motion.div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentStations.map((station) => (
+                <StationCard key={station.id} station={station} />
+              ))}
+            </div>
           ) : (
-            <motion.div
-              key="map"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden relative z-10"
-            >
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <div className="h-[calc(100vh-200px)] rounded-lg overflow-hidden">
                 <MapView stations={filteredStations as unknown as Station[]} />
               </div>
-
-              <div className="mt-8">
-                <GoogleAdsense
-                  slot="5432109876"
-                  style={{ display: "block" }}
-                  format="auto"
-                  responsive={true}
-                />
-              </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+
+          {filteredStations.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              Aucune station ne correspond au filtre sélectionné
+            </div>
+          ) : (
+            <div className="flex justify-center mt-8 gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <Button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  variant={currentPage === i + 1 ? "default" : "outline"}
+                  className={`transition-all duration-200 ${
+                    currentPage === i + 1
+                      ? "bg-blue-500 text-white transform scale-105"
+                      : "hover:bg-blue-50 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  {i + 1}
+                </Button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
