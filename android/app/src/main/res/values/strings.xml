@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SplashCamper</string>
+    <string name="title_activity_main">SplashCamper</string>
+    <string name="package_name">com.splashcamper.app</string>
+    <string name="custom_url_scheme">com.splashcamper.app</string>
+</resources>
