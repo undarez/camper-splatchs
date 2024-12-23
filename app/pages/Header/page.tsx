@@ -32,11 +32,11 @@ const Header = () => {
   }
 
   return (
-    <header className="w-full bg-gradient-to-r from-[#1a1a1a] to-[#2d2d2d] dark:from-[#1a1a1a] dark:to-[#2d2d2d] shadow-xl">
+    <header className="w-full bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex-shrink-0 relative">
-            <div className="w-[160px] h-[160px] relative mt-2">
+            <div className="w-[160px] h-[160px] relative mt-4">
               <Image
                 src="/images/logo.png"
                 alt="logo"
@@ -53,13 +53,13 @@ const Header = () => {
               <MenubarMenu>
                 <MenubarTrigger asChild>
                   <Button
-                    className="font-sans text-base text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-white/20"
+                    className="font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700]"
                     variant="ghost"
                   >
                     Stations
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl">
+                <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-[#A5E9FF] shadow-xl">
                   <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
                     <Link
                       href="/components/localisationStation2"
@@ -87,7 +87,7 @@ const Header = () => {
               <MenubarMenu>
                 <MenubarTrigger asChild>
                   <Button
-                    className="font-sans text-base text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-white/20"
+                    className="font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700]"
                     variant="ghost"
                   >
                     À propos
@@ -110,7 +110,7 @@ const Header = () => {
                 <MenubarMenu>
                   <MenubarTrigger asChild>
                     <Button
-                      className="font-sans text-base text-white dark:text-gray-100 hover:text-[#FFD700] dark:hover:text-[#FFD700] hover:bg-white/10 dark:hover:bg-gray-800/40 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-white/20"
+                      className="font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700]"
                       variant="ghost"
                     >
                       {`Bienvenue, ${session.user?.name}`}
@@ -160,7 +160,7 @@ const Header = () => {
                 </MenubarMenu>
               ) : (
                 <Button
-                  className="font-sans text-base bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFC000] dark:bg-[#FFD700] dark:text-[#0F2B4D] dark:hover:bg-[#FFC000] transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                  className="font-sans text-base bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFD700]/90 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                   onClick={() => router.push("/signin")}
                 >
                   Se connecter
@@ -170,12 +170,12 @@ const Header = () => {
 
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-9 h-9 rounded-lg bg-[#333333]/10 dark:bg-[#333333]/20 backdrop-blur-sm border border-[#333333]/20 dark:border-[#333333]/20 flex items-center justify-center transition-all duration-300 hover:bg-[#333333]/20 dark:hover:bg-[#333333]/30 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm border border-[#A5E9FF] hover:border-[#FFD700] flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
             >
               {theme === "dark" ? (
-                <MoonIcon className="w-4 h-4 text-yellow-300" />
+                <MoonIcon className="w-4 h-4 text-[#FFD700]" />
               ) : (
-                <SunIcon className="w-4 h-4 text-yellow-400" />
+                <SunIcon className="w-4 h-4 text-[#FFD700]" />
               )}
             </button>
           </div>

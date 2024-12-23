@@ -1,33 +1,23 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
-import Header from "@/app/pages/Header/page";
-import CookiesConsentModal from "@/app/pages/Juridique/CookiesConsentModal/page";
-import Footer from "@/app/pages/Footer/page";
-import ClientLayout from "@/app/components/Loader/ClientLayout/page";
-import MobileSidebar from "@/app/pages/mobile-sidebar/page";
-import SessionWrapper from "@/app/components/SessionWrapper";
-import { Toaster } from "./components/ui/toaster";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/app/components/theme-provider";
+import Header from "@/app/pages/Header/page";
+import { Toaster } from "./components/ui/toaster";
+import AuthProvider from "@/app/context/AuthProvider";
+import Script from "next/script";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
+const inter = Inter({ subsets: ["latin"] });
 
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
-export const metadata: Metadata = {
+export const metadata = {
   title: "SplashCamper",
-  description: "Trouvez les meilleures stations de lavage pour camping-car",
-  other: {
-    "google-adsense-account": "ca-pub-9668851625466214",
-  },
+  description:
+    "Trouvez les meilleures stations de lavage pour votre camping-car",
+  manifest: "/manifest.json",
+  themeColor: "#2d2d2d",
+  viewport:
+    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  appleWebAppCapable: "yes",
+  appleWebAppStatusBarStyle: "black-translucent",
 };
 
 export default function RootLayout({
@@ -38,62 +28,43 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
-        <meta property="fb:app_id" content="893594792366674" />
-        <meta property="og:url" content="https://splashcamper.vercel.app" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="SplashCamper" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#2d2d2d" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
-          property="og:description"
-          content="Trouvez les meilleures stations de lavage pour camping-car"
-        />
-        <meta name="author" content="Florian Billard" />
-        <meta name="owner" content="Florian Billard" />
-        <meta name="copyright" content="© 2024 SplashCamper" />
-        <meta name="robots" content="index, follow" />
-        <meta name="googlebot" content="index, follow" />
-        <link rel="canonical" href="https://splashcamper.vercel.app" />
-        <meta
-          name="google-site-verification"
-          content="6eWBLMLxDalDyK7lsjGEkYXqzdw3ULqbrmbees92ves"
-        />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"
-          crossOrigin="anonymous"
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          storageKey="splash-camper-theme"
-        >
-          <SessionWrapper>
-            <ClientLayout>
-              <div className="flex min-h-screen">
-                <MobileSidebar />
-                <div className="flex-1 flex flex-col">
-                  <div className="hidden md:block">
-                    <Header />
-                  </div>
-                  <CookiesConsentModal />
-                  <main className="flex-1">
-                    <div className="max-w-7xl mx-auto w-full px-4">
-                      {children}
-                    </div>
-                  </main>
-                  <div className="hidden md:block">
-                    <Footer />
-                  </div>
-                </div>
-              </div>
-            </ClientLayout>
-          </SessionWrapper>
-          <Toaster />
-        </ThemeProvider>
+      <body className={inter.className}>
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <Header />
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
+        <Script
+          id="register-sw"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(registration) {
+                      console.log('Service Worker registration successful');
+                    },
+                    function(err) {
+                      console.log('Service Worker registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
