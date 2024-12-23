@@ -32,11 +32,11 @@ const Header = () => {
   }
 
   return (
-    <header className="w-full bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] dark:from-[#1B4B82] dark:to-[#0F2B4D] shadow-xl">
+    <header className="w-full bg-gradient-to-r from-[#1a1a1a] to-[#2d2d2d] dark:from-[#1a1a1a] dark:to-[#2d2d2d] shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-24">
           <Link href="/" className="flex-shrink-0 relative">
-            <div className="w-[140px] h-[140px] relative -mt-4">
+            <div className="w-[160px] h-[160px] relative mt-2">
               <Image
                 src="/images/logo.png"
                 alt="logo"
@@ -170,7 +170,7 @@ const Header = () => {
 
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-9 h-9 rounded-lg bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 flex items-center justify-center transition-all duration-300 hover:bg-white/20 dark:hover:bg-gray-700/30 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              className="w-9 h-9 rounded-lg bg-[#333333]/10 dark:bg-[#333333]/20 backdrop-blur-sm border border-[#333333]/20 dark:border-[#333333]/20 flex items-center justify-center transition-all duration-300 hover:bg-[#333333]/20 dark:hover:bg-[#333333]/30 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
             >
               {theme === "dark" ? (
                 <MoonIcon className="w-4 h-4 text-yellow-300" />

@@ -238,7 +238,7 @@ const ValidatedStations = () => {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative z-0 min-h-screen bg-gray-100 dark:bg-gray-900">
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <div
