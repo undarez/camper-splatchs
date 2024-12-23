@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/app/components/theme-provider";
 import Header from "@/app/pages/Header/page";
+import Footer from "@/app/pages/Footer/page";
 import { Toaster } from "./components/ui/toaster";
 import AuthProvider from "./context/AuthProvider";
 import Script from "next/script";
@@ -40,8 +41,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <Header />
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </div>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>

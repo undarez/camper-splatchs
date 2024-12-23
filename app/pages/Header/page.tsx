@@ -31,6 +31,11 @@ const Header = () => {
     return null;
   }
 
+  const menuButtonClass =
+    "font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2.5 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700] font-medium";
+  const menuItemClass =
+    "font-sans text-gray-700 hover:text-[#1B4B82] hover:bg-blue-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium";
+
   return (
     <header className="w-full bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,33 +57,26 @@ const Header = () => {
             <Menubar className="flex bg-transparent border-none items-center gap-4">
               <MenubarMenu>
                 <MenubarTrigger asChild>
-                  <Button
-                    className="font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700]"
-                    variant="ghost"
-                  >
+                  <Button className={menuButtonClass} variant="ghost">
                     Stations
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-[#A5E9FF] shadow-xl">
-                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
+                <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-[#A5E9FF] shadow-xl p-2">
+                  <MenubarItem className={menuItemClass}>
                     <Link
                       href="/components/localisationStation2"
-                      className="flex w-full"
-                      onClick={() =>
-                        router.push("/components/localisationStation2")
-                      }
+                      className="flex w-full items-center"
                     >
                       Ajouter une station
                     </Link>
                   </MenubarItem>
-                  <MenubarSeparator className="dark:bg-gray-700" />
-                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
+                  <MenubarSeparator className="my-2" />
+                  <MenubarItem className={menuItemClass}>
                     <Link
                       href="/pages/StationCard"
-                      className="flex w-full"
-                      onClick={() => router.push("/pages/StationCard")}
+                      className="flex w-full items-center"
                     >
-                      Stations lavage vérifiées
+                      Stations vérifiées
                     </Link>
                   </MenubarItem>
                 </MenubarContent>
@@ -86,19 +84,15 @@ const Header = () => {
 
               <MenubarMenu>
                 <MenubarTrigger asChild>
-                  <Button
-                    className="font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700]"
-                    variant="ghost"
-                  >
+                  <Button className={menuButtonClass} variant="ghost">
                     À propos
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl">
-                  <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
+                <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-[#A5E9FF] shadow-xl p-2">
+                  <MenubarItem className={menuItemClass}>
                     <Link
                       href="/pages/About"
-                      className="flex w-full"
-                      onClick={() => router.push("/pages/About")}
+                      className="flex w-full items-center"
                     >
                       À propos
                     </Link>
@@ -109,50 +103,44 @@ const Header = () => {
               {session ? (
                 <MenubarMenu>
                   <MenubarTrigger asChild>
-                    <Button
-                      className="font-sans text-base text-white hover:text-[#FFD700] hover:bg-white/10 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 border border-[#A5E9FF] hover:border-[#FFD700]"
-                      variant="ghost"
-                    >
+                    <Button className={menuButtonClass} variant="ghost">
                       {`Bienvenue, ${session.user?.name}`}
                     </Button>
                   </MenubarTrigger>
-                  <MenubarContent className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl">
-                    <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
+                  <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-xl border border-[#A5E9FF] shadow-xl p-2">
+                    <MenubarItem className={menuItemClass}>
                       <Link
                         href="/pages/profil"
-                        className="flex w-full"
-                        onClick={() => router.push("/pages/profil")}
+                        className="flex w-full items-center"
                       >
                         Profil
                       </Link>
                     </MenubarItem>
                     {isAdmin && (
                       <>
-                        <MenubarSeparator className="dark:bg-gray-700" />
-                        <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
+                        <MenubarSeparator className="my-2" />
+                        <MenubarItem className={menuItemClass}>
                           <Link
                             href="/pages/AdminStation"
-                            className="flex w-full"
-                            onClick={() => router.push("/pages/AdminStation")}
+                            className="flex w-full items-center"
                           >
                             Administration
                           </Link>
                         </MenubarItem>
-                        <MenubarItem className="dark:text-gray-100 dark:focus:bg-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors rounded-lg m-1 font-sans">
+                        <MenubarItem className={menuItemClass}>
                           <Link
                             href="/pages/AdminUsers"
-                            className="flex w-full"
-                            onClick={() => router.push("/pages/AdminUsers")}
+                            className="flex w-full items-center"
                           >
                             Gestion des utilisateurs
                           </Link>
                         </MenubarItem>
                       </>
                     )}
-                    <MenubarSeparator className="dark:bg-gray-700" />
+                    <MenubarSeparator className="my-2" />
                     <MenubarItem
                       onClick={() => signOut()}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20 transition-colors rounded-lg m-1 font-sans"
+                      className="font-sans text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
                     >
                       Se déconnecter
                     </MenubarItem>
@@ -160,7 +148,7 @@ const Header = () => {
                 </MenubarMenu>
               ) : (
                 <Button
-                  className="font-sans text-base bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFD700]/90 transition-all duration-300 rounded-xl px-6 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+                  className="font-sans text-base bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFD700]/90 transition-all duration-300 rounded-xl px-6 py-2.5 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 font-medium"
                   onClick={() => router.push("/signin")}
                 >
                   Se connecter
@@ -170,12 +158,12 @@ const Header = () => {
 
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-9 h-9 rounded-lg bg-white/10 backdrop-blur-sm border border-[#A5E9FF] hover:border-[#FFD700] flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-[#A5E9FF] hover:border-[#FFD700] flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
             >
               {theme === "dark" ? (
-                <MoonIcon className="w-4 h-4 text-[#FFD700]" />
+                <MoonIcon className="w-5 h-5 text-[#FFD700]" />
               ) : (
-                <SunIcon className="w-4 h-4 text-[#FFD700]" />
+                <SunIcon className="w-5 h-5 text-[#FFD700]" />
               )}
             </button>
           </div>
