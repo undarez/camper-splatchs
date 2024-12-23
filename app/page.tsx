@@ -9,18 +9,17 @@ import { Statistics } from "@/app/components/Statistics";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-  // Redirection si non connecté
   if (!session) {
     redirect("/signin");
   }
   return (
     <div className="w-full">
-      <main className="px-4 py-8">
-        {/* Hero Section */}
-        <section className="relative h-[500px] rounded-xl overflow-hidden mb-16">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#2ABED9] to-[#1B4B82]" />
+      <main className="px-4 py-8 max-w-7xl mx-auto">
+        {/* Hero Section - Plus compact et moderne */}
+        <section className="relative h-[300px] md:h-[400px] rounded-2xl overflow-hidden mb-12 group">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] transition-opacity duration-300" />
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 transform transition-transform duration-500 group-hover:scale-105"
             style={{
               backgroundImage: "url('/images/station-lavage.png')",
               backgroundSize: "cover",
@@ -30,38 +29,43 @@ export default async function Home() {
             }}
           />
           <div className="relative z-10 h-full flex flex-col justify-center items-center text-white text-center px-4">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-[#A5E9FF]">
               Bienvenue sur SplashCamper
             </h1>
-            <p className="text-xl mb-8 max-w-2xl">
+            <p className="text-lg md:text-xl mb-6 max-w-xl text-[#A5E9FF]">
               Trouvez les meilleures stations de lavage pour votre camping-car
             </p>
             <Button
               size="lg"
-              className="bg-[#FFD700] hover:bg-[#FFC000] text-[#1B4B82] font-bold"
+              className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#1B4B82] font-bold transform hover:-translate-y-1 transition-all duration-300"
               asChild
             >
-              <Link href="/pages/StationCard">
+              <Link
+                href="/pages/StationCard"
+                className="flex items-center gap-2"
+              >
                 Découvrir les stations
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="h-5 w-5" />
               </Link>
             </Button>
           </div>
         </section>
 
         {/* Statistics Section */}
-        <section className="mb-16">
+        <section className="mb-12">
           <Statistics />
         </section>
 
-        {/* Features Section */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-center">Nos Services</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Features Section - Design plus moderne */}
+        <section className="mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] bg-clip-text text-transparent">
+            Nos Services
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FeatureCard
               icon={<MapPin className="h-8 w-8" />}
               title="Localisation Facile"
-              description="Trouvez rapidement les stations près de vous grâce à notre carte interactive"
+              description="Trouvez rapidement les stations près de vous"
             />
             <FeatureCard
               icon={<Droplets className="h-8 w-8" />}
@@ -76,25 +80,27 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Community Section */}
-        <section className="mb-16">
-          <div className="bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] rounded-xl p-8 text-white">
-            <h2 className="text-3xl font-bold mb-4 text-center">
-              Rejoignez notre communauté
-            </h2>
-            <p className="text-center mb-8 max-w-2xl mx-auto">
-              Partagez vos expériences et aidez d&apos;autres camping-caristes à
-              trouver les meilleures stations
-            </p>
-            <div className="flex justify-center">
+        {/* Community Section - Plus compact et attrayant */}
+        <section className="mb-12">
+          <div className="bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] rounded-2xl p-6 md:p-8">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3 text-white">
+                Rejoignez notre communauté
+              </h2>
+              <p className="text-[#A5E9FF] mb-6 text-sm md:text-base">
+                Partagez vos expériences et aidez d&apos;autres camping-caristes
+              </p>
               <Button
                 variant="outline"
-                className="bg-white/10 hover:bg-white/20 text-white border-[#A5E9FF] hover:border-[#FFD700]"
+                className="bg-white/10 hover:bg-white/20 text-white border-[#A5E9FF] hover:border-[#FFD700] transform hover:-translate-y-1 transition-all duration-300"
                 asChild
               >
-                <Link href="/components/localisationStation2">
+                <Link
+                  href="/components/localisationStation2"
+                  className="flex items-center gap-2"
+                >
                   Ajouter une station
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
             </div>
@@ -105,7 +111,7 @@ export default async function Home() {
   );
 }
 
-// Components
+// Feature Card Component - Design plus moderne
 function FeatureCard({
   icon,
   title,
@@ -116,11 +122,15 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <Card className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 border-2 border-[#A5E9FF] hover:border-[#FFD700]">
+    <Card className="group bg-white/5 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-[#A5E9FF]/30 hover:border-[#FFD700] overflow-hidden">
       <CardContent className="p-6">
-        <div className="text-[#2ABED9] mb-4">{icon}</div>
-        <h3 className="text-xl font-semibold mb-2 text-blue-600">{title}</h3>
-        <p className="text-gray-600">{description}</p>
+        <div className="text-[#2ABED9] mb-4 transform group-hover:scale-110 transition-transform duration-300">
+          {icon}
+        </div>
+        <h3 className="text-lg font-semibold mb-2 bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] bg-clip-text text-transparent">
+          {title}
+        </h3>
+        <p className="text-gray-600 text-sm">{description}</p>
       </CardContent>
     </Card>
   );
