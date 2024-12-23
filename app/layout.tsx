@@ -14,11 +14,9 @@ export const metadata = {
   description:
     "Trouvez les meilleures stations de lavage pour votre camping-car",
   manifest: "/manifest.json",
-  themeColor: "#2d2d2d",
+  themeColor: "#1B4B82",
   viewport:
     "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  appleWebAppCapable: "yes",
-  appleWebAppStatusBarStyle: "black-translucent",
 };
 
 export default function RootLayout({
@@ -30,13 +28,12 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#2d2d2d" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="theme-color" content="#1B4B82" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="SplashCamper" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body className={inter.className}>
         <AuthProvider>
