@@ -1,91 +1,84 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/AuthOptions";
 import {
-  ElectricityType,
-  HighPressureType,
-  PaymentMethod,
+  Prisma,
   StationStatus,
+  HighPressureType,
+  ElectricityType,
 } from "@prisma/client";
 
-export async function POST(req: Request) {
-  console.log("Route POST appelée");
-
+export async function POST(request: Request) {
   try {
-    // Vérifier la connexion à la base de données
-    await prisma.$connect();
-    console.log("Prisma connecté");
-
     const session = await getServerSession(authOptions);
-    console.log("Session:", session);
-
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const data = await req.json();
-    console.log("Données reçues:", data);
+    const data = await request.json();
 
-    // Trouver ou créer l'utilisateur
-    let user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+    // Récupération de l'utilisateur
+    const user = await prisma.user.findUnique({
+      where: {
+        email: session.user.email,
+      },
     });
 
     if (!user) {
-      // Créer l'utilisateur s'il n'existe pas
-      user = await prisma.user.create({
-        data: {
-          email: session.user.email,
-          name: session.user.name || null,
-          image: session.user.image || null,
-          role: "USER",
-        },
-      });
-      console.log("Nouvel utilisateur créé:", user);
+      return NextResponse.json(
+        { error: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
     }
 
-    console.log("Utilisateur:", user);
+    const stationData: Prisma.StationCreateInput = {
+      name: data.name,
+      address: data.address,
+      latitude: parseFloat(data.latitude || data.lat),
+      longitude: parseFloat(data.longitude || data.lng),
+      images: data.images || [],
+      status: StationStatus.en_attente,
+      author: { connect: { id: user.id } },
+      user: { connect: { id: user.id } },
+      city: data.city || null,
+      postalCode: data.postalCode || null,
+      services: {
+        create: {
+          highPressure: data.highPressure || HighPressureType.NONE,
+          tirePressure: data.tirePressure || false,
+          vacuum: data.vacuum || false,
+          handicapAccess: data.handicapAccess || false,
+          wasteWater: data.wasteWater || false,
+          paymentMethods: data.paymentMethods || [],
+          electricity: data.electricity || ElectricityType.NONE,
+          maxVehicleLength: data.maxVehicleLength
+            ? parseFloat(data.maxVehicleLength)
+            : null,
+        },
+      },
+    };
 
-    // Création de la station
     const station = await prisma.station.create({
-      data: {
-        name: data.name,
-        address: data.address,
-        latitude: data.latitude || data.lat,
-        longitude: data.longitude || data.lng,
-        images: data.images,
-        status: data.status as StationStatus,
-        authorId: user.id,
-        services: {
-          create: {
-            highPressure: data.services.highPressure as HighPressureType,
-            tirePressure: data.services.tirePressure,
-            vacuum: data.services.vacuum,
-            handicapAccess: data.services.handicapAccess,
-            wasteWater: data.services.wasteWater,
-            electricity: data.services.electricity as ElectricityType,
-            paymentMethods: data.services.paymentMethods as PaymentMethod[],
-            maxVehicleLength: data.services.maxVehicleLength,
+      data: stationData,
+      include: {
+        services: true,
+        author: {
+          select: {
+            name: true,
+            email: true,
           },
         },
       },
     });
 
-    console.log("Station créée:", station);
-    return NextResponse.json({ success: true, station });
+    return NextResponse.json(station);
   } catch (error) {
-    console.error("Erreur détaillée:", error);
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Une erreur inconnue est survenue";
+    console.error("Erreur lors de la création de la station:", error);
     return NextResponse.json(
-      { success: false, error: errorMessage },
+      { error: "Erreur lors de la création de la station" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -109,6 +102,8 @@ export async function GET() {
       id: station.id,
       name: station.name,
       address: station.address,
+      city: station.city,
+      postalCode: station.postalCode,
       lat: station.latitude,
       lng: station.longitude,
       images: station.images,
