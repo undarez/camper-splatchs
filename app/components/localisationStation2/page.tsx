@@ -1,14 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
-import LoadingMap from "@/app/pages/MapComponent/LoadingMap/page";
-import { CamperWashStation, GeoapifyResult } from "@/app/types";
-import AddStationModal from "@/app/pages/MapComponent/AddStation_modal/AddStationModal";
+import { useRouter } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import ConnectYou from "@/app/pages/auth/connect-you/page";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/app/components/ui/dialog";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { Checkbox } from "@/app/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -16,332 +21,407 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
-import {
-  GeoapifyContext,
-  GeoapifyGeocoderAutocomplete,
-} from "@geoapify/react-geocoder-autocomplete";
-import "@geoapify/geocoder-autocomplete/styles/minimal.css";
-import GoogleAdsense from "@/app/components/GoogleAdsense";
+import { toast } from "@/hooks/use-toast";
+import { StationType, HighPressureType, ElectricityType } from "@prisma/client";
 
-const AdressGeoapifyWithNoSSR = dynamic(
-  () =>
-    import("@/app/components/AdressGeoapify/AdressGeoapifyWrapper").then(
-      (mod) => mod.default
-    ),
-  { ssr: false, loading: () => <LoadingMap /> }
-);
+const Map = dynamic(() => import("@/app/components/Map"), {
+  ssr: false,
+});
 
-const STATUS_DISPLAY: Record<string, string> = {
-  active: "Active",
-  en_attente: "En attente",
-  inactive: "Inactive",
-};
+interface FormData {
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  lat: number | null;
+  lng: number | null;
+  // Champs pour station de lavage
+  highPressure: HighPressureType;
+  tirePressure: boolean;
+  vacuum: boolean;
+  handicapAccess: boolean;
+  wasteWater: boolean;
+  electricity: ElectricityType;
+  maxVehicleLength: string;
+  paymentMethods: string[];
+  // Champs pour parking
+  isPayant: boolean;
+  tarif: string;
+  commercesProches: string[];
+}
 
-const LocalisationStation = () => {
+interface Location {
+  lat: number;
+  lng: number;
+}
+
+export default function LocalisationStation2() {
   const { data: session } = useSession();
-  const [existingLocations, setExistingLocations] = useState<
-    CamperWashStation[]
-  >([]);
-  const [selectedLocation, setSelectedLocation] =
-    useState<GeoapifyResult | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [mapKey, setMapKey] = useState(0);
-  const [showSuccessAd, setShowSuccessAd] = useState(false);
+  const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [stationType, setStationType] = useState<StationType>(
+    StationType.STATION_LAVAGE
+  );
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    address: "",
+    city: "",
+    postalCode: "",
+    lat: null,
+    lng: null,
+    // Champs pour station de lavage
+    highPressure: HighPressureType.NONE,
+    tirePressure: false,
+    vacuum: false,
+    handicapAccess: false,
+    wasteWater: false,
+    electricity: ElectricityType.NONE,
+    maxVehicleLength: "",
+    paymentMethods: [],
+    // Champs pour parking
+    isPayant: false,
+    tarif: "",
+    commercesProches: [],
+  });
 
-  useEffect(() => {
-    setIsAdmin(session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL);
-  }, [session]);
+  const handleLocationSelect = (location: Location) => {
+    setFormData({
+      ...formData,
+      lat: location.lat,
+      lng: location.lng,
+    });
+    setIsDialogOpen(true);
+  };
 
-  useEffect(() => {
-    const fetchStations = async () => {
-      try {
-        const response = await fetch("/api/stationUpdapte");
-        if (!response.ok) {
-          throw new Error("Erreur lors du chargement des stations");
-        }
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setExistingLocations(data);
-        } else {
-          console.error("Les données reçues ne sont pas un tableau:", data);
-          setExistingLocations([]);
-        }
-      } catch (error) {
-        console.error("Erreur:", error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les stations",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!session) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour ajouter une station",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    fetchStations();
-  }, []);
-
-  const handleAddStation = async (
-    station: Omit<CamperWashStation, "id" | "createdAt">
-  ) => {
     try {
-      if (
-        !selectedLocation?.properties?.lat ||
-        !selectedLocation?.properties?.lon
-      ) {
-        toast({
-          title: "Erreur",
-          description: "Les coordonnées de la station sont manquantes",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const stationData = {
-        ...station,
-        lat: Number(selectedLocation.properties.lat),
-        lng: Number(selectedLocation.properties.lon),
-      };
-
-      await fetch("/api/stations/notify", {
+      const response = await fetch("/api/stationUpdapte", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          address: station.address,
-          latitude: stationData.lat,
-          longitude: stationData.lng,
-          createdBy: session?.user?.email,
+          ...formData,
+          type: stationType,
+          // Données spécifiques au parking si nécessaire
+          ...(stationType === "PARKING" && {
+            parkingDetails: {
+              isPayant: formData.isPayant,
+              tarif: formData.isPayant ? parseFloat(formData.tarif) : null,
+              hasElectricity: formData.electricity,
+              commercesProches: formData.commercesProches,
+              handicapAccess: formData.handicapAccess,
+            },
+          }),
         }),
       });
 
-      const response = await fetch("/api/stationUpdapte", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(stationData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de l'ajout de la station");
+      if (response.ok) {
+        toast({
+          title: "Succès",
+          description:
+            stationType === "PARKING"
+              ? "Place de parking ajoutée avec succès"
+              : "Station ajoutée avec succès",
+        });
+        setIsDialogOpen(false);
+        router.refresh();
+      } else {
+        throw new Error("Erreur lors de l'ajout");
       }
-
-      const newStation = await response.json();
-      setExistingLocations((prev) => [newStation, ...prev]);
-      toast({
-        title: "Succès",
-        description: "Station ajoutée avec succès",
-      });
-      setIsModalOpen(false);
-      setMapKey((prev) => prev + 1);
-      setShowSuccessAd(true);
     } catch (error) {
-      console.error("Erreur:", error);
+      console.error("Erreur lors de l'ajout de la station:", error);
       toast({
         title: "Erreur",
-        description: "Impossible d'ajouter la station",
+        description: "Une erreur est survenue lors de l'ajout",
         variant: "destructive",
       });
     }
   };
 
-  const handleAddressSelect = (formatted: string, lat: number, lon: number) => {
-    console.log("Coordonnées sélectionnées:", { lat, lon });
-    setSelectedLocation({
-      properties: {
-        formatted,
-        lat,
-        lon,
-      },
-    });
-    setIsModalOpen(true);
-  };
-
-  if (!session) {
-    return <ConnectYou />;
-  }
-
-  const filteredLocations = existingLocations.filter((location) => {
-    const matchesStatus =
-      statusFilter === "all" || location.status === statusFilter;
-    return matchesStatus;
-  });
-
-  const activeStations = filteredLocations.filter(
-    (location) => location.status === "active"
-  );
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-6 flex items-center justify-center min-h-[600px]">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Chargement des stations...</p>
-        </div>
-      </div>
-    );
-  }
+  const commerceTypes = [
+    { value: "NOURRITURE", label: "Nourriture" },
+    { value: "BANQUE", label: "Banque" },
+    { value: "CENTRE_VILLE", label: "Centre-ville" },
+    { value: "STATION_SERVICE", label: "Station-service" },
+    { value: "LAVERIE", label: "Laverie" },
+    { value: "GARAGE", label: "Garage" },
+  ];
 
   return (
-    <div className="w-full">
-      <main className="px-4 py-8">
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">
-              Carte des stations CamperWash
-            </h1>
-          </div>
-
-          <div className="flex flex-wrap gap-4 mb-6">
-            <div className="w-full md:w-auto flex-grow">
-              <GeoapifyContext
-                apiKey={process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY}
-              >
-                <GeoapifyGeocoderAutocomplete
-                  placeholder="Rechercher une adresse..."
-                  lang="fr"
-                  limit={5}
-                  debounceDelay={300}
-                  countryCodes={["fr"]}
-                  placeSelect={(value) => {
-                    if (value) {
-                      const { lat, lon, formatted } = value.properties;
-                      handleAddressSelect(formatted, lat, lon);
-                    }
-                  }}
-                />
-              </GeoapifyContext>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Filtrer par status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="en_attente">En attente</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="h-[calc(100vh-250px)] rounded-lg overflow-hidden border border-border">
-                <AdressGeoapifyWithNoSSR
-                  key={`map-${mapKey}`}
-                  onAddressSelect={handleAddressSelect}
-                  existingLocations={filteredLocations}
-                  isModalOpen={isModalOpen}
-                  persistSearchBar={false}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-4 bg-card rounded-lg border border-border">
-                <h2 className="text-lg font-semibold mb-4">Statistiques</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-background rounded-md">
-                    <p className="text-sm text-muted-foreground">
-                      Total stations
-                    </p>
-                    <p className="text-2xl font-bold">
-                      {filteredLocations.length}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-background rounded-md">
-                    <p className="text-sm text-muted-foreground">Actives</p>
-                    <p className="text-2xl font-bold text-green-500">
-                      {activeStations.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-card rounded-lg border border-border">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">Stations récentes</h2>
-                  {isAdmin && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        (window.location.href = "/pages/AdminStation/AdminPage")
-                      }
-                    >
-                      Gérer les stations
-                    </Button>
-                  )}
-                </div>
-                <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                  {filteredLocations.slice(0, 5).map((location) => (
-                    <div
-                      key={location.id}
-                      className="p-3 bg-background rounded-md space-y-1"
-                    >
-                      <p className="font-medium">{location.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {location.address}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            location.status === "active"
-                              ? "bg-green-500"
-                              : location.status === "en_attente"
-                              ? "bg-yellow-500"
-                              : "bg-red-500"
-                          }`}
-                        ></span>
-                        <span className="text-xs text-muted-foreground">
-                          {STATUS_DISPLAY[location.status]}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-white mb-8 text-center">
+          Ajouter une Station ou Place de Parking
+        </h1>
+        <div className="bg-gray-800 p-6 rounded-lg shadow-xl">
+          <Map onLocationSelect={handleLocationSelect} />
         </div>
 
-        <AddStationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          selectedLocation={selectedLocation}
-          onAddStation={handleAddStation}
-        />
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {stationType === "PARKING"
+                  ? "Ajouter une place de parking"
+                  : "Ajouter une station de lavage"}
+              </DialogTitle>
+            </DialogHeader>
 
-        {showSuccessAd && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full">
-              <h3 className="text-lg font-semibold mb-4 text-center">
-                Station ajoutée avec succès !
-              </h3>
-              <GoogleAdsense
-                slot="votre-slot-id-pour-nouvelle-station"
-                style={{
-                  display: "block",
-                  textAlign: "center",
-                  minHeight: "250px",
-                }}
-                format="fluid"
-                responsive={true}
-              />
-              <Button
-                className="mt-4 w-full"
-                onClick={() => setShowSuccessAd(false)}
-              >
-                Continuer
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Type de point d'intérêt */}
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={stationType}
+                  onValueChange={(value: StationType) => setStationType(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="STATION_LAVAGE">
+                      Station de lavage
+                    </SelectItem>
+                    <SelectItem value="PARKING">Place de parking</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Champs communs */}
+              <div className="space-y-2">
+                <Label>Nom</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Adresse</Label>
+                <Input
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Ville</Label>
+                  <Input
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Code postal</Label>
+                  <Input
+                    value={formData.postalCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, postalCode: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Champs spécifiques aux stations de lavage */}
+              {stationType === "STATION_LAVAGE" && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Type de haute pression</Label>
+                    <Select
+                      value={formData.highPressure}
+                      onValueChange={(value: HighPressureType) =>
+                        setFormData({ ...formData, highPressure: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NONE">Aucun</SelectItem>
+                        <SelectItem value="PASSERELLE">Passerelle</SelectItem>
+                        <SelectItem value="ECHAFAUDAGE">Échafaudage</SelectItem>
+                        <SelectItem value="PORTIQUE">Portique</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="tirePressure"
+                        checked={formData.tirePressure}
+                        onCheckedChange={(checked: boolean) =>
+                          setFormData({ ...formData, tirePressure: checked })
+                        }
+                      />
+                      <Label htmlFor="tirePressure">Gonflage des pneus</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="vacuum"
+                        checked={formData.vacuum}
+                        onCheckedChange={(checked: boolean) =>
+                          setFormData({ ...formData, vacuum: checked })
+                        }
+                      />
+                      <Label htmlFor="vacuum">Aspirateur</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="wasteWater"
+                        checked={formData.wasteWater}
+                        onCheckedChange={(checked: boolean) =>
+                          setFormData({ ...formData, wasteWater: checked })
+                        }
+                      />
+                      <Label htmlFor="wasteWater">Vidange eaux usées</Label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Longueur maximale du véhicule (en mètres)</Label>
+                    <Input
+                      type="number"
+                      value={formData.maxVehicleLength}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          maxVehicleLength: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Champs spécifiques aux parkings */}
+              {stationType === "PARKING" && (
+                <>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isPayant"
+                        checked={formData.isPayant}
+                        onCheckedChange={(checked: boolean) =>
+                          setFormData({ ...formData, isPayant: checked })
+                        }
+                      />
+                      <Label htmlFor="isPayant">Parking payant</Label>
+                    </div>
+
+                    {formData.isPayant && (
+                      <div className="space-y-2">
+                        <Label>Tarif approximatif (€/jour)</Label>
+                        <Input
+                          type="number"
+                          value={formData.tarif}
+                          onChange={(e) =>
+                            setFormData({ ...formData, tarif: e.target.value })
+                          }
+                        />
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Label>Commerces à proximité</Label>
+                      {commerceTypes.map((commerce) => (
+                        <div
+                          key={commerce.value}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            id={commerce.value}
+                            checked={formData.commercesProches.includes(
+                              commerce.value
+                            )}
+                            onCheckedChange={(checked) => {
+                              const newCommerces = checked
+                                ? [...formData.commercesProches, commerce.value]
+                                : formData.commercesProches.filter(
+                                    (c) => c !== commerce.value
+                                  );
+                              setFormData({
+                                ...formData,
+                                commercesProches: newCommerces,
+                              });
+                            }}
+                          />
+                          <Label htmlFor={commerce.value}>
+                            {commerce.label}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Champs communs aux deux types */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="handicapAccess"
+                    checked={formData.handicapAccess}
+                    onCheckedChange={(checked: boolean) =>
+                      setFormData({ ...formData, handicapAccess: checked })
+                    }
+                  />
+                  <Label htmlFor="handicapAccess">Accès handicapé</Label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Électricité</Label>
+                  <Select
+                    value={formData.electricity}
+                    onValueChange={(value: ElectricityType) =>
+                      setFormData({ ...formData, electricity: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NONE">Non disponible</SelectItem>
+                      <SelectItem value="AMP_8">8 ampères</SelectItem>
+                      <SelectItem value="AMP_15">15 ampères</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button type="submit" className="w-full">
+                {stationType === "PARKING"
+                  ? "Ajouter le parking"
+                  : "Ajouter la station"}
               </Button>
-            </div>
-          </div>
-        )}
-      </main>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
-};
-
-export default LocalisationStation;
+}

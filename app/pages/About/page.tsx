@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 interface Stats {
@@ -191,10 +192,13 @@ export default function About() {
         </div>
 
         {/* Call to Action */}
+
         <div className="bg-blue-600 rounded-lg p-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Rejoignez l'aventure SplashCamper
-          </h2>
+          <Link href="/components/localisationStation2">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              Rejoignez l'aventure SplashCamper
+            </h2>
+          </Link>
           <p className="text-white text-lg mb-8 max-w-2xl mx-auto">
             Contribuez à notre communauté en partageant vos découvertes et en
             aidant d'autres camping-caristes.

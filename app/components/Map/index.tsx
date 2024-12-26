@@ -1,65 +1,101 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { LatLngTuple } from "leaflet";
-import { CamperWashStation } from "@/app/types";
-import { createIcon } from "@/app/lib/mapUtils";
+import { Icon } from "leaflet";
+import { StationType } from "@prisma/client";
+
+// Icônes personnalisées pour les différents types de points
+const stationIcon = new Icon({
+  iconUrl: "/icons/station-marker.svg",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+const parkingIcon = new Icon({
+  iconUrl: "/icons/parking-marker.svg",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  type: StationType;
+  status: string;
+}
 
 interface MapProps {
-  position: LatLngTuple;
-  selectedLocation: CamperWashStation | null;
-  existingLocations: CamperWashStation[];
-  onLocationSelect?: (location: CamperWashStation) => void;
+  onLocationSelect: (location: { lat: number; lng: number }) => void;
+  existingLocations?: Location[];
+  center?: [number, number];
+  zoom?: number;
+}
+
+interface MapEventsProps {
+  onLocationSelect: (location: { lat: number; lng: number }) => void;
+}
+
+function MapEvents({ onLocationSelect }: MapEventsProps) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+
+    const handleClick = (e: { latlng: { lat: number; lng: number } }) => {
+      const { lat, lng } = e.latlng;
+      onLocationSelect({ lat, lng });
+    };
+
+    map.on("click", handleClick);
+
+    return () => {
+      map.off("click", handleClick);
+    };
+  }, [map, onLocationSelect]);
+
+  return null;
 }
 
 export default function Map({
-  position,
-  selectedLocation,
-  existingLocations,
   onLocationSelect,
+  existingLocations = [],
+  center = [46.603354, 1.888334], // Centre de la France
+  zoom = 6,
 }: MapProps) {
   return (
     <MapContainer
-      center={position}
-      zoom={13}
-      className="h-full w-full"
-      style={{ height: "400px" }}
+      center={center}
+      zoom={zoom}
+      style={{ height: "500px", width: "100%" }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <MapEvents onLocationSelect={onLocationSelect} />
+
       {existingLocations.map((location) => (
         <Marker
           key={location.id}
-          position={[location.lat, location.lng]}
-          icon={createIcon(location.status)}
-          eventHandlers={{
-            click: () => onLocationSelect?.(location),
-          }}
+          position={[location.latitude, location.longitude]}
+          icon={location.type === "PARKING" ? parkingIcon : stationIcon}
         >
           <Popup>
-            <div className="p-2">
-              <h3 className="font-semibold">{location.name}</h3>
-              <p className="text-sm">{location.address}</p>
+            <div>
+              <h3 className="font-bold">{location.name}</h3>
+              <p>{location.address}</p>
+              <p>Status: {location.status}</p>
             </div>
           </Popup>
         </Marker>
       ))}
-      {selectedLocation && (
-        <Marker
-          position={[selectedLocation.lat, selectedLocation.lng]}
-          icon={createIcon("selected")}
-        >
-          <Popup>
-            <div className="p-2">
-              <h3 className="font-semibold">{selectedLocation.name}</h3>
-              <p className="text-sm">{selectedLocation.address}</p>
-            </div>
-          </Popup>
-        </Marker>
-      )}
     </MapContainer>
   );
 }

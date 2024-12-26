@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/AuthOptions";
 import {
   Prisma,
   StationStatus,
+  StationType,
   HighPressureType,
   ElectricityType,
 } from "@prisma/client";
@@ -35,15 +36,20 @@ export async function POST(request: Request) {
     const stationData: Prisma.StationCreateInput = {
       name: data.name,
       address: data.address,
+      city: data.city || null,
+      postalCode: data.postalCode || null,
       latitude: parseFloat(data.latitude || data.lat),
       longitude: parseFloat(data.longitude || data.lng),
       images: data.images || [],
       status: StationStatus.en_attente,
+      type: data.type as StationType,
       author: { connect: { id: user.id } },
       user: { connect: { id: user.id } },
-      city: data.city || null,
-      postalCode: data.postalCode || null,
-      services: {
+    };
+
+    // Si c'est une station de lavage
+    if (data.type === StationType.STATION_LAVAGE) {
+      stationData.services = {
         create: {
           highPressure: data.highPressure || HighPressureType.NONE,
           tirePressure: data.tirePressure || false,
@@ -56,13 +62,27 @@ export async function POST(request: Request) {
             ? parseFloat(data.maxVehicleLength)
             : null,
         },
-      },
-    };
+      };
+    }
+
+    // Si c'est un parking
+    if (data.type === StationType.PARKING) {
+      stationData.parkingDetails = {
+        create: {
+          isPayant: data.isPayant || false,
+          tarif: data.isPayant ? parseFloat(data.tarif) : null,
+          hasElectricity: data.electricity || ElectricityType.NONE,
+          commercesProches: data.commercesProches || [],
+          handicapAccess: data.handicapAccess || false,
+        },
+      };
+    }
 
     const station = await prisma.station.create({
       data: stationData,
       include: {
         services: true,
+        parkingDetails: true,
         author: {
           select: {
             name: true,
@@ -88,6 +108,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       include: {
         services: true,
+        parkingDetails: true,
         author: {
           select: {
             name: true,
@@ -104,11 +125,13 @@ export async function GET() {
       address: station.address,
       city: station.city,
       postalCode: station.postalCode,
-      lat: station.latitude,
-      lng: station.longitude,
+      latitude: station.latitude,
+      longitude: station.longitude,
       images: station.images,
       status: station.status,
+      type: station.type,
       services: station.services,
+      parkingDetails: station.parkingDetails,
       author: station.author,
       createdAt: station.createdAt,
     }));
