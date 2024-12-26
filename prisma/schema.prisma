@@ -55,6 +55,7 @@ model User {
   analytics      Analytics[]
   activities     UserActivity[]
   visits         Visit[]
+  Station        Station[]
 }
 
 enum StationStatus {
@@ -67,6 +68,8 @@ model Station {
   id               String        @id @default(cuid())
   name             String
   address          String
+  city             String
+  postalCode       String
   latitude         Float
   longitude        Float
   images           String[]
@@ -82,6 +85,9 @@ model Station {
   encryptedName    String?       @db.Text
   encryptedAddress String?       @db.Text
   visits           Visit[]
+  hasParking       Boolean       @default(false)
+  userId           String
+  user             User          @relation(fields: [userId], references: [id])
 }
 
 model Review {

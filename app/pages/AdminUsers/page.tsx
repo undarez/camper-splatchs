@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Button } from "@/app/components/ui/button";
+import { toast } from "sonner";
 import {
   Table,
   TableBody,
@@ -11,249 +11,224 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
+import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { toast } from "@/hooks/use-toast";
-import ConnectYou from "../auth/connect-you/page";
+import { User, Role } from "@prisma/client";
 
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  createdAt: string;
-  lastLogin: string;
-}
-
-const AdminUsers = () => {
-  const { data: session, status } = useSession();
+export default function AdminUsers() {
+  const { data: session } = useSession();
   const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch("/api/admin/users");
-        if (!response.ok) {
-          const errorData = await response.text();
-          throw new Error(
-            errorData || "Erreur lors du chargement des utilisateurs"
-          );
-        }
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Erreur:", error);
-        toast({
-          title: "Erreur",
-          description:
-            error instanceof Error
-              ? error.message
-              : "Impossible de charger les utilisateurs",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    fetchUsers();
+  }, []);
 
-    if (session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-      fetchUsers();
-    } else {
-      setIsLoading(false);
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("/api/admin/users");
+      if (!response.ok)
+        throw new Error("Erreur lors de la récupération des utilisateurs");
+      const data = await response.json();
+      setUsers(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error("Impossible de charger les utilisateurs");
+      setLoading(false);
     }
-  }, [session]);
+  };
 
-  if (status === "loading" || isLoading) {
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+  };
+
+  const handleSave = async (user: User) => {
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la mise à jour");
+
+      const updatedUser = await response.json();
+      setUsers(users.map((u) => (u.id === user.id ? updatedUser : u)));
+      setEditingUser(null);
+      toast.success("Utilisateur mis à jour avec succès");
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error("Erreur lors de la mise à jour de l'utilisateur");
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingUser(null);
+  };
+
+  const filteredUsers = users.filter((user) =>
+    Object.values(user).some((value) =>
+      String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  useEffect(() => {
+    const interval = setInterval(fetchUsers, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (session?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-          <p className="text-gray-600">Chargement des utilisateurs...</p>
-        </div>
+      <div className="text-center p-8 text-red-500">Accès non autorisé</div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
-  if (
-    status === "unauthenticated" ||
-    session?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
-  ) {
-    return <ConnectYou />;
-  }
-
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ role: newRole.toUpperCase() }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || "Erreur lors de la modification du rôle");
-      }
-
-      const updatedUser = await response.json();
-      setUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
-
-      toast({
-        title: "Succès",
-        description: "Rôle modifié avec succès",
-      });
-    } catch (error) {
-      console.error("Erreur:", error);
-      toast({
-        title: "Erreur",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Impossible de modifier le rôle",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?"))
-      return;
-
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) throw new Error("Erreur lors de la suppression");
-
-      setUsers(users.filter((user) => user.id !== userId));
-      toast({
-        title: "Succès",
-        description: "Utilisateur supprimé avec succès",
-      });
-    } catch (error) {
-      console.error("Erreur:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'utilisateur",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
-
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Gestion des Utilisateurs</h1>
-
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <Input
-          placeholder="Rechercher un utilisateur..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-xs"
-          disabled={isLoading}
-        />
-        <Select
-          value={roleFilter}
-          onValueChange={setRoleFilter}
-          disabled={isLoading}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrer par rôle" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les rôles</SelectItem>
-            <SelectItem value="user">Utilisateur</SelectItem>
-            <SelectItem value="admin">Administrateur</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="border rounded-lg relative">
-        {isLoading && (
-          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-2 sm:p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4">
+            Gestion des Utilisateurs
+          </h1>
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="w-full sm:w-auto">
+              <Input
+                type="search"
+                placeholder="Rechercher un utilisateur..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full sm:w-80 bg-gray-800 text-white border-gray-700"
+              />
+            </div>
+            <div className="text-gray-300 text-sm sm:text-base">
+              {filteredUsers.length} utilisateur(s) trouvé(s)
+            </div>
           </div>
-        )}
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Rôle</TableHead>
-              <TableHead>Date d'inscription</TableHead>
-              <TableHead>Dernière connexion</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.name || "Non renseigné"}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Select
-                    value={user.role.toLowerCase()}
-                    onValueChange={(value) => handleRoleChange(user.id, value)}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">Utilisateur</SelectItem>
-                      <SelectItem value="admin">Administrateur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(user.lastLogin).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDeleteUser(user.id)}
-                    disabled={isLoading}
-                  >
-                    Supprimer
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-gray-300 px-2 sm:px-4">
+                    Nom
+                  </TableHead>
+                  <TableHead className="text-gray-300 px-2 sm:px-4">
+                    Email
+                  </TableHead>
+                  <TableHead className="text-gray-300 px-2 sm:px-4">
+                    Rôle
+                  </TableHead>
+                  <TableHead className="text-gray-300 px-2 sm:px-4">
+                    Actions
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id} className="hover:bg-gray-700/50">
+                    <TableCell className="text-white px-2 sm:px-4">
+                      {editingUser?.id === user.id ? (
+                        <Input
+                          value={editingUser.name || ""}
+                          onChange={(e) =>
+                            setEditingUser({
+                              ...editingUser,
+                              name: e.target.value,
+                            })
+                          }
+                          className="bg-gray-700 text-white border-gray-600 text-sm sm:text-base"
+                        />
+                      ) : (
+                        <span className="text-sm sm:text-base">
+                          {user.name}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-white px-2 sm:px-4">
+                      {editingUser?.id === user.id ? (
+                        <Input
+                          value={editingUser.email || ""}
+                          onChange={(e) =>
+                            setEditingUser({
+                              ...editingUser,
+                              email: e.target.value,
+                            })
+                          }
+                          className="bg-gray-700 text-white border-gray-600 text-sm sm:text-base"
+                        />
+                      ) : (
+                        <span className="text-sm sm:text-base">
+                          {user.email}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-white px-2 sm:px-4">
+                      {editingUser?.id === user.id ? (
+                        <select
+                          value={editingUser.role}
+                          onChange={(e) =>
+                            setEditingUser({
+                              ...editingUser,
+                              role: e.target.value as Role,
+                            })
+                          }
+                          className="w-full bg-gray-700 text-white border border-gray-600 rounded-md p-1 sm:p-2 text-sm sm:text-base"
+                        >
+                          <option value="USER">Utilisateur</option>
+                          <option value="ADMIN">Administrateur</option>
+                        </select>
+                      ) : (
+                        <span className="text-sm sm:text-base">
+                          {user.role}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-2 sm:px-4">
+                      {editingUser?.id === user.id ? (
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <Button
+                            onClick={() => handleSave(editingUser)}
+                            className="bg-green-600 hover:bg-green-700 text-sm sm:text-base py-1 h-8 sm:h-10"
+                          >
+                            Sauvegarder
+                          </Button>
+                          <Button
+                            onClick={handleCancel}
+                            variant="outline"
+                            className="border-gray-600 text-white hover:bg-gray-700 text-sm sm:text-base py-1 h-8 sm:h-10"
+                          >
+                            Annuler
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          onClick={() => handleEdit(user)}
+                          className="bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-1 h-8 sm:h-10"
+                        >
+                          Modifier
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default AdminUsers;
+}

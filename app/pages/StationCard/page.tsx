@@ -5,7 +5,7 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
-  Bars3Icon,
+  Bars3Icon as Menu,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -202,7 +202,10 @@ const ValidatedStations = () => {
   }, []);
 
   const filteredStations = stations.filter(
-    (station) => statusFilter === "all" || station.status === statusFilter
+    (station) =>
+      statusFilter === "all" ||
+      station.status === statusFilter ||
+      station.status === "active"
   );
 
   const indexOfLastStation = currentPage * stationsPerPage;
@@ -334,45 +337,16 @@ const ValidatedStations = () => {
         {/* Contenu principal */}
         <main className="flex-1 min-h-screen">
           <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500 to-blue-700">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 shadow-lg border border-white/20 transition-all duration-200"
                 aria-label={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
               >
-                <Bars3Icon className="h-6 w-6" />
+                <Menu className="h-6 w-6 text-white" />
               </button>
-              <div className="flex gap-4 ml-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setViewMode("cards")}
-                  className={`
-                    ${
-                      viewMode === "cards"
-                        ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-                        : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }
-                    border-gray-200 dark:border-gray-700
-                  `}
-                >
-                  Vue cartes
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setViewMode("map")}
-                  className={`
-                    ${
-                      viewMode === "map"
-                        ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-                        : "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }
-                    border-gray-200 dark:border-gray-700
-                  `}
-                >
-                  Vue carte
-                </Button>
+              <div className="flex-1 flex justify-center">
+                <h1 className="text-xl font-bold text-white">Stations</h1>
               </div>
             </div>
 
