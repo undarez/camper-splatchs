@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import type { LatLngTuple } from "leaflet";
@@ -22,6 +22,22 @@ import { GeoapifyResult } from "@/app/types/typesGeoapify";
 import { CamperWashStation, StationStatus } from "@/app/types";
 import { Input } from "@/app/components/ui/input";
 import { StationType } from "@prisma/client";
+import { Button } from "@/app/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/app/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/components/ui/select";
+import { Checkbox } from "@/app/components/ui/checkbox";
+import { Label } from "@/app/components/ui/label";
 
 // Dynamic loading of the map
 const Map = dynamic(
@@ -36,11 +52,26 @@ const Map = dynamic(
   }
 );
 
-// Validation schema
-const formSchema = z.object({
+// Validation schemas
+const addressFormSchema = z.object({
   address: z.string().min(1, "L'adresse est requise"),
   lat: z.number(),
   lng: z.number(),
+});
+
+const stationFormSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  highPressure: z.enum(["NONE", "PASSERELLE", "ECHAFAUDAGE", "PORTIQUE"]),
+  tirePressure: z.boolean(),
+  vacuum: z.boolean(),
+  wasteWater: z.boolean(),
+});
+
+const parkingFormSchema = z.object({
+  name: z.string().min(1, "Le nom est requis"),
+  isPayant: z.boolean(),
+  electricity: z.enum(["NONE", "AMP_8", "AMP_15"]),
+  commercesProches: z.array(z.string()),
 });
 
 interface MapLocation {
@@ -87,13 +118,36 @@ const AdressGeoapify = ({
   );
   const [selectedLocation, setSelectedLocation] =
     useState<CamperWashStation | null>(null);
+  const [isStationModalOpen, setIsStationModalOpen] = useState(false);
+  const [isParkingModalOpen, setIsParkingModalOpen] = useState(false);
 
-  const methods = useForm({
-    resolver: zodResolver(formSchema),
+  const addressMethods = useForm({
+    resolver: zodResolver(addressFormSchema),
     defaultValues: {
       address: defaultValue?.formatted || "",
       lat: defaultValue?.lat || 46.227638,
       lng: defaultValue?.lon || 2.213749,
+    },
+  });
+
+  const stationMethods = useForm({
+    resolver: zodResolver(stationFormSchema),
+    defaultValues: {
+      name: "",
+      highPressure: "NONE",
+      tirePressure: false,
+      vacuum: false,
+      wasteWater: false,
+    },
+  });
+
+  const parkingMethods = useForm({
+    resolver: zodResolver(parkingFormSchema),
+    defaultValues: {
+      name: "",
+      isPayant: false,
+      electricity: "NONE",
+      commercesProches: [],
     },
   });
 
@@ -137,16 +191,16 @@ const AdressGeoapify = ({
   useEffect(() => {
     if (defaultValue) {
       setPosition([defaultValue.lat || 0, defaultValue.lon || 0]);
-      methods.setValue("address", defaultValue.formatted || "");
-      methods.setValue("lat", defaultValue.lat || 0);
-      methods.setValue("lng", defaultValue.lon || 0);
+      addressMethods.setValue("address", defaultValue.formatted || "");
+      addressMethods.setValue("lat", defaultValue.lat || 0);
+      addressMethods.setValue("lng", defaultValue.lon || 0);
       onAddressSelect?.(
         defaultValue.formatted || "",
         defaultValue.lat || 0,
         defaultValue.lon || 0
       );
     }
-  }, [defaultValue, onAddressSelect, methods]);
+  }, [defaultValue, onAddressSelect, addressMethods]);
 
   // Convertir position en tuple de deux nombres
   const mapCenter: [number, number] = [
@@ -159,11 +213,40 @@ const AdressGeoapify = ({
     return null;
   }
 
+  type StationFormValues = {
+    name: string;
+    highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
+    tirePressure: boolean;
+    vacuum: boolean;
+    wasteWater: boolean;
+  };
+
+  type ParkingFormValues = {
+    name: string;
+    isPayant: boolean;
+    electricity: "NONE" | "AMP_8" | "AMP_15";
+    commercesProches: string[];
+  };
+
+  const handleStationSubmit: SubmitHandler<StationFormValues> = async (
+    data
+  ) => {
+    console.log("Station data:", data);
+    setIsStationModalOpen(false);
+  };
+
+  const handleParkingSubmit: SubmitHandler<ParkingFormValues> = async (
+    data
+  ) => {
+    console.log("Parking data:", data);
+    setIsParkingModalOpen(false);
+  };
+
   return (
-    <FormProvider {...methods}>
+    <FormProvider {...addressMethods}>
       <form className="space-y-6">
         <FormField
-          control={methods.control}
+          control={addressMethods.control}
           name="address"
           render={({ field }) => (
             <FormItem>
@@ -257,7 +340,7 @@ const AdressGeoapify = ({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField
-            control={methods.control}
+            control={addressMethods.control}
             name="lat"
             render={({ field }) => (
               <FormItem>
@@ -269,7 +352,7 @@ const AdressGeoapify = ({
             )}
           />
           <FormField
-            control={methods.control}
+            control={addressMethods.control}
             name="lng"
             render={({ field }) => (
               <FormItem>
@@ -281,6 +364,227 @@ const AdressGeoapify = ({
             )}
           />
         </div>
+        {selectedLocation && (
+          <div className="flex gap-4 justify-center">
+            <Button
+              type="button"
+              onClick={() => setIsStationModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Créer une Station de Lavage
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsParkingModalOpen(true)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Créer une Place de Parking
+            </Button>
+          </div>
+        )}
+
+        {/* Modal Station de Lavage */}
+        <Dialog open={isStationModalOpen} onOpenChange={setIsStationModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Créer une Station de Lavage</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={stationMethods.handleSubmit(handleStationSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={stationMethods.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom de la station</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Nom de la station" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={stationMethods.control}
+                name="highPressure"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type de haute pression</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner le type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NONE">Aucun</SelectItem>
+                        <SelectItem value="PASSERELLE">Passerelle</SelectItem>
+                        <SelectItem value="ECHAFAUDAGE">Échafaudage</SelectItem>
+                        <SelectItem value="PORTIQUE">Portique</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={stationMethods.control}
+                name="tirePressure"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Gonflage des pneus</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={stationMethods.control}
+                name="vacuum"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Aspirateur</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={stationMethods.control}
+                name="wasteWater"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Vidange eaux usées</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full">
+                Créer la Station
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal Place de Parking */}
+        <Dialog open={isParkingModalOpen} onOpenChange={setIsParkingModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Créer une Place de Parking</DialogTitle>
+            </DialogHeader>
+            <form
+              onSubmit={parkingMethods.handleSubmit(handleParkingSubmit)}
+              className="space-y-4"
+            >
+              <FormField
+                control={parkingMethods.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom du parking</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Nom du parking" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={parkingMethods.control}
+                name="isPayant"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Parking payant</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={parkingMethods.control}
+                name="electricity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Électricité</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Type d'électricité" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="NONE">Non disponible</SelectItem>
+                        <SelectItem value="AMP_8">8 ampères</SelectItem>
+                        <SelectItem value="AMP_15">15 ampères</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={parkingMethods.control}
+                name="commercesProches"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Commerces à proximité</FormLabel>
+                    <div className="space-y-2">
+                      {[
+                        { value: "NOURRITURE", label: "Nourriture" },
+                        { value: "BANQUE", label: "Banque" },
+                        { value: "CENTRE_VILLE", label: "Centre-ville" },
+                        { value: "STATION_SERVICE", label: "Station-service" },
+                        { value: "LAVERIE", label: "Laverie" },
+                        { value: "GARAGE", label: "Garage" },
+                      ].map((commerce) => (
+                        <div
+                          key={commerce.value}
+                          className="flex items-center space-x-2"
+                        >
+                          <Checkbox
+                            checked={field.value.includes(commerce.value)}
+                            onCheckedChange={(checked) => {
+                              const newValue = checked
+                                ? [...field.value, commerce.value]
+                                : field.value.filter(
+                                    (v) => v !== commerce.value
+                                  );
+                              field.onChange(newValue);
+                            }}
+                          />
+                          <Label>{commerce.label}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full">
+                Créer le Parking
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </form>
     </FormProvider>
   );
