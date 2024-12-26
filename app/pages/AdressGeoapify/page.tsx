@@ -19,8 +19,9 @@ import {
   FormMessage,
 } from "@/app/components/ui/form";
 import { GeoapifyResult } from "@/app/types/typesGeoapify";
-import { CamperWashStation } from "@/app/types";
+import { CamperWashStation, StationStatus } from "@/app/types";
 import { Input } from "@/app/components/ui/input";
+import { StationType } from "@prisma/client";
 
 // Dynamic loading of the map
 const Map = dynamic(
@@ -40,6 +41,27 @@ const formSchema = z.object({
   address: z.string().min(1, "L'adresse est requise"),
   lat: z.number(),
   lng: z.number(),
+});
+
+interface MapLocation {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  type: StationType;
+  status: string;
+}
+
+// Fonction de transformation
+const transformToMapLocation = (station: CamperWashStation): MapLocation => ({
+  id: station.id,
+  name: station.name,
+  address: station.address,
+  latitude: station.lat,
+  longitude: station.lng,
+  type: StationType.STATION_LAVAGE,
+  status: station.status,
 });
 
 // Component definition
@@ -126,6 +148,12 @@ const AdressGeoapify = ({
     }
   }, [defaultValue, onAddressSelect, methods]);
 
+  // Convertir position en tuple de deux nombres
+  const mapCenter: [number, number] = [
+    typeof position[0] === "number" ? position[0] : 46.603354,
+    typeof position[1] === "number" ? position[1] : 1.888334,
+  ];
+
   if (!apiKey) {
     console.error("La clé API Geoapify n'est pas définie");
     return null;
@@ -189,10 +217,42 @@ const AdressGeoapify = ({
         )}
         <div className="h-[400px] w-full">
           <Map
-            position={position}
-            selectedLocation={selectedLocation}
-            existingLocations={existingLocations}
-            onLocationSelect={setSelectedLocation}
+            center={mapCenter}
+            zoom={12}
+            existingLocations={existingLocations.map(transformToMapLocation)}
+            onLocationSelect={(location) => {
+              if (selectedLocation) {
+                setSelectedLocation({
+                  ...selectedLocation,
+                  lat: location.lat,
+                  lng: location.lng,
+                });
+              } else {
+                // Créer une nouvelle station avec les valeurs par défaut
+                setSelectedLocation({
+                  id: "",
+                  name: "",
+                  address: "",
+                  lat: location.lat,
+                  lng: location.lng,
+                  status: "en_attente" as StationStatus,
+                  services: {
+                    highPressure: "NONE",
+                    tirePressure: false,
+                    vacuum: false,
+                    handicapAccess: false,
+                    wasteWater: false,
+                    waterPoint: false,
+                    wasteWaterDisposal: false,
+                    blackWaterDisposal: false,
+                    electricity: "NONE",
+                    paymentMethods: [],
+                    maxVehicleLength: null,
+                  },
+                  createdAt: new Date().toISOString(),
+                });
+              }
+            }}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
