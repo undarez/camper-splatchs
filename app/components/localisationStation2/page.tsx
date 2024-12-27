@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -11,20 +11,37 @@ import {
   ElectricityType,
   StationStatus,
 } from "@prisma/client";
-import { GeoapifyGeocoderAutocomplete } from "@geoapify/react-geocoder-autocomplete";
-import "@geoapify/geocoder-autocomplete/styles/minimal.css";
 import AddPointModal from "@/app/components/AddPointModal";
 import { cn } from "@/lib/utils";
-import "leaflet/dist/leaflet.css";
-import { TileLayer, Marker, Popup } from "react-leaflet";
 import { Icon, Map as LeafletMap } from "leaflet";
 
-const MapWithNoSSR = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  {
-    ssr: false,
-  }
+// Import dynamique des composants qui utilisent window/leaflet
+const GeoapifyGeocoderAutocomplete = dynamic(
+  () =>
+    import("@geoapify/react-geocoder-autocomplete").then(
+      (mod) => mod.GeoapifyGeocoderAutocomplete
+    ),
+  { ssr: false }
 );
+
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+
+const Marker = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Marker),
+  { ssr: false }
+);
+
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
+  ssr: false,
+});
 
 interface GeoapifyProperties {
   lat: number;
@@ -180,6 +197,11 @@ const defaultFormData = {
 };
 
 // Correction pour les icônes Leaflet
+interface IconDefaultPrototype extends Icon.Default {
+  _getIconUrl?: () => string;
+}
+
+delete (Icon.Default.prototype as IconDefaultPrototype)._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: "/leaflet/marker-icon-2x.png",
   iconUrl: "/leaflet/marker-icon.png",
@@ -193,6 +215,14 @@ export default function LocalisationStation2() {
   const [formData, setFormData] = useState<StationFormData>(defaultFormData);
   const { data: sessionData } = useSession();
   const router = useRouter();
+
+  // Chargement dynamique des styles CSS
+  useEffect(() => {
+    Promise.all([
+      import("leaflet/dist/leaflet.css"),
+      import("@geoapify/geocoder-autocomplete/styles/minimal.css"),
+    ]);
+  }, []);
 
   useEffect(() => {
     const fetchStations = async () => {
@@ -432,7 +462,7 @@ export default function LocalisationStation2() {
 
       {/* Carte */}
       <div className="h-full">
-        <MapWithNoSSR
+        <MapContainer
           center={[46.603354, 1.888334]}
           zoom={6}
           className="h-full w-full"
@@ -564,7 +594,7 @@ export default function LocalisationStation2() {
               </Popup>
             </Marker>
           ))}
-        </MapWithNoSSR>
+        </MapContainer>
       </div>
 
       {/* Modal */}
