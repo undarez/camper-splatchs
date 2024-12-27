@@ -14,7 +14,7 @@ import {
   Users,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/app/components/ui/button";
 
@@ -35,30 +35,23 @@ const adminItems = [
   { href: "/pages/AdminUsers", label: "Gestion des utilisateurs", icon: Users },
 ];
 
-const MobileSidebar = () => {
+const MobileSidebar = ({
+  isSidebarOpen = false,
+}: {
+  isSidebarOpen?: boolean;
+}) => {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(isSidebarOpen);
 
-  const handleNavigation = () => {
-    setOpen(false);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Escape") {
-      setOpen(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: "/" });
-    setOpen(false);
-  };
+  useEffect(() => {
+    setOpen(isSidebarOpen);
+  }, [isSidebarOpen]);
 
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
         className="fixed top-4 left-4 md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors z-50"
         aria-label="Ouvrir le menu"
       >
@@ -77,15 +70,18 @@ const MobileSidebar = () => {
         </svg>
       </button>
 
+      {/* Overlay */}
       {open && (
-        <div
-          role="presentation"
-          aria-hidden="true"
+        <button
+          type="button"
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[45] md:hidden"
           onClick={() => setOpen(false)}
-          onKeyDown={handleKeyDown}
-          tabIndex={-1}
-          style={{ pointerEvents: "auto" }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              setOpen(false);
+            }
+          }}
+          aria-label="Fermer le menu"
         />
       )}
 
@@ -93,39 +89,11 @@ const MobileSidebar = () => {
         role="navigation"
         aria-label="Menu principal"
         className={cn(
-          "fixed inset-y-0 left-0 z-[50] h-full w-72 transform shadow-lg transition-all duration-300 ease-in-out md:hidden overflow-hidden",
-          open ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 left-0 z-[50] h-full w-72 transform shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-b from-[#2ABED9] to-[#1B4B82]",
+          open ? "translate-x-0" : "-translate-x-full",
+          "md:translate-x-0"
         )}
       >
-        <div className="absolute inset-0 bg-gradient-to-b from-[#2ABED9] to-[#1B4B82] overflow-hidden">
-          <div className="absolute inset-0">
-            <div className="absolute inset-0 animate-wave1">
-              <svg
-                className="h-full w-full"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-              >
-                <path
-                  fill="rgba(255, 255, 255, 0.1)"
-                  d="M0 50 Q 25 40, 50 50 T 100 50 V100 H0 Z"
-                />
-              </svg>
-            </div>
-            <div className="absolute inset-0 animate-wave2 delay-150">
-              <svg
-                className="h-full w-full"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-              >
-                <path
-                  fill="rgba(255, 255, 255, 0.15)"
-                  d="M0 50 Q 25 45, 50 50 T 100 50 V100 H0 Z"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
         <div className="relative flex h-full flex-col">
           <div className="flex items-center justify-between p-4">
             <Link href="/" className="flex items-center space-x-3">
@@ -145,7 +113,7 @@ const MobileSidebar = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={handleNavigation}
+                onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center space-x-3 rounded-lg px-4 py-3 text-white transition-all duration-200",
                   pathname === item.href
@@ -165,7 +133,7 @@ const MobileSidebar = () => {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={handleNavigation}
+                    onClick={() => setOpen(false)}
                     className={cn(
                       "flex items-center space-x-3 rounded-lg px-4 py-3 text-white transition-all duration-200",
                       pathname === item.href
@@ -183,7 +151,7 @@ const MobileSidebar = () => {
 
           <div className="p-4 space-y-4">
             <Button
-              onClick={handleLogout}
+              onClick={() => signOut({ callbackUrl: "/" })}
               className="w-full flex items-center justify-center space-x-2 bg-white/10 hover:bg-white/20 text-white transition-all duration-200"
             >
               <LogOut className="h-5 w-5" />

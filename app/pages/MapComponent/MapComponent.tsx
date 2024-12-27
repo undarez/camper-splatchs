@@ -93,7 +93,7 @@ export function MapComponent({
 
         {selectedLocation && (
           <Marker
-            position={[selectedLocation.lat, selectedLocation.lng]}
+            position={[selectedLocation.latitude, selectedLocation.longitude]}
             icon={createIcon(ICON_COLORS.selected)}
           >
             <Popup>
@@ -108,11 +108,11 @@ export function MapComponent({
 
         {existingLocations.map(
           (location) =>
-            location.lat &&
-            location.lng && (
+            location.latitude &&
+            location.longitude && (
               <Marker
                 key={location.id}
-                position={[location.lat, location.lng]}
+                position={[location.latitude, location.longitude]}
                 icon={createIcon(ICON_COLORS.default)}
                 eventHandlers={{
                   click: () => onLocationSelect(location),

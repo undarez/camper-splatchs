@@ -13,7 +13,7 @@ import {
 } from "@/app/components/ui/table";
 import { Badge } from "@/app/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { CamperWashStation } from "@/app/types";
+import { StationType, HighPressureType, ElectricityType } from "@prisma/client";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -38,9 +38,40 @@ ChartJS.register(
   Filler
 );
 
+interface Station {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  type: StationType;
+  status: string;
+  images: string[];
+  services?: {
+    id: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength?: string;
+  };
+  parkingDetails?: {
+    id: string;
+    isPayant: boolean;
+    tarif: number;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+  };
+}
+
 const AdminStations = () => {
-  const { data: session } = useSession();
-  const [stations, setStations] = useState<CamperWashStation[]>([]);
+  const { data: session, status } = useSession();
+  const [stations, setStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<
     "daily" | "monthly" | "yearly"
@@ -333,17 +364,59 @@ const AdminStations = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {Object.entries(station.services).map(([key, value]) =>
-                          key !== "id" && value ? (
-                            <Badge
-                              key={key}
-                              variant="secondary"
-                              className="bg-gray-700"
-                            >
-                              {key}
-                            </Badge>
-                          ) : null
-                        )}
+                        {station.type === "STATION_LAVAGE" &&
+                          station.services && (
+                            <>
+                              {station.services.highPressure !== "NONE" && (
+                                <Badge variant="outline" className="capitalize">
+                                  {station.services.highPressure
+                                    .toLowerCase()
+                                    .replace(/_/g, " ")}
+                                </Badge>
+                              )}
+                              {station.services.tirePressure && (
+                                <Badge variant="outline">Gonflage pneus</Badge>
+                              )}
+                              {station.services.vacuum && (
+                                <Badge variant="outline">Aspirateur</Badge>
+                              )}
+                              {station.services.wasteWater && (
+                                <Badge variant="outline">
+                                  Vidange eaux usées
+                                </Badge>
+                              )}
+                            </>
+                          )}
+                        {station.type === "PARKING" &&
+                          station.parkingDetails && (
+                            <>
+                              {station.parkingDetails.isPayant && (
+                                <Badge variant="outline">
+                                  Payant ({station.parkingDetails.tarif}€)
+                                </Badge>
+                              )}
+                              {station.parkingDetails.hasElectricity !==
+                                "NONE" && (
+                                <Badge variant="outline">
+                                  {station.parkingDetails.hasElectricity ===
+                                  "AMP_8"
+                                    ? "8A"
+                                    : "15A"}
+                                </Badge>
+                              )}
+                              {station.parkingDetails.commercesProches.map(
+                                (commerce) => (
+                                  <Badge
+                                    key={commerce}
+                                    variant="outline"
+                                    className="capitalize"
+                                  >
+                                    {commerce.toLowerCase().replace(/_/g, " ")}
+                                  </Badge>
+                                )
+                              )}
+                            </>
+                          )}
                       </div>
                     </TableCell>
                     <TableCell>

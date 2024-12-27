@@ -14,10 +14,11 @@ export const createIcon = (color: string): Icon => {
   });
 };
 
-export const icons: Record<IconType, Icon> = {
+export const icons: Record<IconType | "parking", Icon> = {
   default: createIcon("blue"),
   active: createIcon("green"),
   inactive: createIcon("red"),
   en_attente: createIcon("orange"),
   selected: createIcon("yellow"),
+  parking: createIcon("violet"),
 };

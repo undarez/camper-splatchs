@@ -23,7 +23,12 @@ const notificationSchema = z.object({
     vacuum: z.boolean(),
     handicapAccess: z.boolean(),
     wasteWater: z.boolean(),
+    waterPoint: z.boolean(),
+    wasteWaterDisposal: z.boolean(),
+    blackWaterDisposal: z.boolean(),
     electricity: z.string(),
+    maxVehicleLength: z.number().nullable(),
+    paymentMethods: z.array(z.string()),
   }),
 });
 
@@ -58,8 +63,21 @@ export async function POST(request: Request) {
     if (validatedData.services.handicapAccess)
       servicesList.push("Accès handicapé");
     if (validatedData.services.wasteWater) servicesList.push("Eaux usées");
+    if (validatedData.services.waterPoint) servicesList.push("Point d'eau");
+    if (validatedData.services.wasteWaterDisposal)
+      servicesList.push("Évacuation eaux usées");
+    if (validatedData.services.blackWaterDisposal)
+      servicesList.push("Évacuation eaux noires");
     if (validatedData.services.electricity !== "NONE")
       servicesList.push(`Électricité: ${validatedData.services.electricity}`);
+    if (validatedData.services.maxVehicleLength)
+      servicesList.push(
+        `Longueur maximale: ${validatedData.services.maxVehicleLength}m`
+      );
+    if (validatedData.services.paymentMethods.length > 0)
+      servicesList.push(
+        `Paiement: ${validatedData.services.paymentMethods.join(", ")}`
+      );
 
     // Vérifier si les identifiants Gmail sont disponibles
     if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {

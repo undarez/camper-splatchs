@@ -317,8 +317,8 @@ const StationsList = ({ adminView = false }: StationsListProps) => {
 
                   <div className="flex justify-between items-center">
                     <NavigationButton
-                      lat={station.lat}
-                      lng={station.lng}
+                      lat={station.latitude}
+                      lng={station.longitude}
                       address={station.address}
                     />
 

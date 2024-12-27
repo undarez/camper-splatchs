@@ -23,6 +23,9 @@ const serviceLabels: Record<string, string> = {
   vacuum: "Aspirateur",
   handicapAccess: "Accès handicapé",
   wasteWater: "Eaux usées",
+  waterPoint: "Point d'eau",
+  wasteWaterDisposal: "Évacuation eaux usées",
+  blackWaterDisposal: "Évacuation eaux noires",
   maxVehicleLength: "Longueur maximale du véhicule",
 };
 

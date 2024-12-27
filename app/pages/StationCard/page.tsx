@@ -88,6 +88,10 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
             .join(", ");
         }
         return String(value);
+      case "waterPoint":
+      case "wasteWaterDisposal":
+      case "blackWaterDisposal":
+        return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
       default:
         return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
     }

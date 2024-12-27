@@ -131,18 +131,21 @@ model Review {
 }
 
 model Service {
-  id               String           @id @default(cuid())
-  highPressure     HighPressureType @default(NONE)
-  tirePressure     Boolean          @default(false)
-  vacuum           Boolean          @default(false)
-  handicapAccess   Boolean          @default(false)
-  wasteWater       Boolean          @default(false)
-  paymentMethods   PaymentMethod[]
-  electricity      ElectricityType  @default(NONE)
-  maxVehicleLength Float?
-  station          Station          @relation(fields: [stationId], references: [id], onDelete: Cascade)
-  stationId        String           @unique
-  createdAt        DateTime         @default(now())
+  id                 String           @id @default(cuid())
+  highPressure       HighPressureType @default(NONE)
+  tirePressure       Boolean          @default(false)
+  vacuum             Boolean          @default(false)
+  handicapAccess     Boolean          @default(false)
+  wasteWater         Boolean          @default(false)
+  waterPoint         Boolean          @default(false)
+  wasteWaterDisposal Boolean          @default(false)
+  blackWaterDisposal Boolean          @default(false)
+  paymentMethods     PaymentMethod[]
+  electricity        ElectricityType  @default(NONE)
+  maxVehicleLength   Float?
+  station            Station          @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  stationId          String           @unique
+  createdAt          DateTime         @default(now())
 }
 
 model VerificationToken {

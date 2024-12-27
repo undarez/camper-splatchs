@@ -51,16 +51,19 @@ export async function POST(request: Request) {
     if (data.type === StationType.STATION_LAVAGE) {
       stationData.services = {
         create: {
-          highPressure: data.highPressure || HighPressureType.NONE,
-          tirePressure: data.tirePressure || false,
-          vacuum: data.vacuum || false,
-          handicapAccess: data.handicapAccess || false,
-          wasteWater: data.wasteWater || false,
-          paymentMethods: data.paymentMethods || [],
-          electricity: data.electricity || ElectricityType.NONE,
-          maxVehicleLength: data.maxVehicleLength
-            ? parseFloat(data.maxVehicleLength)
+          highPressure: data.services?.highPressure || HighPressureType.NONE,
+          tirePressure: data.services?.tirePressure || false,
+          vacuum: data.services?.vacuum || false,
+          handicapAccess: data.services?.handicapAccess || false,
+          wasteWater: data.services?.wasteWater || false,
+          waterPoint: data.services?.waterPoint || false,
+          wasteWaterDisposal: data.services?.wasteWaterDisposal || false,
+          blackWaterDisposal: data.services?.blackWaterDisposal || false,
+          electricity: data.services?.electricity || ElectricityType.NONE,
+          maxVehicleLength: data.services?.maxVehicleLength
+            ? parseFloat(data.services.maxVehicleLength.toString())
             : null,
+          paymentMethods: data.services?.paymentMethods || [],
         },
       };
     }

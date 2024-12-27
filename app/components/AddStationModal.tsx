@@ -3,11 +3,32 @@
 import { useState } from "react";
 import GoogleAdsense from "./GoogleAdsense";
 
+type StationType = "STATION_LAVAGE" | "PARKING";
+
 interface StationData {
   name: string;
   address: string;
   latitude: number;
   longitude: number;
+  type: StationType;
+  city: string;
+  postalCode: string;
+  status: "active" | "en_attente" | "inactive";
+  services: {
+    id: string;
+    highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: "NONE" | "AMP_8" | "AMP_15";
+    paymentMethods: string[];
+    maxVehicleLength: number | null;
+  };
+  images: string[];
 }
 
 interface AddStationModalProps {
@@ -25,6 +46,25 @@ export default function AddStationModal({
     address: "",
     latitude: 0,
     longitude: 0,
+    type: "STATION_LAVAGE",
+    city: "",
+    postalCode: "",
+    status: "en_attente",
+    services: {
+      id: "",
+      highPressure: "NONE",
+      tirePressure: false,
+      vacuum: false,
+      handicapAccess: false,
+      wasteWater: false,
+      waterPoint: false,
+      wasteWaterDisposal: false,
+      blackWaterDisposal: false,
+      electricity: "NONE",
+      paymentMethods: [],
+      maxVehicleLength: null,
+    },
+    images: [],
   });
 
   const handleSubmit = () => {
