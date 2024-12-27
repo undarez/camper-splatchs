@@ -297,11 +297,16 @@ const AdressGeoapify = ({
                     paymentMethods: [],
                     maxVehicleLength: null,
                   },
-                  createdAt: new Date().toISOString(),
+                  createdAt: new Date(),
                   city: "",
                   postalCode: "",
                   type: StationType.STATION_LAVAGE,
                   images: [],
+                  parkingDetails: null,
+                  author: {
+                    name: null,
+                    email: null,
+                  },
                 });
               }
             }}
