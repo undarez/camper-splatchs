@@ -18,6 +18,7 @@ import {
   HighPressureType,
   ElectricityType,
 } from "@/app/types";
+import { StationType } from "@prisma/client";
 import dynamic from "next/dynamic";
 import { toast } from "react-hot-toast";
 
@@ -108,11 +109,32 @@ export default function AddStationModal({
     const stationData = {
       name: formData.name,
       address: selectedLocation.properties.formatted,
-      description: formData.description,
-      lat: selectedLocation.properties.lat,
-      lng: selectedLocation.properties.lon,
-      services: formData.services,
+      city: "",
+      postalCode: "",
+      latitude: selectedLocation.properties.lat,
+      longitude: selectedLocation.properties.lon,
+      type: StationType.STATION_LAVAGE,
       status: "en_attente" as const,
+      images: [],
+      services: {
+        id: `service-${Date.now()}`,
+        highPressure: formData.services.highPressure,
+        tirePressure: formData.services.tirePressure,
+        vacuum: formData.services.vacuum,
+        handicapAccess: formData.services.handicapAccess,
+        wasteWater: formData.services.wasteWater,
+        waterPoint: formData.services.waterPoint,
+        wasteWaterDisposal: formData.services.wasteWaterDisposal,
+        blackWaterDisposal: formData.services.blackWaterDisposal,
+        electricity: formData.services.electricity,
+        maxVehicleLength: formData.services.maxVehicleLength,
+        paymentMethods: formData.services.paymentMethods,
+      },
+      parkingDetails: null,
+      author: {
+        name: null,
+        email: null,
+      },
     };
 
     onAddStation(stationData);
@@ -142,12 +164,12 @@ export default function AddStationModal({
             <div className="grid gap-2">
               <Label htmlFor="address">Adresse</Label>
               <AdressGeoapifyWithNoSSR
-                onAddressSelect={(formatted, lat, lon) => {
+                onAddressSelect={(location: Partial<CamperWashStation>) => {
                   setFormData((prev) => ({
                     ...prev,
-                    address: formatted,
-                    lat: lat,
-                    lng: lon,
+                    address: location.address || "",
+                    lat: location.latitude || 0,
+                    lng: location.longitude || 0,
                   }));
                 }}
                 existingLocations={[]}
