@@ -157,7 +157,7 @@ const AdressGeoapify = ({
       postalCode: "",
       latitude: lat,
       longitude: lon,
-      type: StationType.STATION_LAVAGE,
+      type: "STATION_LAVAGE",
       status: "en_attente",
       images: [],
       services: {
@@ -171,9 +171,15 @@ const AdressGeoapify = ({
         wasteWaterDisposal: false,
         blackWaterDisposal: false,
         electricity: "NONE",
-        paymentMethods: [],
         maxVehicleLength: null,
+        paymentMethods: [],
       },
+      parkingDetails: null,
+      author: {
+        name: null,
+        email: null,
+      },
+      createdAt: new Date(),
     };
     setSelectedLocation(newStation);
     onAddressSelect?.(formatted, lat, lon);
