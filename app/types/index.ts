@@ -1,6 +1,5 @@
 import type { LatLngTuple } from "leaflet";
 import { ServiceType } from "./typesGeoapify";
-import type { StationType } from "@prisma/client";
 
 export type StationStatus = "active" | "en_attente" | "inactive";
 
@@ -52,17 +51,16 @@ export interface CamperWashStation {
   id: string;
   name: string;
   address: string;
-  city: string;
-  postalCode: string;
+  city: string | null;
+  postalCode: string | null;
   latitude: number;
   longitude: number;
-  type: StationType;
-  status: string;
   images: string[];
-  author?: StationAuthor;
-  services?: {
+  status: string;
+  type: string;
+  services: {
     id: string;
-    highPressure: HighPressureType;
+    highPressure: string;
     tirePressure: boolean;
     vacuum: boolean;
     handicapAccess: boolean;
@@ -70,19 +68,23 @@ export interface CamperWashStation {
     waterPoint: boolean;
     wasteWaterDisposal: boolean;
     blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    paymentMethods: PaymentMethodType[];
+    electricity: string;
     maxVehicleLength: number | null;
-  };
-  parkingDetails?: {
+    paymentMethods: string[];
+  } | null;
+  parkingDetails: {
     id: string;
     isPayant: boolean;
-    tarif: number;
-    hasElectricity: ElectricityType;
+    tarif: number | null;
+    hasElectricity: string;
     commercesProches: string[];
     handicapAccess: boolean;
+  } | null;
+  author: {
+    name: string | null;
+    email: string | null;
   };
-  createdAt?: string;
+  createdAt: Date;
 }
 
 export interface Review {

@@ -3,11 +3,7 @@
 import "@geoapify/geocoder-autocomplete/styles/minimal.css";
 import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import {
-  CamperWashStation,
-  GeoapifyResult,
-  StationServices,
-} from "@/app/types";
+import { CamperWashStation, GeoapifyResult } from "@/app/types";
 import {
   GeoapifyContext,
   GeoapifyGeocoderAutocomplete,
@@ -39,7 +35,7 @@ const createIcon = (status: string) => {
 };
 
 interface AddressProps {
-  onAddressSelect: (formatted: string, lat: number, lon: number) => void;
+  onAddressSelect: (location: Partial<CamperWashStation>) => void;
   existingLocations?: CamperWashStation[];
   isModalOpen?: boolean;
   persistSearchBar?: boolean;
@@ -89,9 +85,21 @@ export default function AdressGeoapify({
     }
   }, [isModalOpen]);
 
-  const handleNewLocationSelect = (location: GeoapifyResult) => {
-    const { formatted, lat, lon } = location.properties;
-    onAddressSelect(formatted, lat, lon);
+  const handlePlaceSelect = (value: GeoapifyResult | null) => {
+    if (!value) return;
+
+    const { lat, lon, formatted, address_line1, city, postcode } =
+      value.properties;
+
+    const newLocation: Partial<CamperWashStation> = {
+      latitude: lat,
+      longitude: lon,
+      address: address_line1 || formatted,
+      city: city || null,
+      postalCode: postcode || null,
+    };
+
+    onAddressSelect(newLocation);
   };
 
   const getStatusIcon = (status: string) => {
@@ -116,19 +124,25 @@ export default function AdressGeoapify({
     }
   };
 
-  const formatServices = (services?: StationServices) => {
+  const formatServices = (services: CamperWashStation["services"]) => {
     const servicesList = [];
     if (!services) return [];
 
     if (services.highPressure && services.highPressure !== "NONE") {
-      servicesList.push(`Haute pression: ${services.highPressure}`);
+      servicesList.push(
+        `Haute pression: ${services.highPressure.toLowerCase()}`
+      );
     }
     if (services.tirePressure) servicesList.push("Pression des pneus");
     if (services.vacuum) servicesList.push("Aspirateur");
     if (services.waterPoint) servicesList.push("Point d'eau");
     if (services.wasteWaterDisposal) servicesList.push("Vidange eaux usées");
     if (services.blackWaterDisposal) servicesList.push("Vidange eaux noires");
-    if (services.electricity) servicesList.push("Électricité");
+    if (services.electricity && services.electricity !== "NONE") {
+      servicesList.push(
+        `Électricité: ${services.electricity.replace("AMP_", "")} ampères`
+      );
+    }
 
     return servicesList;
   };
@@ -152,7 +166,7 @@ export default function AdressGeoapify({
               countryCodes={["fr"]}
               placeSelect={(value) => {
                 if (value) {
-                  handleNewLocationSelect(value as GeoapifyResult);
+                  handlePlaceSelect(value as GeoapifyResult);
                 }
               }}
             />
@@ -175,11 +189,11 @@ export default function AdressGeoapify({
             {existingLocations.map((location) => {
               // Vérifier que les coordonnées sont valides
               if (
-                typeof location.lat !== "number" ||
-                typeof location.lng !== "number"
+                typeof location.latitude !== "number" ||
+                typeof location.longitude !== "number"
               ) {
                 console.warn(
-                  "Coordonnées invalides pour la station:",
+                  "Coordonnées invalides pour la localisation:",
                   location
                 );
                 return null;
@@ -187,7 +201,7 @@ export default function AdressGeoapify({
               return (
                 <Marker
                   key={location.id}
-                  position={[location.lat, location.lng]}
+                  position={[location.latitude, location.longitude]}
                   icon={createIcon(location.status)}
                 >
                   <Popup className="station-popup">
@@ -200,8 +214,8 @@ export default function AdressGeoapify({
                       </p>
                       <div className="mt-2 space-y-1">
                         <p className="text-xs text-gray-500">
-                          Coordonnées: {location.lat.toFixed(6)},{" "}
-                          {location.lng.toFixed(6)}
+                          Coordonnées: {location.latitude.toFixed(6)},{" "}
+                          {location.longitude.toFixed(6)}
                         </p>
                         <div className="flex items-center gap-1">
                           {getStatusIcon(location.status)}
