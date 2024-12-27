@@ -26,10 +26,17 @@ export default function AdressGeoapifyWrapper({
   isModalOpen = false,
   persistSearchBar = false,
 }: AdressGeoapifyWrapperProps) {
+  // Fonction d'adaptation pour convertir le nouveau format au format attendu
+  const handleAddressSelect = (location: Partial<CamperWashStation>) => {
+    if (location.latitude && location.longitude && location.address) {
+      onAddressSelect(location.address, location.latitude, location.longitude);
+    }
+  };
+
   return (
     <div className="address-search-container">
       <AdressGeoapify
-        onAddressSelect={onAddressSelect}
+        onAddressSelect={handleAddressSelect}
         existingLocations={existingLocations}
         isModalOpen={isModalOpen}
         persistSearchBar={persistSearchBar}
