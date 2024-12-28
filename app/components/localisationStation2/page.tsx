@@ -190,6 +190,8 @@ export default function LocalisationStation2() {
   const { data: sessionData } = useSession();
   const router = useRouter();
 
+  const mapCenter: [number, number] = [46.603354, 1.888334];
+
   // Chargement des stations
   useEffect(() => {
     const fetchStations = async () => {
@@ -419,7 +421,12 @@ export default function LocalisationStation2() {
 
       {/* Carte */}
       <div className="h-full">
-        <MapComponent stations={stations} getMarkerIcon={getMarkerIcon} />
+        <MapComponent
+          stations={stations}
+          getMarkerIcon={getMarkerIcon}
+          center={mapCenter}
+          zoom={12}
+        />
       </div>
 
       {/* Modal */}

@@ -9,11 +9,22 @@ import { CamperWashStation } from "@/app/types/typesGeoapify";
 interface MapProps {
   stations: Station[];
   getMarkerIcon: (status: StationStatus, type: StationType) => string;
-  center: [number, number];
+  center: [number, number]; // Assurez-vous que cette prop existe
   zoom: number;
-  existingLocations?: CamperWashStation[];
+  existingLocations?: MapLocation[]; // Utilisez MapLocation au lieu de CamperWashStation
   onLocationSelect?: (location: Partial<CamperWashStation>) => void;
   zoomControl?: boolean;
+}
+
+// Ajoutez aussi l'interface MapLocation si elle n'existe pas déjà
+interface MapLocation {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  type: StationType;
+  status: string;
 }
 interface StationServices {
   id: string;
@@ -211,7 +222,7 @@ const Map: ComponentType<MapProps> = ({
       {existingLocations?.map((location) => (
         <Marker
           key={location.id}
-          position={[location.lat, location.lng]}
+          position={[location.latitude, location.longitude]}
           icon={
             new Icon({
               iconUrl:

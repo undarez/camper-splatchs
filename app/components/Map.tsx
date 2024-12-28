@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Icon } from "leaflet";
 import { StationType, StationStatus } from "@prisma/client";
+import { CamperWashStation } from "@/app/types";
 
 interface StationServices {
   id: string;
@@ -46,6 +47,21 @@ interface Station {
 interface MapProps {
   stations: Station[];
   getMarkerIcon: (status: StationStatus, type: StationType) => string;
+  center: [number, number];
+  zoom: number;
+  existingLocations?: MapLocation[];
+  onLocationSelect?: (location: Partial<CamperWashStation>) => void;
+  zoomControl?: boolean;
+}
+
+interface MapLocation {
+  id: string;
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  type: StationType;
+  status: string;
 }
 
 const MapContainer = dynamic(
@@ -67,7 +83,15 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
-export default function Map({ stations, getMarkerIcon }: MapProps) {
+export default function Map({
+  stations,
+  getMarkerIcon,
+  center = [46.603354, 1.888334],
+  zoom = 6,
+  existingLocations = [],
+  onLocationSelect,
+  zoomControl = true,
+}: MapProps) {
   useEffect(() => {
     Promise.all([
       import("leaflet/dist/leaflet.css"),
@@ -77,9 +101,10 @@ export default function Map({ stations, getMarkerIcon }: MapProps) {
 
   return (
     <MapContainer
-      center={[46.603354, 1.888334]}
-      zoom={6}
+      center={center}
+      zoom={zoom}
       className="h-full w-full"
+      zoomControl={zoomControl}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -171,6 +196,30 @@ export default function Map({ stations, getMarkerIcon }: MapProps) {
                   </ul>
                 </div>
               )}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+      {existingLocations?.map((location) => (
+        <Marker
+          key={location.id}
+          position={[location.latitude, location.longitude]}
+          icon={
+            new Icon({
+              iconUrl:
+                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+            })
+          }
+          eventHandlers={{
+            click: () => onLocationSelect?.(location),
+          }}
+        >
+          <Popup>
+            <div>
+              <h3 className="font-semibold">{location.name}</h3>
+              <p>{location.address}</p>
             </div>
           </Popup>
         </Marker>

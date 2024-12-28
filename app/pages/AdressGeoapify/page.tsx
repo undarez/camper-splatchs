@@ -268,20 +268,20 @@ const AdressGeoapify = ({
             center={mapCenter}
             zoom={12}
             existingLocations={existingLocations.map(transformToMapLocation)}
-            onLocationSelect={(location) => {
+            onLocationSelect={(location: Partial<CamperWashStation>) => {
               if (selectedLocation) {
                 setSelectedLocation({
                   ...selectedLocation,
-                  latitude: location.lat,
-                  longitude: location.lng,
+                  latitude: location.latitude,
+                  longitude: location.longitude,
                 });
               } else {
                 setSelectedLocation({
                   id: "",
                   name: "",
                   address: "",
-                  latitude: location.lat,
-                  longitude: location.lng,
+                  latitude: location.latitude,
+                  longitude: location.longitude,
                   status: "en_attente" as StationStatus,
                   services: {
                     id: "temp-" + Date.now(),
@@ -310,6 +310,9 @@ const AdressGeoapify = ({
                 });
               }
             }}
+            stations={[]}
+            getMarkerIcon={() => ""}
+            zoomControl={false}
           />
         </div>
       </div>
