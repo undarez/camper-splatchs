@@ -93,7 +93,7 @@ const Header = () => {
                 <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-lg border border-[#A5E9FF] shadow-xl p-1 w-48">
                   <MenubarItem className={menuItemClass}>
                     <Link
-                      href="/components/localisationStation2"
+                      href="/components/LocalisationStation2"
                       className="w-full"
                     >
                       Ajouter une station
