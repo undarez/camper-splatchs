@@ -4,7 +4,17 @@ import { useEffect, ComponentType } from "react";
 import dynamic from "next/dynamic";
 import { Icon } from "leaflet";
 import { StationType, StationStatus } from "@prisma/client";
+import { CamperWashStation } from "@/app/types/typesGeoapify";
 
+interface MapProps {
+  stations: Station[];
+  getMarkerIcon: (status: StationStatus, type: StationType) => string;
+  center: [number, number];
+  zoom: number;
+  existingLocations?: CamperWashStation[];
+  onLocationSelect?: (location: Partial<CamperWashStation>) => void;
+  zoomControl?: boolean;
+}
 interface StationServices {
   id: string;
   highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
@@ -79,6 +89,9 @@ const Map: ComponentType<MapProps> = ({
   getMarkerIcon,
   center,
   zoom,
+  existingLocations = [],
+
+  zoomControl = true,
 }) => {
   useEffect(() => {
     Promise.all([
@@ -88,7 +101,12 @@ const Map: ComponentType<MapProps> = ({
   }, []);
 
   return (
-    <MapContainer center={center} zoom={zoom} className="h-full w-full">
+    <MapContainer
+      center={center}
+      zoom={zoom}
+      className="h-full w-full"
+      zoomControl={zoomControl}
+    >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -179,6 +197,28 @@ const Map: ComponentType<MapProps> = ({
                   </ul>
                 </div>
               )}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+
+      {existingLocations?.map((location) => (
+        <Marker
+          key={location.id}
+          position={[location.lat, location.lng]}
+          icon={
+            new Icon({
+              iconUrl:
+                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32],
+            })
+          }
+        >
+          <Popup>
+            <div>
+              <h3 className="font-semibold">{location.name}</h3>
+              <p>{location.address}</p>
             </div>
           </Popup>
         </Marker>
