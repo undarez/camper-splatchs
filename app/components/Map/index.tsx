@@ -53,13 +53,6 @@ interface Station {
   parkingDetails: ParkingDetails | null;
 }
 
-interface MapProps {
-  stations: Station[];
-  getMarkerIcon: (status: StationStatus, type: StationType) => string;
-  center: [number, number];
-  zoom: number;
-}
-
 const MapContainer: ComponentType<
   React.ComponentProps<typeof import("react-leaflet").MapContainer>
 > = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), {
@@ -90,7 +83,7 @@ const Map: ComponentType<MapProps> = ({
   center,
   zoom,
   existingLocations = [],
-
+  onLocationSelect,
   zoomControl = true,
 }) => {
   useEffect(() => {
@@ -122,6 +115,19 @@ const Map: ComponentType<MapProps> = ({
               iconAnchor: [16, 32],
             })
           }
+          eventHandlers={{
+            click: () => {
+              if (onLocationSelect) {
+                onLocationSelect({
+                  id: station.id,
+                  name: station.name,
+                  address: station.address,
+                  lat: station.latitude,
+                  lng: station.longitude,
+                });
+              }
+            },
+          }}
         >
           <Popup>
             <div>
