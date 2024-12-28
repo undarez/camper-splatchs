@@ -4,7 +4,7 @@ import { CamperWashStation } from "@/app/types";
 import dynamic from "next/dynamic";
 
 // Import dynamique du composant AdressGeoapify
-const AdressGeoapify = dynamic(() => import("./AdressGeoapify"), {
+const AdressGeoapify = dynamic(() => import("./page"), {
   ssr: false,
   loading: () => (
     <div className="flex justify-center items-center h-10">
