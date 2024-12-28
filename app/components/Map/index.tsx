@@ -46,6 +46,10 @@ interface Station {
 interface MapProps {
   stations: Station[];
   getMarkerIcon: (status: StationStatus, type: StationType) => string;
+  center: [number, number];
+  zoom: number;
+  existingLocations?: Location[];
+  onLocationSelect?: (location: Location) => void;
 }
 
 const MapContainer: ComponentType<
