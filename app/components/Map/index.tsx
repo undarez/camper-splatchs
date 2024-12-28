@@ -48,8 +48,6 @@ interface MapProps {
   getMarkerIcon: (status: StationStatus, type: StationType) => string;
   center: [number, number];
   zoom: number;
-  existingLocations?: Location[];
-  onLocationSelect?: (location: Location) => void;
 }
 
 const MapContainer: ComponentType<
@@ -76,7 +74,12 @@ const Popup: ComponentType<
   ssr: false,
 });
 
-const Map: ComponentType<MapProps> = ({ stations, getMarkerIcon }) => {
+const Map: ComponentType<MapProps> = ({
+  stations,
+  getMarkerIcon,
+  center,
+  zoom,
+}) => {
   useEffect(() => {
     Promise.all([
       import("leaflet/dist/leaflet.css"),
@@ -85,11 +88,7 @@ const Map: ComponentType<MapProps> = ({ stations, getMarkerIcon }) => {
   }, []);
 
   return (
-    <MapContainer
-      center={[46.603354, 1.888334]}
-      zoom={6}
-      className="h-full w-full"
-    >
+    <MapContainer center={center} zoom={zoom} className="h-full w-full">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
