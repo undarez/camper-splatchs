@@ -23,7 +23,7 @@ import dynamic from "next/dynamic";
 import { toast } from "react-hot-toast";
 
 const AdressGeoapifyWithNoSSR = dynamic(
-  () => import("@/app/components/AdressGeoapify/page"),
+  () => import("@/app/components/AdressGeoapify/AdressGeoapify"),
   { ssr: false }
 );
 
