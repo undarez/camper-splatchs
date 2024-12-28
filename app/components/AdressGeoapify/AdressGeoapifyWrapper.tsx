@@ -7,8 +7,8 @@ import dynamic from "next/dynamic";
 const AdressGeoapify = dynamic(() => import("./AdressGeoapify"), {
   ssr: false,
   loading: () => (
-    <div className="flex justify-center items-center h-10">
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+    <div className="h-[400px] w-full rounded-lg overflow-hidden border border-input flex items-center justify-center bg-muted">
+      <span className="text-muted-foreground">Chargement de la carte...</span>
     </div>
   ),
 });
