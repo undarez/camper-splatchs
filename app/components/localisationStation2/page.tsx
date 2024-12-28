@@ -13,35 +13,21 @@ import {
 } from "@prisma/client";
 import AddPointModal from "@/app/components/AddPointModal";
 import { cn } from "@/lib/utils";
-import { Icon, Map as LeafletMap } from "leaflet";
+import { GeoapifyGeocoderAutocomplete } from "@geoapify/react-geocoder-autocomplete";
+import { Icon } from "leaflet";
 
-// Import dynamique des composants qui utilisent window/leaflet
-const GeoapifyGeocoderAutocomplete = dynamic(
-  () =>
-    import("@geoapify/react-geocoder-autocomplete").then(
-      (mod) => mod.GeoapifyGeocoderAutocomplete
+// Import dynamique de la carte complète
+const MapComponent = dynamic(
+  () => import("@/app/components/Map").then((mod) => mod.default),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-full w-full flex items-center justify-center">
+        <p>Chargement de la carte...</p>
+      </div>
     ),
-  { ssr: false }
+  }
 );
-
-const MapContainer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-
-const TileLayer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-
-const Marker = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Marker),
-  { ssr: false }
-);
-
-const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
-  ssr: false,
-});
 
 interface GeoapifyProperties {
   lat: number;
@@ -114,63 +100,6 @@ interface Station {
   } | null;
 }
 
-// Ajout d'une interface pour étendre HTMLElement avec la propriété _leaflet_map
-interface ExtendedHTMLElement extends HTMLElement {
-  _leaflet_map?: LeafletMap;
-}
-
-const searchBarStyles = `
-  .geoapify-autocomplete-input {
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 16px;
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  .geoapify-autocomplete-items {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-top: 4px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
-  .geoapify-autocomplete-item {
-    padding: 10px;
-    cursor: pointer;
-  }
-  .geoapify-autocomplete-item:hover {
-    background-color: #f5f5f5;
-  }
-
-  .leaflet-container {
-    width: 100%;
-    height: 100%;
-  }
-
-  .leaflet-popup-content {
-    min-width: 200px;
-  }
-
-  .leaflet-popup-content h3 {
-    margin-bottom: 0.5rem;
-  }
-
-  .leaflet-popup-content p {
-    margin-bottom: 0.5rem;
-  }
-
-  .leaflet-popup-content ul {
-    margin-top: 0.5rem;
-  }
-
-  .leaflet-popup-content li {
-    margin-bottom: 0.25rem;
-  }
-`;
-
 // Déplacer defaultFormData avant son utilisation
 const defaultFormData = {
   name: "",
@@ -208,22 +137,60 @@ Icon.Default.mergeOptions({
   shadowUrl: "/leaflet/marker-shadow.png",
 });
 
+// Styles pour la barre de recherche
+const searchBarStyles = `
+  .geoapify-autocomplete-input {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .geoapify-autocomplete-items {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  .geoapify-autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  .geoapify-autocomplete-item:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+// Interface pour l'élément HTML étendu
+interface ExtendedHTMLElement extends HTMLElement {
+  _leaflet_map?: {
+    setView: (coords: [number, number], zoom: number) => void;
+  };
+}
+
+// Fonction pour gérer le clic sur la carte
+const handleMapClick = (
+  mapElement: ExtendedHTMLElement | null,
+  latitude: number,
+  longitude: number
+) => {
+  if (mapElement?._leaflet_map) {
+    mapElement._leaflet_map.setView([latitude, longitude], 15);
+  }
+};
+
 export default function LocalisationStation2() {
   const [stations, setStations] = useState<Station[]>([]);
-  const [_map, setMap] = useState<LeafletMap | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationFormData>(defaultFormData);
   const { data: sessionData } = useSession();
   const router = useRouter();
 
-  // Chargement dynamique des styles CSS
-  useEffect(() => {
-    Promise.all([
-      import("leaflet/dist/leaflet.css"),
-      import("@geoapify/geocoder-autocomplete/styles/minimal.css"),
-    ]);
-  }, []);
-
+  // Chargement des stations
   useEffect(() => {
     const fetchStations = async () => {
       try {
@@ -349,16 +316,6 @@ export default function LocalisationStation2() {
     }
   };
 
-  const handleMapClick = (
-    mapElement: ExtendedHTMLElement | null,
-    latitude: number,
-    longitude: number
-  ) => {
-    if (mapElement?._leaflet_map) {
-      mapElement._leaflet_map.setView([latitude, longitude], 15);
-    }
-  };
-
   return (
     <div className="relative h-screen">
       <style>{searchBarStyles}</style>
@@ -462,139 +419,7 @@ export default function LocalisationStation2() {
 
       {/* Carte */}
       <div className="h-full">
-        <MapContainer
-          center={[46.603354, 1.888334]}
-          zoom={6}
-          className="h-full w-full"
-          ref={setMap}
-          id="map"
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {stations.map((station) => (
-            <Marker
-              key={station.id}
-              position={[station.latitude, station.longitude]}
-              icon={
-                new Icon({
-                  iconUrl: getMarkerIcon(station.status, station.type),
-                  iconSize: [32, 32],
-                  iconAnchor: [16, 32],
-                })
-              }
-            >
-              <Popup>
-                <div>
-                  <h3 className="font-semibold">{station.name}</h3>
-                  <p>{station.address}</p>
-                  {station.services && (
-                    <div className="mt-2">
-                      <h4 className="font-semibold">Services :</h4>
-                      <ul className="list-disc list-inside">
-                        {station.services.highPressure !== "NONE" && (
-                          <li>
-                            Haute pression (
-                            {station.services.highPressure.toLowerCase()})
-                          </li>
-                        )}
-                        {station.services.tirePressure && (
-                          <li>Gonflage des pneus</li>
-                        )}
-                        {station.services.vacuum && <li>Aspirateur</li>}
-                        {station.services.handicapAccess && (
-                          <li>Accès handicapé</li>
-                        )}
-                        {station.services.wasteWater && (
-                          <li>Vidange eaux usées</li>
-                        )}
-                        {station.services.waterPoint && <li>Point d'eau</li>}
-                        {station.services.wasteWaterDisposal && (
-                          <li>Évacuation eaux usées</li>
-                        )}
-                        {station.services.blackWaterDisposal && (
-                          <li>Évacuation eaux noires</li>
-                        )}
-                        {station.services.electricity !== "NONE" && (
-                          <li>
-                            Électricité (
-                            {station.services.electricity === "AMP_8"
-                              ? "8 ampères"
-                              : "15 ampères"}
-                            )
-                          </li>
-                        )}
-                        {station.services.maxVehicleLength && (
-                          <li>
-                            Longueur maximale :{" "}
-                            {station.services.maxVehicleLength}m
-                          </li>
-                        )}
-                        {station.services.paymentMethods.length > 0 && (
-                          <li>
-                            Paiement :{" "}
-                            {station.services.paymentMethods
-                              .map((method) =>
-                                method === "JETON"
-                                  ? "Jeton"
-                                  : method === "ESPECES"
-                                  ? "Espèces"
-                                  : "Carte bancaire"
-                              )
-                              .join(", ")}
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-                  {station.parkingDetails && (
-                    <div className="mt-2">
-                      <h4 className="font-semibold">Informations parking :</h4>
-                      <ul className="list-disc list-inside">
-                        {station.parkingDetails.isPayant && (
-                          <li>Payant ({station.parkingDetails.tarif}€/jour)</li>
-                        )}
-                        {station.parkingDetails.hasElectricity !== "NONE" && (
-                          <li>
-                            Électricité (
-                            {station.parkingDetails.hasElectricity === "AMP_8"
-                              ? "8 ampères"
-                              : "15 ampères"}
-                            )
-                          </li>
-                        )}
-                        {station.parkingDetails.handicapAccess && (
-                          <li>Accès handicapé</li>
-                        )}
-                        {station.parkingDetails.commercesProches.length > 0 && (
-                          <li>
-                            Commerces à proximité :{" "}
-                            {station.parkingDetails.commercesProches
-                              .map((commerce) =>
-                                commerce === "NOURRITURE"
-                                  ? "Nourriture"
-                                  : commerce === "BANQUE"
-                                  ? "Banque"
-                                  : commerce === "CENTRE_VILLE"
-                                  ? "Centre-ville"
-                                  : commerce === "STATION_SERVICE"
-                                  ? "Station-service"
-                                  : commerce === "LAVERIE"
-                                  ? "Laverie"
-                                  : "Garage"
-                              )
-                              .join(", ")}
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+        <MapComponent stations={stations} getMarkerIcon={getMarkerIcon} />
       </div>
 
       {/* Modal */}

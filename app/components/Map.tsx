@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, ComponentType } from "react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Icon } from "leaflet";
 import { StationType, StationStatus } from "@prisma/client";
@@ -48,31 +48,26 @@ interface MapProps {
   getMarkerIcon: (status: StationStatus, type: StationType) => string;
 }
 
-const MapContainer: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").MapContainer>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), {
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+
+const Marker = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Marker),
+  { ssr: false }
+);
+
+const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
-const TileLayer: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").TileLayer>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), {
-  ssr: false,
-});
-
-const Marker: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").Marker>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), {
-  ssr: false,
-});
-
-const Popup: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").Popup>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
-  ssr: false,
-});
-
-const Map: ComponentType<MapProps> = ({ stations, getMarkerIcon }) => {
+export default function Map({ stations, getMarkerIcon }: MapProps) {
   useEffect(() => {
     Promise.all([
       import("leaflet/dist/leaflet.css"),
@@ -182,6 +177,4 @@ const Map: ComponentType<MapProps> = ({ stations, getMarkerIcon }) => {
       ))}
     </MapContainer>
   );
-};
-
-export default Map;
+}
