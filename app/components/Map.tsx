@@ -92,12 +92,143 @@ export default function Map({
   onLocationSelect,
   zoomControl = true,
 }: MapProps) {
+  console.log("Stations reçues dans Map:", stations);
+
   useEffect(() => {
     Promise.all([
       import("leaflet/dist/leaflet.css"),
       import("@geoapify/geocoder-autocomplete/styles/minimal.css"),
     ]);
   }, []);
+
+  const renderServices = (station) => {
+    console.log("Services de la station:", station.services);
+    if (station.type === "STATION_LAVAGE" && station.services) {
+      return (
+        <div className="mt-2">
+          <h4 className="font-semibold text-sm mb-2">Services :</h4>
+          <ul className="space-y-1">
+            {station.services.highPressure !== "NONE" && (
+              <li className="text-green-600 text-sm">
+                • Haute pression ({station.services.highPressure.toLowerCase()})
+              </li>
+            )}
+            {station.services.tirePressure && (
+              <li className="text-green-600 text-sm">• Gonflage des pneus</li>
+            )}
+            {station.services.vacuum && (
+              <li className="text-green-600 text-sm">• Aspirateur</li>
+            )}
+            {station.services.handicapAccess && (
+              <li className="text-green-600 text-sm">• Accès handicapé</li>
+            )}
+            {station.services.wasteWater && (
+              <li className="text-green-600 text-sm">• Vidange eaux usées</li>
+            )}
+            {station.services.waterPoint && (
+              <li className="text-green-600 text-sm">• Point d'eau</li>
+            )}
+            {station.services.wasteWaterDisposal && (
+              <li className="text-green-600 text-sm">
+                • Évacuation eaux usées
+              </li>
+            )}
+            {station.services.blackWaterDisposal && (
+              <li className="text-green-600 text-sm">
+                • Évacuation eaux noires
+              </li>
+            )}
+            {station.services.electricity !== "NONE" && (
+              <li className="text-green-600 text-sm">
+                • Électricité (
+                {station.services.electricity === "AMP_8" ? "8A" : "15A"})
+              </li>
+            )}
+            {station.services.maxVehicleLength && (
+              <li className="text-green-600 text-sm">
+                • Longueur max: {station.services.maxVehicleLength}m
+              </li>
+            )}
+            {station.services.paymentMethods &&
+              station.services.paymentMethods.length > 0 && (
+                <li className="text-green-600 text-sm">
+                  • Moyens de paiement:{" "}
+                  {station.services.paymentMethods
+                    .map((method) => {
+                      switch (method) {
+                        case "JETON":
+                          return "Jeton";
+                        case "ESPECES":
+                          return "Espèces";
+                        case "CARTE_BANCAIRE":
+                          return "Carte bancaire";
+                        default:
+                          return method;
+                      }
+                    })
+                    .join(", ")}
+                </li>
+              )}
+          </ul>
+        </div>
+      );
+    } else if (station.type === "PARKING" && station.parkingDetails) {
+      return (
+        <div className="mt-2">
+          <h4 className="font-semibold text-sm mb-2">Services du parking :</h4>
+          <ul className="space-y-1">
+            {station.parkingDetails.isPayant && (
+              <li className="text-purple-600 text-sm">
+                • Parking payant{" "}
+                {station.parkingDetails.tarif
+                  ? `(${station.parkingDetails.tarif}€/jour)`
+                  : ""}
+              </li>
+            )}
+            {station.parkingDetails.hasElectricity !== "NONE" && (
+              <li className="text-purple-600 text-sm">
+                • Électricité (
+                {station.parkingDetails.hasElectricity === "AMP_8"
+                  ? "8A"
+                  : "15A"}
+                )
+              </li>
+            )}
+            {station.parkingDetails.handicapAccess && (
+              <li className="text-purple-600 text-sm">• Accès handicapé</li>
+            )}
+            {station.parkingDetails.commercesProches &&
+              station.parkingDetails.commercesProches.length > 0 && (
+                <li className="text-purple-600 text-sm">
+                  • Commerces à proximité:{" "}
+                  {station.parkingDetails.commercesProches
+                    .map((commerce) => {
+                      switch (commerce) {
+                        case "NOURRITURE":
+                          return "Alimentation";
+                        case "BANQUE":
+                          return "Banque";
+                        case "CENTRE_VILLE":
+                          return "Centre-ville";
+                        case "STATION_SERVICE":
+                          return "Station-service";
+                        case "LAVERIE":
+                          return "Laverie";
+                        case "GARAGE":
+                          return "Garage";
+                        default:
+                          return commerce;
+                      }
+                    })
+                    .join(", ")}
+                </li>
+              )}
+          </ul>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <MapContainer
@@ -123,77 +254,50 @@ export default function Map({
           }
         >
           <Popup>
-            <div>
-              <h3 className="font-semibold">{station.name}</h3>
-              <p>{station.address}</p>
-              {station.services && (
-                <div className="mt-2">
-                  <h4 className="font-semibold">Services :</h4>
-                  <ul className="list-disc list-inside">
-                    {station.services.highPressure !== "NONE" && (
-                      <li>
-                        Haute pression (
-                        {station.services.highPressure.toLowerCase()})
-                      </li>
-                    )}
-                    {station.services.tirePressure && (
-                      <li>Gonflage des pneus</li>
-                    )}
-                    {station.services.vacuum && <li>Aspirateur</li>}
-                    {station.services.handicapAccess && (
-                      <li>Accès handicapé</li>
-                    )}
-                    {station.services.wasteWater && <li>Vidange eaux usées</li>}
-                    {station.services.waterPoint && <li>Point d'eau</li>}
-                    {station.services.wasteWaterDisposal && (
-                      <li>Évacuation eaux usées</li>
-                    )}
-                    {station.services.blackWaterDisposal && (
-                      <li>Évacuation eaux noires</li>
-                    )}
-                    {station.services.electricity !== "NONE" && (
-                      <li>
-                        Électricité (
-                        {station.services.electricity === "AMP_8"
-                          ? "8 ampères"
-                          : "15 ampères"}
-                        )
-                      </li>
-                    )}
-                    {station.services.maxVehicleLength && (
-                      <li>
-                        Longueur maximale : {station.services.maxVehicleLength}m
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              )}
-              {station.parkingDetails && (
-                <div className="mt-2">
-                  <h4 className="font-semibold">Informations parking :</h4>
-                  <ul className="list-disc list-inside">
-                    {station.parkingDetails.isPayant && (
-                      <li>Payant ({station.parkingDetails.tarif}€/jour)</li>
-                    )}
-                    {station.parkingDetails.hasElectricity !== "NONE" && (
-                      <li>
-                        Électricité (
-                        {station.parkingDetails.hasElectricity === "AMP_8"
-                          ? "8 ampères"
-                          : "15 ampères"}
-                        )
-                      </li>
-                    )}
-                    {station.parkingDetails.handicapAccess && (
-                      <li>Accès handicapé</li>
-                    )}
-                    {station.parkingDetails.commercesProches.length > 0 && (
-                      <li>
-                        Commerces à proximité :{" "}
-                        {station.parkingDetails.commercesProches.join(", ")}
-                      </li>
-                    )}
-                  </ul>
+            <div className="p-4 min-w-[250px]">
+              <h3 className="font-semibold text-lg mb-2">{station.name}</h3>
+              <p className="text-sm text-gray-600 mb-2">{station.address}</p>
+              <p className="text-xs text-gray-500 mb-2">
+                Coordonnées: {station.latitude.toFixed(6)},{" "}
+                {station.longitude.toFixed(6)}
+              </p>
+              {renderServices(station)}
+              <div className="mt-3 flex gap-2 flex-wrap">
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    station.status === "active"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : station.status === "en_attente"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {station.status === "active"
+                    ? "Active"
+                    : station.status === "en_attente"
+                    ? "En attente"
+                    : "Inactive"}
+                </span>
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${
+                    station.type === "STATION_LAVAGE"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-purple-100 text-purple-700"
+                  }`}
+                >
+                  {station.type === "STATION_LAVAGE"
+                    ? "Station de lavage"
+                    : "Parking"}
+                </span>
+              </div>
+              {station.status === "en_attente" && (
+                <div className="mt-3">
+                  <a
+                    href="/pages/AdminStation"
+                    className="inline-block w-full text-center px-4 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition-colors"
+                  >
+                    Valider la station
+                  </a>
                 </div>
               )}
             </div>

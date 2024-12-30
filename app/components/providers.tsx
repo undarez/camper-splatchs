@@ -2,7 +2,7 @@
 
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
-import AuthProvider from "@/app/context/AuthProvider";
+import AuthProvider from "../context/AuthProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

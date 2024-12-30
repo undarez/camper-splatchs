@@ -1,247 +1,167 @@
 "use client";
 
-import { useEffect, ComponentType } from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { Icon } from "leaflet";
-import { StationType, StationStatus } from "@prisma/client";
-import { CamperWashStation } from "@/app/types/typesGeoapify";
+import "leaflet/dist/leaflet.css";
+import { Station } from "@prisma/client";
+import { toast } from "sonner";
 
 interface MapProps {
   stations: Station[];
-  getMarkerIcon: (status: StationStatus, type: StationType) => string;
-  center: [number, number]; // Assurez-vous que cette prop existe
+  getMarkerIcon: (status: string, type: string) => string;
+  center: [number, number];
   zoom: number;
-  existingLocations?: MapLocation[]; // Utilisez MapLocation au lieu de CamperWashStation
-  onLocationSelect?: (location: Partial<CamperWashStation>) => void;
-  zoomControl?: boolean;
 }
 
-// Ajoutez aussi l'interface MapLocation si elle n'existe pas déjà
-interface MapLocation {
-  id: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  type: StationType;
-  status: string;
+// Composant pour gérer la géolocalisation
+function LocationMarker({
+  shouldLocate,
+  onLocated,
+}: {
+  shouldLocate: boolean;
+  onLocated: () => void;
+}) {
+  const [position, setPosition] = useState<[number, number] | null>(null);
+  const map = useMap();
+
+  useEffect(() => {
+    if (shouldLocate) {
+      console.log("Tentative de géolocalisation...");
+      map.locate({
+        setView: true,
+        maxZoom: 13,
+        watch: true,
+        timeout: 10000,
+      });
+    }
+  }, [shouldLocate, map]);
+
+  useEffect(() => {
+    map.on("locationfound", (e) => {
+      console.log("Location found:", e.latlng);
+      setPosition([e.latlng.lat, e.latlng.lng]);
+      map.flyTo(e.latlng, 13);
+      onLocated();
+    });
+
+    map.on("locationerror", (e) => {
+      console.error("Location error:", e);
+      toast.error(
+        "Impossible d'obtenir votre position. Vérifiez que la géolocalisation est activée."
+      );
+      onLocated();
+    });
+
+    return () => {
+      map.off("locationfound");
+      map.off("locationerror");
+    };
+  }, [map, onLocated]);
+
+  const userIcon = new Icon({
+    iconUrl: "/markers/user-location.svg",
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+  });
+
+  return position === null ? null : (
+    <Marker position={position} icon={userIcon}>
+      <Popup>
+        <div className="text-center">
+          <p className="font-semibold">Votre position</p>
+        </div>
+      </Popup>
+    </Marker>
+  );
 }
-interface StationServices {
-  id: string;
-  highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
-  tirePressure: boolean;
-  vacuum: boolean;
-  handicapAccess: boolean;
-  wasteWater: boolean;
-  waterPoint: boolean;
-  wasteWaterDisposal: boolean;
-  blackWaterDisposal: boolean;
-  electricity: "NONE" | "AMP_8" | "AMP_15";
-  maxVehicleLength: number | null;
-  paymentMethods: string[];
-}
 
-interface ParkingDetails {
-  id: string;
-  isPayant: boolean;
-  tarif: number | null;
-  hasElectricity: "NONE" | "AMP_8" | "AMP_15";
-  commercesProches: string[];
-  handicapAccess: boolean;
-}
-
-interface Station {
-  id: string;
-  name: string;
-  address: string;
-  city: string | null;
-  postalCode: string | null;
-  latitude: number;
-  longitude: number;
-  status: StationStatus;
-  type: StationType;
-  services: StationServices | null;
-  parkingDetails: ParkingDetails | null;
-}
-
-const MapContainer: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").MapContainer>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), {
-  ssr: false,
-});
-
-const TileLayer: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").TileLayer>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.TileLayer), {
-  ssr: false,
-});
-
-const Marker: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").Marker>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.Marker), {
-  ssr: false,
-});
-
-const Popup: ComponentType<
-  React.ComponentProps<typeof import("react-leaflet").Popup>
-> = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
-  ssr: false,
-});
-
-const Map: ComponentType<MapProps> = ({
+export default function MapComponent({
   stations,
   getMarkerIcon,
   center,
   zoom,
-  existingLocations = [],
-  onLocationSelect,
-  zoomControl = true,
-}) => {
-  useEffect(() => {
-    Promise.all([
-      import("leaflet/dist/leaflet.css"),
-      import("@geoapify/geocoder-autocomplete/styles/minimal.css"),
-    ]);
-  }, []);
+}: MapProps) {
+  const [shouldLocate, setShouldLocate] = useState(false);
 
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      className="h-full w-full"
-      zoomControl={zoomControl}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {stations.map((station) => (
-        <Marker
-          key={station.id}
-          position={[station.latitude, station.longitude]}
-          icon={
-            new Icon({
-              iconUrl: getMarkerIcon(station.status, station.type),
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            })
-          }
-          eventHandlers={{
-            click: () => {
-              if (onLocationSelect) {
-                onLocationSelect({
-                  id: station.id,
-                  name: station.name,
-                  address: station.address,
-                  lat: station.latitude,
-                  lng: station.longitude,
-                });
-              }
-            },
-          }}
+    <div className="relative w-[800px] h-[800px] mx-auto rounded-xl overflow-hidden shadow-xl border border-gray-700/50">
+      <div className="absolute top-4 right-4 z-[400]">
+        <button
+          onClick={() => setShouldLocate(true)}
+          className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg text-white hover:bg-white/20 transition-colors shadow-lg border border-white/20"
         >
-          <Popup>
-            <div>
-              <h3 className="font-semibold">{station.name}</h3>
-              <p>{station.address}</p>
-              {station.services && (
-                <div className="mt-2">
-                  <h4 className="font-semibold">Services :</h4>
-                  <ul className="list-disc list-inside">
-                    {station.services.highPressure !== "NONE" && (
-                      <li>
-                        Haute pression (
-                        {station.services.highPressure.toLowerCase()})
-                      </li>
-                    )}
-                    {station.services.tirePressure && (
-                      <li>Gonflage des pneus</li>
-                    )}
-                    {station.services.vacuum && <li>Aspirateur</li>}
-                    {station.services.handicapAccess && (
-                      <li>Accès handicapé</li>
-                    )}
-                    {station.services.wasteWater && <li>Vidange eaux usées</li>}
-                    {station.services.waterPoint && <li>Point d'eau</li>}
-                    {station.services.wasteWaterDisposal && (
-                      <li>Évacuation eaux usées</li>
-                    )}
-                    {station.services.blackWaterDisposal && (
-                      <li>Évacuation eaux noires</li>
-                    )}
-                    {station.services.electricity !== "NONE" && (
-                      <li>
-                        Électricité (
-                        {station.services.electricity === "AMP_8"
-                          ? "8 ampères"
-                          : "15 ampères"}
-                        )
-                      </li>
-                    )}
-                    {station.services.maxVehicleLength && (
-                      <li>
-                        Longueur maximale : {station.services.maxVehicleLength}m
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              )}
-              {station.parkingDetails && (
-                <div className="mt-2">
-                  <h4 className="font-semibold">Informations parking :</h4>
-                  <ul className="list-disc list-inside">
-                    {station.parkingDetails.isPayant && (
-                      <li>Payant ({station.parkingDetails.tarif}€/jour)</li>
-                    )}
-                    {station.parkingDetails.hasElectricity !== "NONE" && (
-                      <li>
-                        Électricité (
-                        {station.parkingDetails.hasElectricity === "AMP_8"
-                          ? "8 ampères"
-                          : "15 ampères"}
-                        )
-                      </li>
-                    )}
-                    {station.parkingDetails.handicapAccess && (
-                      <li>Accès handicapé</li>
-                    )}
-                    {station.parkingDetails.commercesProches.length > 0 && (
-                      <li>
-                        Commerces à proximité :{" "}
-                        {station.parkingDetails.commercesProches.join(", ")}
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+          Ma position
+        </button>
+      </div>
 
-      {existingLocations?.map((location) => (
-        <Marker
-          key={location.id}
-          position={[location.latitude, location.longitude]}
-          icon={
-            new Icon({
-              iconUrl:
-                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            })
-          }
-        >
-          <Popup>
-            <div>
-              <h3 className="font-semibold">{location.name}</h3>
-              <p>{location.address}</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        className="w-full h-full"
+        style={{ background: "#1a1f37" }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          className="map-tiles"
+        />
+        <LocationMarker
+          shouldLocate={shouldLocate}
+          onLocated={() => setShouldLocate(false)}
+        />
+
+        {stations.map((station) => (
+          <Marker
+            key={station.id}
+            position={[station.latitude, station.longitude]}
+            icon={
+              new Icon({
+                iconUrl: getMarkerIcon(station.status, station.type),
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32],
+              })
+            }
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-semibold text-lg mb-2">{station.name}</h3>
+                <p className="text-sm text-gray-600">{station.address}</p>
+                <div className="mt-2 flex gap-2">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      station.status === "active"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : station.status === "en_attente"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {station.status === "active"
+                      ? "Active"
+                      : station.status === "en_attente"
+                      ? "En attente"
+                      : "Inactive"}
+                  </span>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      station.type === "STATION_LAVAGE"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-purple-100 text-purple-700"
+                    }`}
+                  >
+                    {station.type === "STATION_LAVAGE"
+                      ? "Station de lavage"
+                      : "Parking"}
+                  </span>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
-};
-
-export default Map;
+}

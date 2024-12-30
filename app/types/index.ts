@@ -24,8 +24,8 @@ export interface StationServices {
   wasteWaterDisposal: boolean;
   blackWaterDisposal: boolean;
   electricity: ElectricityType;
-  paymentMethods: PaymentMethodType[];
   maxVehicleLength: number | null;
+  paymentMethods: PaymentMethodType[];
   stationId?: string;
 }
 

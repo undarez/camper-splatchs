@@ -17,14 +17,28 @@ export type ServiceType = {
   vacuum: boolean;
   handicapAccess: boolean;
   wasteWater: boolean;
+  waterPoint: boolean;
+  wasteWaterDisposal: boolean;
+  blackWaterDisposal: boolean;
+  electricity: "NONE" | "AMP_8" | "AMP_15";
+  maxVehicleLength: number | null;
+  paymentMethods: ("JETON" | "ESPECES" | "CARTE_BANCAIRE")[];
 };
 
-export const SERVICE_LABELS: Record<keyof Omit<ServiceType, "id">, string> = {
+export const SERVICE_LABELS: Record<
+  keyof Omit<ServiceType, "id" | "paymentMethods">,
+  string
+> = {
   highPressure: "Haute pression",
   tirePressure: "Gonflage pneus",
   vacuum: "Aspirateur",
   handicapAccess: "Accès PMR",
   wasteWater: "Eaux usées",
+  waterPoint: "Point d'eau",
+  wasteWaterDisposal: "Vidange eaux usées",
+  blackWaterDisposal: "Vidange eaux noires",
+  electricity: "Électricité",
+  maxVehicleLength: "Longueur maximale",
 };
 
 export interface StationServices {

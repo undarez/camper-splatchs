@@ -32,19 +32,19 @@ const Header = () => {
   if (!mounted) return null;
 
   const menuButtonClass = cn(
-    "font-sans text-sm text-white",
-    "hover:text-[#FFD700] hover:bg-white/10",
+    "font-sans text-sm text-gray-200",
+    "hover:text-blue-400 hover:bg-[#1E2337]/50",
     "transition-all duration-300",
     "rounded-lg px-4 py-2",
     "hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0",
-    "border border-[#A5E9FF] hover:border-[#FFD700]",
+    "border border-gray-700/50 hover:border-blue-500/50",
     "font-medium",
     "group"
   );
 
   const menuItemClass = cn(
-    "font-sans text-gray-700",
-    "hover:text-[#1B4B82] hover:bg-blue-50",
+    "font-sans text-gray-300",
+    "hover:text-blue-400 hover:bg-[#1E2337]/80",
     "transition-all duration-200",
     "rounded-lg m-1 p-2",
     "w-full text-sm font-medium",
@@ -53,7 +53,7 @@ const Header = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] shadow-xl">
+    <header className="sticky top-0 z-50 w-full bg-[#1E2337]/95 backdrop-blur-md border-b border-gray-700/50 shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
           {/* Mobile Menu Button */}
@@ -61,7 +61,7 @@ const Header = () => {
             <MobileSidebar />
           </div>
 
-          {/* Logo - Centré en mobile, aligné à gauche en desktop */}
+          {/* Logo */}
           <div className="absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none">
             <Link href="/" className="flex-shrink-0 relative block">
               <div className="w-[120px] h-[120px] relative">
@@ -90,12 +90,9 @@ const Header = () => {
                     </span>
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-lg border border-[#A5E9FF] shadow-xl p-1 w-48">
+                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
                   <MenubarItem className={menuItemClass}>
-                    <Link
-                      href="/components/localisationStation2/LocalisationStation2"
-                      className="w-full"
-                    >
+                    <Link href="/localisationStation2" className="w-full">
                       Ajouter une station
                     </Link>
                   </MenubarItem>
@@ -117,7 +114,7 @@ const Header = () => {
                     </span>
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-lg border border-[#A5E9FF] shadow-xl p-1 w-48">
+                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
                   <MenubarItem className={menuItemClass}>
                     <Link href="/pages/About" className="w-full">
                       À propos
@@ -136,7 +133,7 @@ const Header = () => {
                       </span>
                     </Button>
                   </MenubarTrigger>
-                  <MenubarContent className="bg-white/95 backdrop-blur-sm animate-in slide-in-from-top-2 rounded-lg border border-[#A5E9FF] shadow-xl p-1 w-48">
+                  <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
                     <MenubarItem className={menuItemClass}>
                       <Link href="/pages/profil" className="w-full">
                         Profil
@@ -176,7 +173,7 @@ const Header = () => {
                 </MenubarMenu>
               ) : (
                 <Button
-                  className="font-sans text-sm bg-[#FFD700] text-[#1B4B82] hover:bg-[#FFD700]/90 transition-all duration-300 rounded-lg px-4 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 font-medium"
+                  className="font-sans text-sm bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 rounded-lg px-4 py-2 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 font-medium"
                   onClick={() => router.push("/signin")}
                 >
                   Se connecter
@@ -186,17 +183,17 @@ const Header = () => {
 
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-sm border border-[#A5E9FF] hover:border-[#FFD700] flex items-center justify-center transition-all duration-300 hover:bg-white/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+              className="w-8 h-8 rounded-lg bg-[#1E2337]/80 backdrop-blur-sm border border-gray-700/50 hover:border-blue-500/50 flex items-center justify-center transition-all duration-300 hover:bg-[#1E2337] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
             >
               {theme === "dark" ? (
-                <MoonIcon className="w-4 h-4 text-[#FFD700]" />
+                <MoonIcon className="w-4 h-4 text-blue-400" />
               ) : (
-                <SunIcon className="w-4 h-4 text-[#FFD700]" />
+                <SunIcon className="w-4 h-4 text-blue-400" />
               )}
             </button>
           </div>
 
-          {/* Placeholder pour équilibrer le layout en mobile */}
+          {/* Placeholder mobile */}
           <div className="w-10 md:hidden"></div>
         </div>
       </div>

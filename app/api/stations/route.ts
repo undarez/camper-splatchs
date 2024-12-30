@@ -7,10 +7,28 @@ export async function GET() {
       include: {
         services: true,
         parkingDetails: true,
+        author: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    return NextResponse.json(stations);
+    // Conversion pour l'interface frontend
+    const formattedStations = stations.map((station) => ({
+      ...station,
+      services: station.services || null,
+      parkingDetails: station.parkingDetails || null,
+    }));
+
+    console.log("Stations envoyées par l'API:", formattedStations);
+
+    return NextResponse.json(formattedStations);
   } catch (error) {
     console.error("Erreur lors de la récupération des stations:", error);
     return NextResponse.json(

@@ -86,7 +86,7 @@ model Station {
   postalCode       String?
   latitude         Float
   longitude        Float
-  images           String[]
+  images           String[]        @default([])
   status           StationStatus   @default(en_attente)
   type             StationType     @default(STATION_LAVAGE)
   validatedAt      DateTime?

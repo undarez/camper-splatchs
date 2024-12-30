@@ -5,146 +5,387 @@ import { createTransport } from "nodemailer";
 const transporter = createTransport({
   service: "gmail",
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
+// Schéma simplifié
 const notificationSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   address: z.string().min(1, "L'adresse est requise"),
+  city: z.string().optional(),
+  postalCode: z.string().optional(),
+  latitude: z.number(),
+  longitude: z.number(),
+  type: z.enum(["STATION_LAVAGE", "PARKING"]),
+  services: z
+    .object({
+      highPressure: z.enum(["NONE", "PASSERELLE", "ECHAFAUDAGE", "PORTIQUE"]),
+      tirePressure: z.boolean(),
+      vacuum: z.boolean(),
+      handicapAccess: z.boolean(),
+      wasteWater: z.boolean(),
+      waterPoint: z.boolean(),
+      wasteWaterDisposal: z.boolean(),
+      blackWaterDisposal: z.boolean(),
+      electricity: z.enum(["NONE", "AMP_8", "AMP_15"]),
+      maxVehicleLength: z.number().nullable(),
+      paymentMethods: z.array(z.string()),
+    })
+    .optional()
+    .nullable(),
+  parkingDetails: z
+    .object({
+      isPayant: z.boolean(),
+      tarif: z.number().nullable(),
+      hasElectricity: z.enum(["NONE", "AMP_8", "AMP_15"]),
+      commercesProches: z.array(z.string()),
+      handicapAccess: z.boolean(),
+    })
+    .optional()
+    .nullable(),
   author: z.object({
     name: z.string().nullable(),
     email: z.string().email("Email invalide").optional(),
   }),
-  services: z.object({
-    highPressure: z.string(),
-    tirePressure: z.boolean(),
-    vacuum: z.boolean(),
-    handicapAccess: z.boolean(),
-    wasteWater: z.boolean(),
-    waterPoint: z.boolean(),
-    wasteWaterDisposal: z.boolean(),
-    blackWaterDisposal: z.boolean(),
-    electricity: z.string(),
-    maxVehicleLength: z.number().nullable(),
-    paymentMethods: z.array(z.string()),
-  }),
 });
-
-if (!process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-  throw new Error(
-    "NEXT_PUBLIC_ADMIN_EMAIL n'est pas défini dans les variables d'environnement"
-  );
-}
 
 export async function POST(request: Request) {
   try {
-    const contentType = request.headers.get("content-type");
-    if (!contentType?.includes("application/json")) {
-      return NextResponse.json(
-        { success: false, error: "Content-type doit être application/json" },
-        { status: 415 }
-      );
-    }
-
+    console.log("Route notify-new-station appelée");
     const body = await request.json();
+    console.log("Données reçues:", body);
+
+    console.log("Validation des données...");
     const validatedData = notificationSchema.parse(body);
+    console.log("Données validées:", validatedData);
+
+    console.log("Vérification des variables d'environnement...");
+    console.log(
+      "EMAIL_USER:",
+      process.env.EMAIL_USER ? "Défini" : "Non défini"
+    );
+    console.log(
+      "EMAIL_APP_PASSWORD:",
+      process.env.EMAIL_APP_PASSWORD ? "Défini" : "Non défini"
+    );
+    console.log(
+      "NEXT_PUBLIC_ADMIN_EMAIL:",
+      process.env.NEXT_PUBLIC_ADMIN_EMAIL ? "Défini" : "Non défini"
+    );
 
     // Formater les services pour l'email
-    const servicesList = [];
-    if (validatedData.services.highPressure !== "NONE")
-      servicesList.push(
-        `Haute pression: ${validatedData.services.highPressure}`
-      );
-    if (validatedData.services.tirePressure)
-      servicesList.push("Pression des pneus");
-    if (validatedData.services.vacuum) servicesList.push("Aspirateur");
-    if (validatedData.services.handicapAccess)
-      servicesList.push("Accès handicapé");
-    if (validatedData.services.wasteWater) servicesList.push("Eaux usées");
-    if (validatedData.services.waterPoint) servicesList.push("Point d'eau");
-    if (validatedData.services.wasteWaterDisposal)
-      servicesList.push("Évacuation eaux usées");
-    if (validatedData.services.blackWaterDisposal)
-      servicesList.push("Évacuation eaux noires");
-    if (validatedData.services.electricity !== "NONE")
-      servicesList.push(`Électricité: ${validatedData.services.electricity}`);
-    if (validatedData.services.maxVehicleLength)
-      servicesList.push(
-        `Longueur maximale: ${validatedData.services.maxVehicleLength}m`
-      );
-    if (validatedData.services.paymentMethods.length > 0)
-      servicesList.push(
-        `Paiement: ${validatedData.services.paymentMethods.join(", ")}`
-      );
+    const formatServices = () => {
+      if (validatedData.type === "STATION_LAVAGE" && validatedData.services) {
+        const services = [];
+        const s = validatedData.services;
 
-    // Vérifier si les identifiants Gmail sont disponibles
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-      console.warn(
-        "Identifiants Gmail manquants. Les emails ne seront pas envoyés."
-      );
+        if (s.highPressure !== "NONE")
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Haute pression: ${formatHighPressure(
+                s.highPressure
+              )}</span>
+            </li>
+          `);
+        if (s.tirePressure)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Gonflage pneus</span>
+            </li>
+          `);
+        if (s.vacuum)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Aspirateur</span>
+            </li>
+          `);
+        if (s.handicapAccess)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Accès handicapé</span>
+            </li>
+          `);
+        if (s.wasteWater)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Vidange eaux usées</span>
+            </li>
+          `);
+        if (s.waterPoint)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Point d'eau</span>
+            </li>
+          `);
+        if (s.wasteWaterDisposal)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Évacuation eaux usées</span>
+            </li>
+          `);
+        if (s.blackWaterDisposal)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Évacuation eaux noires</span>
+            </li>
+          `);
+        if (s.electricity !== "NONE")
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Électricité: ${formatElectricity(
+                s.electricity
+              )}</span>
+            </li>
+          `);
+        if (s.maxVehicleLength)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Longueur max: ${s.maxVehicleLength}m</span>
+            </li>
+          `);
+
+        return services.join("");
+      }
+
+      if (validatedData.type === "PARKING" && validatedData.parkingDetails) {
+        const services = [];
+        const p = validatedData.parkingDetails;
+
+        if (p.isPayant)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Parking payant${
+                p.tarif ? ` (${p.tarif}€/jour)` : ""
+              }</span>
+            </li>
+          `);
+        if (p.hasElectricity !== "NONE")
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Électricité: ${formatElectricity(
+                p.hasElectricity
+              )}</span>
+            </li>
+          `);
+        if (p.handicapAccess)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Accès handicapé</span>
+            </li>
+          `);
+        if (p.commercesProches && p.commercesProches.length > 0)
+          services.push(`
+            <li style="margin-bottom: 10px; display: flex; align-items: center;">
+              <span style="color: #10B981; margin-right: 8px;">✓</span>
+              <span style="color: #E5E7EB;">Commerces à proximité: ${formatCommerces(
+                p.commercesProches
+              )}</span>
+            </li>
+          `);
+
+        return services.join("");
+      }
+
+      return "<li style='color: #E5E7EB;'>Aucun service spécifié</li>";
+    };
+
+    const emailTemplate = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #1E2337; color: white;">
+        <div style="text-align: center; padding: 40px 20px; background: linear-gradient(to right, #2ABED9, #1B4B82);">
+          <img src="/images/logo.png" alt="CamperWash Logo" style="max-width: 200px; margin-bottom: 20px;">
+          <h1 style="margin: 0; font-size: 28px; color: white;">Nouvelle ${
+            validatedData.type === "STATION_LAVAGE"
+              ? "Station de Lavage"
+              : "Place de Parking"
+          }</h1>
+        </div>
+        
+        <div style="padding: 40px 20px;">
+          <div style="background-color: #252B43; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+            <h2 style="color: #2ABED9; margin-top: 0; font-size: 20px;">Informations Générales</h2>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 10px;">
+                <strong style="color: #2ABED9;">Nom:</strong> 
+                <span style="color: #E5E7EB;">${validatedData.name}</span>
+              </li>
+              <li style="margin-bottom: 10px;">
+                <strong style="color: #2ABED9;">Adresse:</strong> 
+                <span style="color: #E5E7EB;">${validatedData.address}</span>
+              </li>
+              <li style="margin-bottom: 10px;">
+                <strong style="color: #2ABED9;">Ville:</strong> 
+                <span style="color: #E5E7EB;">${
+                  validatedData.city || "Non spécifié"
+                }</span>
+              </li>
+              <li style="margin-bottom: 10px;">
+                <strong style="color: #2ABED9;">Code Postal:</strong> 
+                <span style="color: #E5E7EB;">${
+                  validatedData.postalCode || "Non spécifié"
+                }</span>
+              </li>
+              <li style="margin-bottom: 10px;">
+                <strong style="color: #2ABED9;">Coordonnées:</strong> 
+                <span style="color: #E5E7EB;">${validatedData.latitude}, ${
+      validatedData.longitude
+    }</span>
+              </li>
+            </ul>
+          </div>
+
+          <div style="background-color: #252B43; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
+            <h2 style="color: #2ABED9; margin-top: 0; font-size: 20px;">Services Disponibles</h2>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              ${formatServices()}
+            </ul>
+          </div>
+
+          <div style="background-color: #252B43; padding: 30px; border-radius: 10px;">
+            <h2 style="color: #2ABED9; margin-top: 0; font-size: 20px;">Informations Complémentaires</h2>
+            <p style="color: #E5E7EB; margin-bottom: 20px;">
+              Cette ${
+                validatedData.type === "STATION_LAVAGE"
+                  ? "station"
+                  : "place de parking"
+              } a été ajoutée par:
+              <strong>${
+                validatedData.author.name ||
+                validatedData.author.email ||
+                "Utilisateur anonyme"
+              }</strong>
+            </p>
+            <p style="color: #E5E7EB; margin-bottom: 20px;">
+              Statut actuel: <span style="color: #FCD34D;">En attente de validation</span>
+            </p>
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/stations" 
+                 style="background: linear-gradient(to right, #2ABED9, #1B4B82);
+                        color: white;
+                        padding: 12px 24px;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        display: inline-block;
+                        font-weight: bold;">
+                Valider la Station
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; padding: 20px; border-top: 1px solid #374151;">
+          <p style="color: #9CA3AF; margin: 0; font-size: 14px;">
+            © ${new Date().getFullYear()} CamperWash. Tous droits réservés.
+          </p>
+        </div>
+      </div>
+    `;
+
+    if (
+      process.env.EMAIL_USER &&
+      process.env.EMAIL_APP_PASSWORD &&
+      process.env.NEXT_PUBLIC_ADMIN_EMAIL
+    ) {
+      console.log("Configuration du transporteur nodemailer...");
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+        subject: "Nouvelle station CamperWash à valider",
+        html: emailTemplate,
+      };
+      console.log("Options d'email configurées:", {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+      });
+
+      console.log("Tentative d'envoi de l'email...");
+      await transporter.sendMail(mailOptions);
+      console.log("Email envoyé avec succès");
+
       return NextResponse.json({
         success: true,
-        message: "Station créée avec succès (notifications email désactivées)",
+        message: "Notification envoyée avec succès",
       });
+    } else {
+      console.error(
+        "Variables d'environnement manquantes pour l'envoi d'email"
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Configuration email manquante",
+          missingVars: {
+            EMAIL_USER: !process.env.EMAIL_USER,
+            EMAIL_APP_PASSWORD: !process.env.EMAIL_APP_PASSWORD,
+            NEXT_PUBLIC_ADMIN_EMAIL: !process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+          },
+        },
+        { status: 500 }
+      );
     }
-
-    // Email à l'administrateur
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
-      subject: "Nouvelle station CamperWash créée",
-      html: `
-        <h2>Nouvelle station créée</h2>
-        <p><strong>Nom de la station:</strong> ${validatedData.name}</p>
-        <p><strong>Adresse:</strong> ${validatedData.address}</p>
-        <p><strong>Créée par:</strong> ${
-          validatedData.author.name || validatedData.author.email || "Anonyme"
-        }</p>
-        <h3>Services proposés:</h3>
-        <ul>
-          ${servicesList.map((service) => `<li>${service}</li>`).join("")}
-        </ul>
-        <p>Connectez-vous au tableau de bord administrateur pour valider cette station.</p>
-      `,
-    });
-
-    // Email à l'utilisateur si un email est fourni
-    if (validatedData.author.email) {
-      await transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        to: validatedData.author.email,
-        subject: "Votre station CamperWash a été soumise",
-        html: `
-          <h2>Merci d'avoir soumis une nouvelle station !</h2>
-          <p>Votre station "${
-            validatedData.name
-          }" a été soumise avec succès.</p>
-          <p>Détails de la station :</p>
-          <ul>
-            <li>Adresse : ${validatedData.address}</li>
-            <li>Services proposés :
-              <ul>
-                ${servicesList.map((service) => `<li>${service}</li>`).join("")}
-              </ul>
-            </li>
-          </ul>
-          <p>Notre équipe va examiner votre soumission dans les plus brefs délais.</p>
-          <p>Nous vous notifierons dès que votre station sera validée.</p>
-        `,
-      });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Station créée et notifications envoyées avec succès",
-    });
   } catch (error) {
-    console.error("Erreur lors de la création de la station:", error);
+    console.error("Erreur détaillée:", error);
+    if (error.code === "EAUTH") {
+      console.error("Erreur d'authentification Gmail");
+    }
+    if (error.response) {
+      console.error("Réponse d'erreur:", error.response);
+    }
     return NextResponse.json(
-      { success: false, error: "Erreur lors de la création de la station" },
+      {
+        success: false,
+        error: "Erreur lors de l'envoi de la notification",
+        details: error.message,
+      },
       { status: 500 }
     );
   }
+}
+
+// Fonctions utilitaires pour le formatage
+function formatHighPressure(type: string): string {
+  const types = {
+    PASSERELLE: "Passerelle",
+    ECHAFAUDAGE: "Échafaudage",
+    PORTIQUE: "Portique",
+  };
+  return types[type] || type;
+}
+
+function formatElectricity(type: string): string {
+  const types = {
+    AMP_8: "8 ampères",
+    AMP_15: "15 ampères",
+  };
+  return types[type] || type;
+}
+
+function formatCommerces(commerces: string[]): string {
+  const types = {
+    CENTRE_VILLE: "Centre-ville",
+    SUPERMARCHE: "Supermarché",
+    RESTAURANT: "Restaurant",
+    STATION_SERVICE: "Station-service",
+    BOULANGERIE: "Boulangerie",
+    PHARMACIE: "Pharmacie",
+  };
+  return commerces.map((c) => types[c] || c).join(", ");
 }

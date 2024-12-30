@@ -1,145 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { Card } from "@/app/components/ui/card";
 
-interface Review {
-  userName: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
+interface StatisticProps {
+  value: string;
+  label: string;
+  icon: React.ReactNode;
 }
 
-interface Statistics {
-  stations: number;
-  users: number;
-  reviews: number;
-}
+const StatisticCard = ({ value, label, icon }: StatisticProps) => (
+  <Card className="flex flex-col items-center justify-center p-8 bg-white rounded-3xl transition-all hover:scale-105 hover:shadow-lg">
+    <div className="text-blue-500 mb-4 p-4">{icon}</div>
+    <div className="text-4xl font-bold text-gray-900 mb-2">{value}</div>
+    <div className="text-sm text-gray-600">{label}</div>
+  </Card>
+);
 
-export function Statistics() {
-  const [stats, setStats] = useState<Statistics | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+const CamperIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    className="text-blue-500 w-8 h-8"
+  >
+    <path d="M4 11h16v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8z" strokeWidth="2" />
+    <path
+      d="M4 11V7a2 2 0 012-2h12a2 2 0 012 2v4M8 17h.01M16 17h.01"
+      strokeWidth="2"
+    />
+  </svg>
+);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch("/api/statistics");
-        const data = await response.json();
-        setStats(data.statistics);
-        setReviews(data.recentReviews);
-      } catch (error) {
-        console.error(
-          "Erreur lors de la récupération des statistiques:",
-          error
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+const UsersIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    className="text-blue-500 w-8 h-8"
+  >
+    <path
+      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
+      strokeWidth="2"
+    />
+  </svg>
+);
 
-    fetchStats();
-  }, []);
+const StarIcon = () => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    className="text-blue-500 w-8 h-8"
+  >
+    <path
+      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+      strokeWidth="2"
+    />
+  </svg>
+);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
+export default function Statistics() {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 border-2 border-[#A5E9FF] hover:border-[#FFD700]">
-          <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Image
-                src="/images/van-icon.svg"
-                alt="Stations"
-                width={30}
-                height={30}
-                className="w-8 h-8"
-              />
-            </div>
-          </div>
-          <h3 className="text-3xl font-bold text-center mb-2 text-blue-600">
-            {stats?.stations}+
-          </h3>
-          <Link href="/pages/StationCard">
-            <p className="text-gray-600 text-center">Stations référencées</p>
-          </Link>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 border-2 border-[#A5E9FF] hover:border-[#FFD700]">
-          <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Image
-                src="/images/users-icon.svg"
-                alt="Utilisateurs"
-                width={30}
-                height={30}
-                className="w-8 h-8"
-              />
-            </div>
-          </div>
-          <h3 className="text-3xl font-bold text-center mb-2 text-blue-600">
-            {stats?.users}+
-          </h3>
-          <p className="text-gray-600 text-center">Utilisateurs actifs</p>
-        </div>
-
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 border-2 border-[#A5E9FF] hover:border-[#FFD700]">
-          <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Image
-                src="/images/star-icon.svg"
-                alt="Avis"
-                width={30}
-                height={30}
-                className="w-8 h-8"
-              />
-            </div>
-          </div>
-          <h3 className="text-3xl font-bold text-center mb-2 text-blue-600">
-            {stats?.reviews}+
-          </h3>
-          <p className="text-gray-600 text-center">Avis vérifiés</p>
-        </div>
-      </div>
-
-      {reviews && reviews.length > 0 && (
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6 text-center">Derniers Avis</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {reviews.map((review, index) => (
-              <div
-                key={index}
-                className="bg-white/10 backdrop-blur-sm rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 border-2 border-[#A5E9FF] hover:border-[#FFD700]"
-              >
-                <div className="flex items-center mb-4">
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{review.userName}</h3>
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className="text-yellow-400">
-                          {i < review.rating ? "★" : "☆"}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(review.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-                <p className="text-gray-600">{review.comment}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 -mt-24 relative z-10">
+      <StatisticCard
+        value="17+"
+        label="Stations référencées"
+        icon={<CamperIcon />}
+      />
+      <StatisticCard
+        value="3+"
+        label="Utilisateurs actifs"
+        icon={<UsersIcon />}
+      />
+      <StatisticCard value="0+" label="Avis vérifiés" icon={<StarIcon />} />
     </div>
   );
 }
