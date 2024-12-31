@@ -54,6 +54,12 @@ const notificationSchema = z.object({
   }),
 });
 
+interface EmailError {
+  code?: string;
+  response?: unknown;
+  message?: string;
+}
+
 export async function POST(request: Request) {
   try {
     console.log("Route notify-new-station appelée");
@@ -343,17 +349,20 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("Erreur détaillée:", error);
-    if (error.code === "EAUTH") {
+
+    const emailError = error as EmailError;
+
+    if (emailError.code === "EAUTH") {
       console.error("Erreur d'authentification Gmail");
     }
-    if (error.response) {
-      console.error("Réponse d'erreur:", error.response);
+    if (emailError.response) {
+      console.error("Réponse d'erreur:", emailError.response);
     }
     return NextResponse.json(
       {
         success: false,
         error: "Erreur lors de l'envoi de la notification",
-        details: error.message,
+        details: emailError.message,
       },
       { status: 500 }
     );
@@ -361,8 +370,18 @@ export async function POST(request: Request) {
 }
 
 // Fonctions utilitaires pour le formatage
-function formatHighPressure(type: string): string {
-  const types = {
+type HighPressureType = "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
+type ElectricityType = "AMP_8" | "AMP_15";
+type CommerceType =
+  | "CENTRE_VILLE"
+  | "SUPERMARCHE"
+  | "RESTAURANT"
+  | "STATION_SERVICE"
+  | "BOULANGERIE"
+  | "PHARMACIE";
+
+function formatHighPressure(type: HighPressureType): string {
+  const types: Record<HighPressureType, string> = {
     PASSERELLE: "Passerelle",
     ECHAFAUDAGE: "Échafaudage",
     PORTIQUE: "Portique",
@@ -370,16 +389,16 @@ function formatHighPressure(type: string): string {
   return types[type] || type;
 }
 
-function formatElectricity(type: string): string {
-  const types = {
+function formatElectricity(type: ElectricityType): string {
+  const types: Record<ElectricityType, string> = {
     AMP_8: "8 ampères",
     AMP_15: "15 ampères",
   };
   return types[type] || type;
 }
 
-function formatCommerces(commerces: string[]): string {
-  const types = {
+function formatCommerces(commerces: (CommerceType | string)[]): string {
+  const types: Record<CommerceType, string> = {
     CENTRE_VILLE: "Centre-ville",
     SUPERMARCHE: "Supermarché",
     RESTAURANT: "Restaurant",
@@ -387,5 +406,5 @@ function formatCommerces(commerces: string[]): string {
     BOULANGERIE: "Boulangerie",
     PHARMACIE: "Pharmacie",
   };
-  return commerces.map((c) => types[c] || c).join(", ");
+  return commerces.map((c) => types[c as CommerceType] || c).join(", ");
 }
