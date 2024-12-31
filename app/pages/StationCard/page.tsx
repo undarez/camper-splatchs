@@ -5,7 +5,7 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
-  Bars3Icon as Menu,
+  FunnelIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -249,9 +249,9 @@ const ValidatedStations = () => {
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:relative md:translate-x-0`}
+          } md:relative md:translate-x-0 md:w-72 lg:w-80 shadow-lg`}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-6 md:hidden">
@@ -340,21 +340,26 @@ const ValidatedStations = () => {
 
         {/* Contenu principal */}
         <main className="flex-1 min-h-screen">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-500 to-blue-700">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
+            <div className="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg mb-4">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 shadow-lg border border-white/20 transition-all duration-200"
-                aria-label={isSidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 shadow-lg border border-white/20 transition-all duration-200 flex items-center gap-2"
+                aria-label="Ouvrir les filtres"
               >
-                <Menu className="h-6 w-6 text-white" />
+                <FunnelIcon className="h-5 w-5 text-white" />
+                <span className="text-white text-sm hidden sm:inline">
+                  Filtres
+                </span>
               </button>
               <div className="flex-1 flex justify-center">
-                <h1 className="text-xl font-bold text-white">Stations</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-white">
+                  Stations
+                </h1>
               </div>
             </div>
 
-            {/* Contenu de la vue */}
+            {/* Vue des cartes */}
             <div
               className={`w-full transition-all duration-300 ${
                 isSidebarOpen ? "md:pl-4" : ""
@@ -362,10 +367,10 @@ const ValidatedStations = () => {
             >
               {viewMode === "cards" ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                     {currentStations.map((station) => (
                       <div
-                        className="w-full max-w-sm transform transition-all duration-200 hover:scale-[1.02]"
+                        className="w-full transform transition-all duration-200 hover:scale-[1.02]"
                         key={station.id}
                       >
                         <StationCard station={station} />
@@ -373,9 +378,9 @@ const ValidatedStations = () => {
                     ))}
                   </div>
 
-                  {/* Pagination */}
+                  {/* Pagination avec meilleur responsive */}
                   {filteredStations.length > stationsPerPage && (
-                    <div className="flex justify-center mt-8 gap-2">
+                    <div className="flex justify-center mt-4 sm:mt-6 gap-1 sm:gap-2 flex-wrap">
                       {Array.from({ length: totalPages }, (_, i) => (
                         <Button
                           key={i + 1}
@@ -383,7 +388,8 @@ const ValidatedStations = () => {
                           variant={
                             currentPage === i + 1 ? "default" : "outline"
                           }
-                          className={`transition-all duration-200 ${
+                          size="sm"
+                          className={`min-w-[2.5rem] h-8 px-2 sm:px-3 ${
                             currentPage === i + 1
                               ? "bg-blue-500 dark:bg-blue-600 text-white transform scale-105 shadow-lg"
                               : "hover:bg-blue-50 dark:hover:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
@@ -394,19 +400,9 @@ const ValidatedStations = () => {
                       ))}
                     </div>
                   )}
-
-                  {filteredStations.length === 0 && (
-                    <div className="text-center py-12 text-gray-500 dark:text-gray-400 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg">
-                      Aucune station ne correspond au filtre sélectionné
-                    </div>
-                  )}
                 </>
               ) : (
-                <div
-                  className={`w-full h-[calc(100vh-200px)] rounded-lg overflow-hidden transition-opacity duration-300 ${
-                    isSidebarOpen ? "opacity-0 md:opacity-100" : "opacity-100"
-                  }`}
-                >
+                <div className="h-[calc(100vh-180px)] rounded-lg overflow-hidden shadow-lg">
                   <MapView
                     stations={stations.map((station) => ({
                       ...station,

@@ -324,9 +324,9 @@ export default function LocalisationStation2() {
     <div className="min-h-screen bg-[#1E2337]">
       <style>{searchBarStyles}</style>
 
-      <div className="flex">
-        {/* Sidebar gauche */}
-        <div className="w-80 bg-[#1E2337] border-r border-gray-700/50 p-4 h-screen fixed left-0">
+      <div className="flex flex-col md:flex-row relative">
+        {/* Sidebar pour desktop */}
+        <div className="hidden md:block w-80 bg-[#1E2337] border-r border-gray-700/50 p-4 h-screen fixed left-0">
           <div className="space-y-4">
             {/* Bouton de géolocalisation */}
             <button
@@ -493,7 +493,7 @@ export default function LocalisationStation2() {
         </div>
 
         {/* Contenu principal avec la carte */}
-        <div className="flex-1 ml-80">
+        <div className="flex-1 md:ml-80">
           <div className="h-screen">
             <MapComponent
               stations={stations}
@@ -501,6 +501,113 @@ export default function LocalisationStation2() {
               center={mapCenter}
               zoom={8}
             />
+          </div>
+        </div>
+
+        {/* Barre de filtres mobile en bas */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1E2337] border-t border-gray-700/50 z-50">
+          {/* Barre de contrôle toujours visible */}
+          <div className="flex items-center justify-between p-3 bg-[#252B43]">
+            <button
+              onClick={handleGeolocation}
+              disabled={isLocating}
+              className="flex items-center gap-2 text-blue-400 px-4 py-2 rounded-lg bg-blue-500/20"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {isLocating ? "..." : "Me localiser"}
+            </button>
+
+            <div className="flex-1 mx-4">
+              <GeoapifyContext
+                apiKey={process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY}
+              >
+                <GeoapifyGeocoderAutocomplete
+                  placeholder="Rechercher..."
+                  lang="fr"
+                  limit={5}
+                  debounceDelay={300}
+                  countryCodes={["fr"]}
+                  placeSelect={(value: GeoapifyResult | null) => {
+                    if (value?.properties) {
+                      const {
+                        lat,
+                        lon,
+                        formatted,
+                        address_line1,
+                        city,
+                        postcode,
+                      } = value.properties;
+                      setFormData((prev) => ({
+                        ...prev,
+                        lat,
+                        lng: lon,
+                        address: address_line1 || formatted,
+                        city: city || "",
+                        postalCode: postcode || "",
+                      }));
+                      setIsDialogOpen(true);
+                    }
+                  }}
+                />
+              </GeoapifyContext>
+            </div>
+          </div>
+
+          {/* Liste des stations en version mobile */}
+          <div className="overflow-y-auto max-h-[40vh] bg-[#1E2337] p-3 space-y-2">
+            {stations.map((station) => (
+              <button
+                key={station.id}
+                className="w-full bg-[#252B43] p-3 rounded-lg flex items-center justify-between hover:bg-[#2A3150] transition-all text-left"
+                onClick={() => {
+                  const mapElement = document.getElementById(
+                    "map"
+                  ) as ExtendedHTMLElement;
+                  handleMapClick(
+                    mapElement,
+                    station.latitude,
+                    station.longitude
+                  );
+                }}
+                aria-label={`Voir la station ${station.name} sur la carte`}
+              >
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white text-sm">
+                    {station.name}
+                  </h3>
+                  <p className="text-xs text-gray-400">{station.address}</p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={cn(
+                      "px-2 py-1 text-xs rounded-full",
+                      station.status === "active"
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : station.status === "en_attente"
+                        ? "bg-amber-500/20 text-amber-400"
+                        : "bg-red-500/20 text-red-400"
+                    )}
+                  >
+                    {station.status === "active"
+                      ? "Active"
+                      : station.status === "en_attente"
+                      ? "En attente"
+                      : "Inactive"}
+                  </span>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
       </div>
