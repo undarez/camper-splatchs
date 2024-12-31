@@ -4,6 +4,9 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const stations = await prisma.station.findMany({
+      where: {
+        status: "active",
+      },
       include: {
         services: true,
         parkingDetails: true,
@@ -25,8 +28,6 @@ export async function GET() {
       services: station.services || null,
       parkingDetails: station.parkingDetails || null,
     }));
-
-    console.log("Stations envoyées par l'API:", formattedStations);
 
     return NextResponse.json(formattedStations);
   } catch (error) {

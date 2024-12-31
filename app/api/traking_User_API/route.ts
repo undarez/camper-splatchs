@@ -4,6 +4,9 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const stations = await prisma.station.findMany({
+      where: {
+        status: "active",
+      },
       include: {
         services: {
           select: {

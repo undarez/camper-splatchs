@@ -180,6 +180,7 @@ interface ExtendedHTMLElement extends HTMLElement {
   _leaflet_map?: {
     setView: (coords: [number, number], zoom: number) => void;
     locate: (options?: { setView?: boolean; maxZoom?: number }) => L.Map;
+    invalidateSize: () => void;
   };
 }
 
@@ -310,6 +311,7 @@ export default function LocalisationStation2() {
         }
       );
     } else {
+      console.error("Géolocalisation non supportée");
       toast({
         title: "Erreur",
         description:
