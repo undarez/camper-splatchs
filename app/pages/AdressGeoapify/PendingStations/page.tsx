@@ -15,6 +15,32 @@ import {
   CardTitle,
 } from "@/app/components/ui/card";
 
+type ServiceValue = boolean | string | string[] | number | null;
+
+const formatKey = (key: string): string => {
+  const keyMap: Record<string, string> = {
+    highPressure: "Haute pression",
+    tirePressure: "Gonflage pneus",
+    vacuum: "Aspirateur",
+    handicapAccess: "Accès handicapé",
+    wasteWater: "Eaux usées",
+    waterPoint: "Point d'eau",
+    wasteWaterDisposal: "Évacuation eaux usées",
+    blackWaterDisposal: "Évacuation eaux noires",
+    electricity: "Électricité",
+    maxVehicleLength: "Longueur max",
+    paymentMethods: "Paiement",
+  };
+  return keyMap[key] || key;
+};
+
+const formatValue = (value: ServiceValue): string => {
+  if (typeof value === "boolean") return value ? "Oui" : "Non";
+  if (Array.isArray(value)) return value.join(", ");
+  if (value === null) return "Non spécifié";
+  return value.toString();
+};
+
 const PendingStations = () => {
   const [stations, setStations] = useState<CamperWashStation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -145,16 +171,21 @@ const PendingStations = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              {Object.entries(station.services)
-                .filter(([key]) => key !== "id")
-                .map(
-                  ([key, value]) =>
-                    value && (
-                      <Badge key={key} variant="outline">
-                        {key}
-                      </Badge>
-                    )
-                )}
+              {station.services &&
+                Object.entries(station.services)
+                  .filter(([key]) => key !== "id")
+                  .map(
+                    ([key, value]) =>
+                      typeof value !== "undefined" && (
+                        <div
+                          key={key}
+                          className="flex items-center space-x-2 text-sm"
+                        >
+                          <span className="font-medium">{formatKey(key)}:</span>
+                          <span>{formatValue(value)}</span>
+                        </div>
+                      )
+                  )}
             </div>
 
             <div className="text-sm text-muted-foreground">
