@@ -10,6 +10,19 @@ export async function GET() {
       include: {
         services: true,
         parkingDetails: true,
+        reviews: {
+          select: {
+            rating: true,
+            content: true,
+            createdAt: true,
+            author: {
+              select: {
+                name: true,
+                image: true,
+              },
+            },
+          },
+        },
         author: {
           select: {
             name: true,
@@ -22,11 +35,16 @@ export async function GET() {
       },
     });
 
-    // Conversion pour l'interface frontend
+    // Conversion pour l'interface frontend avec calcul de la moyenne des notes
     const formattedStations = stations.map((station) => ({
       ...station,
       services: station.services || null,
       parkingDetails: station.parkingDetails || null,
+      averageRating:
+        station.reviews.length > 0
+          ? station.reviews.reduce((acc, review) => acc + review.rating, 0) /
+            station.reviews.length
+          : 0,
     }));
 
     return NextResponse.json(formattedStations);

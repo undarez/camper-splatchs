@@ -186,6 +186,7 @@ const ValidatedStations = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
+        console.log("Stations reçues:", data);
         setStations(data);
         setTotalPages(Math.ceil(data.length / stationsPerPage));
       } catch (error) {
@@ -201,12 +202,10 @@ const ValidatedStations = () => {
     fetchStations();
   }, []);
 
-  const filteredStations = stations.filter(
-    (station) =>
-      statusFilter === "all" ||
-      station.status === statusFilter ||
-      station.status === "active"
-  );
+  const filteredStations = stations.filter((station) => {
+    console.log("Filtrage station:", station.status, statusFilter);
+    return statusFilter === "all" || station.status === statusFilter;
+  });
 
   const indexOfLastStation = currentPage * stationsPerPage;
   const indexOfFirstStation = indexOfLastStation - stationsPerPage;
@@ -214,6 +213,9 @@ const ValidatedStations = () => {
     indexOfFirstStation,
     indexOfLastStation
   );
+
+  console.log("Stations filtrées:", filteredStations);
+  console.log("Stations actuelles:", currentStations);
 
   if (loading) {
     return (
