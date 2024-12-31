@@ -54,7 +54,7 @@ const adminItems = [
   },
 ];
 
-const MobileSidebar = ({
+const MobileSidebarComponent = ({
   isSidebarOpen = false,
 }: {
   isSidebarOpen?: boolean;
@@ -209,4 +209,6 @@ const MobileSidebar = ({
   );
 };
 
-export default MobileSidebar;
+export default function Page() {
+  return <MobileSidebarComponent />;
+}
