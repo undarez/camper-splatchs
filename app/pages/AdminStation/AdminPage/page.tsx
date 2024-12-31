@@ -22,6 +22,9 @@ import {
   Tooltip,
   Legend,
   Filler,
+  ChartOptions,
+  Scale,
+  CoreScaleOptions,
 } from "chart.js";
 
 ChartJS.register(
@@ -142,7 +145,7 @@ const AdminPage = () => {
     },
   };
 
-  const verticalBarOptions = {
+  const verticalBarOptions: ChartOptions<"bar"> = {
     responsive: true,
     plugins: {
       legend: {
@@ -151,21 +154,29 @@ const AdminPage = () => {
     },
     scales: {
       y: {
+        type: "linear" as const,
         beginAtZero: true,
         grid: {
           color: "rgba(255, 255, 255, 0.1)",
         },
         ticks: {
-          color: "white",
-          callback: (value: number) => `€${value}K`,
+          color: "rgba(255, 255, 255, 0.7)",
+          callback: function (
+            this: Scale<CoreScaleOptions>,
+            value: number | string
+          ) {
+            const numValue = Number(value);
+            return `€${(numValue / 1000).toFixed(1)}K`;
+          },
         },
       },
       x: {
+        type: "category" as const,
         grid: {
           color: "rgba(255, 255, 255, 0.1)",
         },
         ticks: {
-          color: "white",
+          color: "rgba(255, 255, 255, 0.7)",
         },
       },
     },
