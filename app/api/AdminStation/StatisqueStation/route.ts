@@ -4,6 +4,11 @@ import { authOptions } from "@/lib/AuthOptions";
 
 export const dynamic = "force-dynamic";
 
+interface StatisticsData {
+  labels: string[];
+  values: number[];
+}
+
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -16,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   try {
     // Données simulées pour l'exemple
-    const data = {
+    const data: StatisticsData = {
       labels: [],
       values: [],
     };
