@@ -6,13 +6,30 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { StationType } from "@prisma/client";
 
+interface FormData {
+  type: StationType;
+  name: string;
+  city: string;
+  postalCode: string;
+  tirePressure?: boolean;
+  isPayant?: boolean;
+}
+
+interface AddPointModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  formData: FormData;
+  onFormDataChange: (updates: Partial<FormData>) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}
+
 export default function AddPointModal({
   isOpen,
   onClose,
   formData,
   onFormDataChange,
   onSubmit,
-}) {
+}: AddPointModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-[#1E2337] border border-gray-700/50 text-white max-w-2xl">
