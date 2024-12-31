@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
-import { toast } from "@/hooks/use-toast";
 import {
   StationType,
   HighPressureType,
@@ -16,7 +15,9 @@ import {
   GeoapifyContext,
   GeoapifyGeocoderAutocomplete,
 } from "@geoapify/react-geocoder-autocomplete";
-import { Icon } from "leaflet";
+import { Icon, divIcon, marker as LeafletMarker, Map } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useToast } from "@/hooks/use-toast";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic(
@@ -196,12 +197,15 @@ const handleMapClick = (
 };
 
 export default function LocalisationStation2() {
-  const [stations, setStations] = useState<Station[]>([]);
+  const { toast } = useToast();
+  const [isLocating, setIsLocating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationData>(defaultFormData);
+  const userMarkerRef = useRef<L.Marker | null>(null);
+  const mapCenter: [number, number] = [46.603354, 1.888334]; // Centre de la France
+  const [stations, setStations] = useState<Station[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { data: sessionData } = useSession();
-  const [isLocating, setIsLocating] = useState(false);
 
   // Ajoutons un useEffect pour réinitialiser formData et uploadedImages quand le modal se ferme
   useEffect(() => {
@@ -210,8 +214,6 @@ export default function LocalisationStation2() {
       setUploadedImages([]);
     }
   }, [isDialogOpen]);
-
-  const mapCenter: [number, number] = [46.603354, 1.888334];
 
   // Chargement des stations
   useEffect(() => {
@@ -272,10 +274,57 @@ export default function LocalisationStation2() {
             ".leaflet-container"
           ) as ExtendedHTMLElement;
           if (mapElement?._leaflet_map) {
+            // Créer un marqueur personnalisé pour la position de l'utilisateur
+            const userIcon = divIcon({
+              className: "user-location-marker",
+              html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg pulse-animation"></div>`,
+              iconSize: [16, 16],
+              iconAnchor: [8, 8],
+            });
+
+            // Supprimer l'ancien marqueur s'il existe
+            if (userMarkerRef.current) {
+              userMarkerRef.current.remove();
+            }
+
+            // Créer et ajouter le nouveau marqueur
+            const map = mapElement._leaflet_map as unknown as Map;
+            const userMarker = LeafletMarker(
+              [position.coords.latitude, position.coords.longitude],
+              { icon: userIcon }
+            ).addTo(map);
+
+            // Sauvegarder la référence du marqueur
+            userMarkerRef.current = userMarker;
+
+            // Centrer la carte sur la position
             mapElement._leaflet_map.setView(
               [position.coords.latitude, position.coords.longitude],
               13
             );
+
+            // Ajouter le style pour l'animation du marqueur
+            const style = document.createElement("style");
+            style.textContent = `
+              .pulse-animation {
+                animation: pulse 1.5s infinite;
+              }
+              @keyframes pulse {
+                0% {
+                  transform: scale(1);
+                  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+                }
+                70% {
+                  transform: scale(1.2);
+                  box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+                }
+                100% {
+                  transform: scale(1);
+                  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+                }
+              }
+            `;
+            document.head.appendChild(style);
           }
           setIsLocating(false);
         },
@@ -306,7 +355,7 @@ export default function LocalisationStation2() {
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000, // 10 secondes au lieu de 5
+          timeout: 10000,
           maximumAge: 0,
         }
       );
