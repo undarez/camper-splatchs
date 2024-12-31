@@ -18,6 +18,7 @@ import {
 import { Icon, divIcon, marker as LeafletMarker, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
+import { useGeolocated } from "react-geolocated";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic(
@@ -196,108 +197,18 @@ const handleMapClick = (
   }
 };
 
-const useGeolocation = () => {
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-
-  const getLocation = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      // Vérifier d'abord si la géolocalisation est supportée
-      if (!navigator.geolocation) {
-        throw new Error(
-          "La géolocalisation n'est pas supportée par votre navigateur"
-        );
-      }
-
-      // Vérifier les permissions si possible
-      if (navigator.permissions && navigator.permissions.query) {
-        try {
-          const result = await navigator.permissions.query({
-            name: "geolocation",
-          });
-          if (result.state === "denied") {
-            throw new Error(
-              "L'accès à votre position a été bloqué. Pour utiliser la géolocalisation, veuillez l'autoriser dans les paramètres de votre navigateur."
-            );
-          }
-        } catch (e) {
-          // Ignorer les erreurs de vérification des permissions
-          console.log("Impossible de vérifier les permissions:", e);
-        }
-      }
-
-      // Obtenir la position
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          const geoOptions = {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          };
-
-          const successCallback = (pos: GeolocationPosition) => {
-            resolve(pos);
-          };
-
-          const errorCallback = (err: GeolocationPositionError) => {
-            reject(err);
-          };
-
-          navigator.geolocation.getCurrentPosition(
-            successCallback,
-            errorCallback,
-            geoOptions
-          );
-        }
-      );
-
-      setLocation({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      });
-    } catch (err) {
-      console.error("Erreur de géolocalisation:", err);
-
-      if (err instanceof GeolocationPositionError) {
-        switch (err.code) {
-          case GeolocationPositionError.PERMISSION_DENIED:
-            setError(
-              "Pour utiliser la géolocalisation, veuillez l'autoriser dans les paramètres de votre navigateur (cliquez sur l'icône à gauche de l'URL)"
-            );
-            break;
-          case GeolocationPositionError.POSITION_UNAVAILABLE:
-            setError(
-              "Position non disponible. Vérifiez que votre GPS est activé"
-            );
-            break;
-          case GeolocationPositionError.TIMEOUT:
-            setError("Délai d'attente dépassé. Veuillez réessayer");
-            break;
-          default:
-            setError("Une erreur est survenue lors de la géolocalisation");
-        }
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Une erreur est survenue lors de la géolocalisation");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { location, error, loading, getLocation };
-};
-
 export default function LocalisationStation2() {
-  const { location, error, loading, getLocation } = useGeolocation();
+  const { coords, isGeolocationAvailable, isGeolocationEnabled, getPosition } =
+    useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000,
+      },
+      watchPosition: false,
+      userDecisionTimeout: 5000,
+    });
+
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationData>(defaultFormData);
@@ -366,7 +277,7 @@ export default function LocalisationStation2() {
   }, []);
 
   useEffect(() => {
-    if (location) {
+    if (coords) {
       const mapElement = document.querySelector(
         ".leaflet-container"
       ) as ExtendedHTMLElement;
@@ -383,13 +294,12 @@ export default function LocalisationStation2() {
         }
 
         const map = mapElement._leaflet_map as unknown as Map;
-        const userMarker = LeafletMarker(
-          [location.latitude, location.longitude],
-          { icon: userIcon }
-        ).addTo(map);
+        const userMarker = LeafletMarker([coords.latitude, coords.longitude], {
+          icon: userIcon,
+        }).addTo(map);
 
         userMarkerRef.current = userMarker;
-        map.setView([location.latitude, location.longitude], 13);
+        map.setView([coords.latitude, coords.longitude], 13);
 
         // Ajouter le style pour l'animation
         const style = document.createElement("style");
@@ -415,20 +325,30 @@ export default function LocalisationStation2() {
         document.head.appendChild(style);
       }
     }
-  }, [location]);
+  }, [coords]);
 
   useEffect(() => {
-    if (error) {
+    if (!isGeolocationAvailable) {
       toast({
         title: "Erreur de localisation",
-        description: error,
+        description:
+          "La géolocalisation n'est pas supportée par votre navigateur",
+        variant: "destructive",
+      });
+    } else if (!isGeolocationEnabled) {
+      toast({
+        title: "Erreur de localisation",
+        description:
+          "Veuillez autoriser l'accès à votre position dans les paramètres de votre navigateur",
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [isGeolocationAvailable, isGeolocationEnabled, toast]);
 
   const handleGeolocation = () => {
-    getLocation();
+    if (getPosition) {
+      getPosition();
+    }
   };
 
   return (
@@ -442,46 +362,24 @@ export default function LocalisationStation2() {
             {/* Bouton de géolocalisation */}
             <button
               onClick={handleGeolocation}
-              disabled={loading}
+              disabled={!isGeolocationAvailable || !isGeolocationEnabled}
               className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 p-4 rounded-lg flex items-center justify-center gap-2 transition-all border border-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Localisation...
-                </>
-              ) : (
-                <>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Me localiser
-                </>
-              )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {isGeolocationAvailable && isGeolocationEnabled
+                ? "Me localiser"
+                : "Localisation..."}
             </button>
 
             {/* Titre */}
@@ -621,7 +519,7 @@ export default function LocalisationStation2() {
           <div className="flex items-center justify-between p-3 bg-[#252B43]">
             <button
               onClick={handleGeolocation}
-              disabled={loading}
+              disabled={!isGeolocationAvailable || !isGeolocationEnabled}
               className="flex items-center gap-2 text-blue-400 px-4 py-2 rounded-lg bg-blue-500/20"
             >
               <svg
@@ -636,7 +534,9 @@ export default function LocalisationStation2() {
                   clipRule="evenodd"
                 />
               </svg>
-              {loading ? "..." : "Me localiser"}
+              {isGeolocationAvailable && isGeolocationEnabled
+                ? "Me localiser"
+                : "Localisation..."}
             </button>
 
             <div className="flex-1 mx-4">
