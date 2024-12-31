@@ -5,17 +5,15 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
+  ChartData,
   ChartOptions,
-  Scale,
-  CoreScaleOptions,
-  Tick,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement);
 
 export function AdminDashboard() {
-  const bookingData = {
+  const bookingData: ChartData<"bar"> = {
     labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"],
     datasets: [
       {
@@ -34,25 +32,17 @@ export function AdminDashboard() {
     },
     scales: {
       y: {
-        type: "linear",
+        type: "linear" as const,
         beginAtZero: true,
         grid: {
           color: "rgba(255, 255, 255, 0.1)",
         },
         ticks: {
           color: "rgba(255, 255, 255, 0.7)",
-          callback: function (
-            this: Scale<CoreScaleOptions>,
-            tickValue: number | string,
-            _index: number,
-            _ticks: Tick[]
-          ) {
-            return tickValue.toString();
-          },
         },
       },
       x: {
-        type: "category",
+        type: "category" as const,
         grid: {
           color: "rgba(255, 255, 255, 0.1)",
         },
