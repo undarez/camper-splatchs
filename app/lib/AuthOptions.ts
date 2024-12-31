@@ -1,7 +1,14 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, Session } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import InstagramProvider from "next-auth/providers/instagram";
+
+interface DiscordProfile {
+  id: string;
+  username: string;
+  account_type?: string;
+  name?: string;
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -58,7 +65,7 @@ export const authOptions: NextAuthOptions = {
         url: "https://graph.instagram.com/me",
         params: { fields: "id,username,account_type,name" },
       },
-      profile(profile) {
+      profile(profile: DiscordProfile) {
         return {
           id: profile.id,
           name: profile.username,
@@ -74,8 +81,14 @@ export const authOptions: NextAuthOptions = {
     error: "/pages/auth/error",
   },
   callbacks: {
-    async session({ session, token }) {
-      if (session?.user) {
+    async session({
+      session,
+      token,
+    }: {
+      session: Session;
+      token: { sub?: string };
+    }) {
+      if (session?.user && token.sub) {
         session.user.id = token.sub;
       }
       return session;
