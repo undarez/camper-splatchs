@@ -8,36 +8,28 @@ export async function DELETE() {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return new NextResponse("Non autorisé", { status: 401 });
+      return NextResponse.json(
+        { error: "Email de l'utilisateur non trouvé" },
+        { status: 400 }
+      );
     }
 
-    // Supprimer toutes les données associées à l'utilisateur
+    const userEmail: string = session.user.email;
+
     await prisma.$transaction(async (prisma) => {
-      // Supprimer les sessions de l'utilisateur
-      await prisma.session.deleteMany({
-        where: {
-          userId: session.user.id,
-        },
-      });
-
-      // Supprimer les comptes liés (Google, Facebook, etc.)
-      await prisma.account.deleteMany({
-        where: {
-          userId: session.user.id,
-        },
-      });
-
-      // Supprimer l'utilisateur lui-même
       await prisma.user.delete({
         where: {
-          email: session.user.email,
+          email: userEmail,
         },
       });
     });
 
-    return new NextResponse(null, { status: 200 });
+    return NextResponse.json({ message: "Compte supprimé avec succès" });
   } catch (error) {
     console.error("Erreur lors de la suppression du compte:", error);
-    return new NextResponse("Erreur interne du serveur", { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression du compte" },
+      { status: 500 }
+    );
   }
 }
