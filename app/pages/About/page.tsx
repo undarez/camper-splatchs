@@ -203,9 +203,11 @@ export default function About() {
             Contribuez à notre communauté en partageant vos découvertes et en
             aidant d'autres camping-caristes.
           </p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-blue-50 transition-colors duration-200">
-            Commencer maintenant
-          </button>
+          <Link href="/localisationStation2">
+            <button className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-blue-50 transition-colors duration-200">
+              Commencer maintenant
+            </button>
+          </Link>
         </div>
       </div>
     </div>

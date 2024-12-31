@@ -1,84 +1,81 @@
 "use client";
 
-import { Card } from "@/app/components/ui/card";
-
-interface StatisticProps {
-  value: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-const StatisticCard = ({ value, label, icon }: StatisticProps) => (
-  <Card className="flex flex-col items-center justify-center p-8 bg-white rounded-3xl transition-all hover:scale-105 hover:shadow-lg">
-    <div className="text-blue-500 mb-4 p-4">{icon}</div>
-    <div className="text-4xl font-bold text-gray-900 mb-2">{value}</div>
-    <div className="text-sm text-gray-600">{label}</div>
-  </Card>
-);
-
-const CamperIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    className="text-blue-500 w-8 h-8"
-  >
-    <path d="M4 11h16v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8z" strokeWidth="2" />
-    <path
-      d="M4 11V7a2 2 0 012-2h12a2 2 0 012 2v4M8 17h.01M16 17h.01"
-      strokeWidth="2"
-    />
-  </svg>
-);
-
-const UsersIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    className="text-blue-500 w-8 h-8"
-  >
-    <path
-      d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"
-      strokeWidth="2"
-    />
-  </svg>
-);
-
-const StarIcon = () => (
-  <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    className="text-blue-500 w-8 h-8"
-  >
-    <path
-      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-      strokeWidth="2"
-    />
-  </svg>
-);
+import { useEffect, useState } from "react";
+import { Users, Star, MapPin } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
+import Link from "next/link";
 
 export default function Statistics() {
+  const [stats, setStats] = useState({
+    stations: 17,
+    users: 3,
+    reviews: 0,
+  });
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const { data, error } = await supabase.rpc("get_public_stats");
+
+        if (error) {
+          console.error("Erreur RPC:", error);
+          return;
+        }
+
+        if (data) {
+          setStats({
+            stations: data.stations_count || 17,
+            users: data.users_count || 3,
+            reviews: data.reviews_count || 0,
+          });
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des statistiques:",
+          error
+        );
+      }
+    }
+
+    fetchStats();
+  }, [supabase]);
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-6 -mt-24 relative z-10">
-      <StatisticCard
-        value="17+"
-        label="Stations référencées"
-        icon={<CamperIcon />}
-      />
-      <StatisticCard
-        value="3+"
-        label="Utilisateurs actifs"
-        icon={<UsersIcon />}
-      />
-      <StatisticCard value="0+" label="Avis vérifiés" icon={<StarIcon />} />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto px-4 py-12">
+      <div className="bg-[#1a1f37] rounded-xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+        <div className="flex justify-center mb-4">
+          <MapPin className="w-12 h-12 text-blue-400" />
+        </div>
+        <div className="text-5xl font-bold mb-2 text-white">
+          {stats.stations}+
+        </div>
+        <Link href="/pages/StationCard">
+          <div className="text-blue-200 text-lg">Stations référencées</div>
+        </Link>
+      </div>
+
+      <div className="bg-[#1a1f37] rounded-xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+        <div className="flex justify-center mb-4">
+          <Users className="w-12 h-12 text-blue-400" />
+        </div>
+        <div className="text-5xl font-bold mb-2 text-white">{stats.users}+</div>
+        <div className="text-blue-200 text-lg">Utilisateurs actifs</div>
+      </div>
+
+      <div className="bg-[#1a1f37] rounded-xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+        <div className="flex justify-center mb-4">
+          <Star className="w-12 h-12 text-blue-400" />
+        </div>
+        <div className="text-5xl font-bold mb-2 text-white">
+          {stats.reviews}+
+        </div>
+        <div className="text-blue-200 text-lg">Avis vérifiés</div>
+      </div>
     </div>
   );
 }

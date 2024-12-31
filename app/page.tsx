@@ -3,6 +3,7 @@
 import Statistics from "@/app/components/Statistics";
 import Image from "next/image";
 import Services from "@/app/components/Services";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -33,7 +34,9 @@ export default function Home() {
             Trouvez les meilleures stations de lavage pour votre camping-car
           </p>
           <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-10 rounded-lg transition-all transform hover:scale-105 shadow-lg flex items-center gap-2 mx-auto">
-            <span>Découvrir les stations</span>
+            <Link href="/pages/StationCard">
+              <span>Découvrir les stations</span>
+            </Link>
             <svg
               className="w-5 h-5"
               fill="none"
