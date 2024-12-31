@@ -4,9 +4,10 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/AuthOptions";
 import { CommerceType } from "@prisma/client";
 
+// Désactiver le cache pour cette route
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-// Ajouter la méthode GET
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -24,7 +25,14 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(stations);
+    return new NextResponse(JSON.stringify(stations), {
+      headers: {
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate, proxy-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
   } catch (error) {
     console.error("Erreur lors de la récupération des stations:", error);
     return NextResponse.json(
@@ -36,8 +44,12 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    }
+
     const data = await req.json();
-    console.log("Données reçues par l'API:", data);
 
     // Valider les types de commerces
     const validCommerces =
@@ -46,9 +58,6 @@ export async function POST(req: Request) {
             Object.values(CommerceType).includes(commerce as CommerceType)
           )
         : [];
-
-    console.log("Types de commerces valides:", validCommerces);
-    console.log("Détails du parking reçus:", data.parkingDetails);
 
     const station = await prisma.station.create({
       data: {
@@ -61,6 +70,11 @@ export async function POST(req: Request) {
         type: data.type,
         status: "en_attente",
         images: data.images || [],
+        author: {
+          connect: {
+            email: session.user.email,
+          },
+        },
         services:
           data.type === "STATION_LAVAGE"
             ? {
@@ -83,21 +97,14 @@ export async function POST(req: Request) {
           data.type === "PARKING"
             ? {
                 create: {
-                  isPayant: data.parkingDetails.isPayant === true,
-                  tarif: data.parkingDetails.tarif
-                    ? Number(data.parkingDetails.tarif)
-                    : null,
-                  hasElectricity: data.parkingDetails.hasElectricity || "NONE",
+                  isPayant: data.isPayant === true,
+                  tarif: data.isPayant ? parseFloat(data.tarif) : null,
+                  hasElectricity: data.electricity || "NONE",
                   commercesProches: validCommerces,
-                  handicapAccess: data.parkingDetails.handicapAccess === true,
+                  handicapAccess: data.handicapAccess === true,
                 },
               }
             : undefined,
-        author: {
-          connect: {
-            email: data.author.email,
-          },
-        },
       },
       include: {
         services: true,
@@ -106,63 +113,14 @@ export async function POST(req: Request) {
       },
     });
 
-    // Envoyer la notification par email
-    try {
-      console.log("Tentative d'envoi de notification par email...");
-      console.log(
-        "URL de l'API:",
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/notify-new-station`
-      );
-      console.log("Données à envoyer:", {
-        ...data,
-        services: station.services,
-        parkingDetails: station.parkingDetails,
-        author: station.author,
-      });
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/notify-new-station`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...data,
-            services: station.services,
-            parkingDetails: station.parkingDetails,
-            author: station.author,
-          }),
-        }
-      );
-
-      const responseData = await response.json();
-      console.log("Réponse de notify-new-station:", responseData);
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-    } catch (error) {
-      console.error(
-        "Erreur détaillée lors de l'envoi de la notification:",
-        error
-      );
-      if (error instanceof Error) {
-        console.error("Message d'erreur:", error.message);
-        if ("response" in error) {
-          const errorWithResponse = error as {
-            response: { text: () => Promise<string> };
-          };
-          console.error(
-            "Réponse d'erreur:",
-            await errorWithResponse.response.text()
-          );
-        }
-      }
-    }
-
-    console.log("Station créée:", station);
-    return NextResponse.json(station);
+    return new NextResponse(JSON.stringify(station), {
+      headers: {
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate, proxy-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
   } catch (error) {
     console.error("Erreur détaillée lors de la création de la station:", error);
     return NextResponse.json(

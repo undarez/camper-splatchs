@@ -1,6 +1,10 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+// Désactiver le cache pour cette route
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get("page") || "1");
@@ -39,11 +43,21 @@ export async function GET(request: Request) {
       },
     });
 
-    return NextResponse.json({
-      stations,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-    });
+    return new NextResponse(
+      JSON.stringify({
+        stations,
+        totalPages: Math.ceil(total / limit),
+        currentPage: page,
+      }),
+      {
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      }
+    );
   } catch (error) {
     console.error(
       "Erreur lors de la récupération des stations validées:",
