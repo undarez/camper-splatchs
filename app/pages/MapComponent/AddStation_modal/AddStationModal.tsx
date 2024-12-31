@@ -313,18 +313,20 @@ export default function AddStationModal({
               <Input
                 type="number"
                 id="maxVehicleLength"
-                value={formData.services.maxVehicleLength}
+                value={formData.services.maxVehicleLength ?? ""}
                 onChange={(e) => {
                   setFormData((prev) => ({
                     ...prev,
                     services: {
                       ...prev.services,
-                      maxVehicleLength: Number(e.target.value),
+                      maxVehicleLength: e.target.value
+                        ? Number(e.target.value)
+                        : null,
                     },
                   }));
                 }}
-                min="0"
-                step="0.1"
+                className="w-full"
+                placeholder="Longueur maximale du véhicule"
               />
             </div>
           </div>
