@@ -196,13 +196,113 @@ const handleMapClick = (
   }
 };
 
+const useGeolocation = () => {
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+
+  const getLocation = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // Vérifier d'abord si la géolocalisation est supportée
+      if (!navigator.geolocation) {
+        throw new Error(
+          "La géolocalisation n'est pas supportée par votre navigateur"
+        );
+      }
+
+      // Vérifier les permissions si possible
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const result = await navigator.permissions.query({
+            name: "geolocation",
+          });
+          if (result.state === "denied") {
+            throw new Error(
+              "L'accès à votre position a été bloqué. Pour utiliser la géolocalisation, veuillez l'autoriser dans les paramètres de votre navigateur."
+            );
+          }
+        } catch (e) {
+          // Ignorer les erreurs de vérification des permissions
+          console.log("Impossible de vérifier les permissions:", e);
+        }
+      }
+
+      // Obtenir la position
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          const geoOptions = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+          };
+
+          const successCallback = (pos: GeolocationPosition) => {
+            resolve(pos);
+          };
+
+          const errorCallback = (err: GeolocationPositionError) => {
+            reject(err);
+          };
+
+          navigator.geolocation.getCurrentPosition(
+            successCallback,
+            errorCallback,
+            geoOptions
+          );
+        }
+      );
+
+      setLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+    } catch (err) {
+      console.error("Erreur de géolocalisation:", err);
+
+      if (err instanceof GeolocationPositionError) {
+        switch (err.code) {
+          case GeolocationPositionError.PERMISSION_DENIED:
+            setError(
+              "Pour utiliser la géolocalisation, veuillez l'autoriser dans les paramètres de votre navigateur (cliquez sur l'icône à gauche de l'URL)"
+            );
+            break;
+          case GeolocationPositionError.POSITION_UNAVAILABLE:
+            setError(
+              "Position non disponible. Vérifiez que votre GPS est activé"
+            );
+            break;
+          case GeolocationPositionError.TIMEOUT:
+            setError("Délai d'attente dépassé. Veuillez réessayer");
+            break;
+          default:
+            setError("Une erreur est survenue lors de la géolocalisation");
+        }
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Une erreur est survenue lors de la géolocalisation");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { location, error, loading, getLocation };
+};
+
 export default function LocalisationStation2() {
+  const { location, error, loading, getLocation } = useGeolocation();
   const { toast } = useToast();
-  const [isLocating, setIsLocating] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationData>(defaultFormData);
   const userMarkerRef = useRef<L.Marker | null>(null);
-  const mapCenter: [number, number] = [46.603354, 1.888334]; // Centre de la France
+  const mapCenter: [number, number] = [46.603354, 1.888334];
   const [stations, setStations] = useState<Station[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { data: sessionData } = useSession();
@@ -265,110 +365,70 @@ export default function LocalisationStation2() {
     });
   }, []);
 
-  const handleGeolocation = () => {
-    setIsLocating(true);
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const mapElement = document.querySelector(
-            ".leaflet-container"
-          ) as ExtendedHTMLElement;
-          if (mapElement?._leaflet_map) {
-            // Créer un marqueur personnalisé pour la position de l'utilisateur
-            const userIcon = divIcon({
-              className: "user-location-marker",
-              html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg pulse-animation"></div>`,
-              iconSize: [16, 16],
-              iconAnchor: [8, 8],
-            });
+  useEffect(() => {
+    if (location) {
+      const mapElement = document.querySelector(
+        ".leaflet-container"
+      ) as ExtendedHTMLElement;
+      if (mapElement?._leaflet_map) {
+        const userIcon = divIcon({
+          className: "user-location-marker",
+          html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg pulse-animation"></div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        });
 
-            // Supprimer l'ancien marqueur s'il existe
-            if (userMarkerRef.current) {
-              userMarkerRef.current.remove();
-            }
-
-            // Créer et ajouter le nouveau marqueur
-            const map = mapElement._leaflet_map as unknown as Map;
-            const userMarker = LeafletMarker(
-              [position.coords.latitude, position.coords.longitude],
-              { icon: userIcon }
-            ).addTo(map);
-
-            // Sauvegarder la référence du marqueur
-            userMarkerRef.current = userMarker;
-
-            // Centrer la carte sur la position
-            mapElement._leaflet_map.setView(
-              [position.coords.latitude, position.coords.longitude],
-              13
-            );
-
-            // Ajouter le style pour l'animation du marqueur
-            const style = document.createElement("style");
-            style.textContent = `
-              .pulse-animation {
-                animation: pulse 1.5s infinite;
-              }
-              @keyframes pulse {
-                0% {
-                  transform: scale(1);
-                  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
-                }
-                70% {
-                  transform: scale(1.2);
-                  box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-                }
-                100% {
-                  transform: scale(1);
-                  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-                }
-              }
-            `;
-            document.head.appendChild(style);
-          }
-          setIsLocating(false);
-        },
-        (error) => {
-          console.error("Erreur de géolocalisation:", error);
-          let message = "";
-          switch (error.code) {
-            case 1: // PERMISSION_DENIED
-              message =
-                "Vous devez autoriser l'accès à votre position dans les paramètres de votre navigateur pour utiliser cette fonctionnalité.";
-              break;
-            case 2: // POSITION_UNAVAILABLE
-              message =
-                "Votre position n'a pas pu être déterminée. Vérifiez que votre GPS est activé.";
-              break;
-            case 3: // TIMEOUT
-              message = "La demande de position a expiré. Veuillez réessayer.";
-              break;
-            default:
-              message = "Une erreur est survenue lors de la géolocalisation.";
-          }
-          toast({
-            title: "Erreur de localisation",
-            description: message,
-            variant: "destructive",
-          });
-          setIsLocating(false);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
+        if (userMarkerRef.current) {
+          userMarkerRef.current.remove();
         }
-      );
-    } else {
-      console.error("Géolocalisation non supportée");
+
+        const map = mapElement._leaflet_map as unknown as Map;
+        const userMarker = LeafletMarker(
+          [location.latitude, location.longitude],
+          { icon: userIcon }
+        ).addTo(map);
+
+        userMarkerRef.current = userMarker;
+        map.setView([location.latitude, location.longitude], 13);
+
+        // Ajouter le style pour l'animation
+        const style = document.createElement("style");
+        style.textContent = `
+          .pulse-animation {
+            animation: pulse 1.5s infinite;
+          }
+          @keyframes pulse {
+            0% {
+              transform: scale(1);
+              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+            }
+            70% {
+              transform: scale(1.2);
+              box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+            100% {
+              transform: scale(1);
+              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (error) {
       toast({
-        title: "Erreur",
-        description:
-          "La géolocalisation n'est pas supportée par votre navigateur",
+        title: "Erreur de localisation",
+        description: error,
         variant: "destructive",
       });
-      setIsLocating(false);
     }
+  }, [error, toast]);
+
+  const handleGeolocation = () => {
+    getLocation();
   };
 
   return (
@@ -382,10 +442,10 @@ export default function LocalisationStation2() {
             {/* Bouton de géolocalisation */}
             <button
               onClick={handleGeolocation}
-              disabled={isLocating}
+              disabled={loading}
               className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 p-4 rounded-lg flex items-center justify-center gap-2 transition-all border border-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLocating ? (
+              {loading ? (
                 <>
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle
@@ -561,7 +621,7 @@ export default function LocalisationStation2() {
           <div className="flex items-center justify-between p-3 bg-[#252B43]">
             <button
               onClick={handleGeolocation}
-              disabled={isLocating}
+              disabled={loading}
               className="flex items-center gap-2 text-blue-400 px-4 py-2 rounded-lg bg-blue-500/20"
             >
               <svg
@@ -576,7 +636,7 @@ export default function LocalisationStation2() {
                   clipRule="evenodd"
                 />
               </svg>
-              {isLocating ? "..." : "Me localiser"}
+              {loading ? "..." : "Me localiser"}
             </button>
 
             <div className="flex-1 mx-4">
