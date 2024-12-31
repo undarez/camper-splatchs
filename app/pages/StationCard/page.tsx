@@ -407,7 +407,12 @@ const ValidatedStations = () => {
                     isSidebarOpen ? "opacity-0 md:opacity-100" : "opacity-100"
                   }`}
                 >
-                  <MapView stations={stations} />
+                  <MapView
+                    stations={stations.map((station) => ({
+                      ...station,
+                      validatedBy: station.validatedBy || "",
+                    }))}
+                  />
                 </div>
               )}
             </div>
