@@ -181,17 +181,13 @@ const ValidatedStations = () => {
     async function fetchStations() {
       try {
         setError(null);
-        const response = await fetch("/api/traking_User_API");
+        const response = await fetch("/api/stations");
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        if (data.success) {
-          setStations(data.stations);
-          setTotalPages(Math.ceil(data.stations.length / stationsPerPage));
-        } else {
-          throw new Error(data.error || "Une erreur est survenue");
-        }
+        setStations(data);
+        setTotalPages(Math.ceil(data.length / stationsPerPage));
       } catch (error) {
         console.error("Erreur lors de la récupération des stations:", error);
         setError(
