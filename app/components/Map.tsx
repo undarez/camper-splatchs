@@ -3,32 +3,13 @@
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Icon } from "leaflet";
-import { StationType, StationStatus } from "@prisma/client";
+import {
+  StationType,
+  StationStatus,
+  ElectricityType,
+  HighPressureType,
+} from "@prisma/client";
 import { CamperWashStation } from "@/app/types";
-
-interface StationServices {
-  id: string;
-  highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
-  tirePressure: boolean;
-  vacuum: boolean;
-  handicapAccess: boolean;
-  wasteWater: boolean;
-  waterPoint: boolean;
-  wasteWaterDisposal: boolean;
-  blackWaterDisposal: boolean;
-  electricity: "NONE" | "AMP_8" | "AMP_15";
-  maxVehicleLength: number | null;
-  paymentMethods: string[];
-}
-
-interface ParkingDetails {
-  id: string;
-  isPayant: boolean;
-  tarif: number | null;
-  hasElectricity: "NONE" | "AMP_8" | "AMP_15";
-  commercesProches: string[];
-  handicapAccess: boolean;
-}
 
 interface Station {
   id: string;
@@ -40,8 +21,26 @@ interface Station {
   longitude: number;
   status: StationStatus;
   type: StationType;
-  services: StationServices | null;
-  parkingDetails: ParkingDetails | null;
+  services?: {
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    paymentMethods: string[];
+  } | null;
+  parkingDetails?: {
+    isPayant: boolean;
+    tarif: number | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+  } | null;
 }
 
 interface MapProps {
@@ -101,7 +100,7 @@ export default function Map({
     ]);
   }, []);
 
-  const renderServices = (station) => {
+  const renderServices = (station: Station) => {
     console.log("Services de la station:", station.services);
     if (station.type === "STATION_LAVAGE" && station.services) {
       return (
