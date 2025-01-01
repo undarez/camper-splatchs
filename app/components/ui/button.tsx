@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline";
+  variant?: "default" | "outline" | "ghost";
   size?: "default" | "icon";
 }
 
@@ -19,6 +19,7 @@ const buttonVariants = ({
     variant === "outline"
       ? "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
       : "",
+    variant === "ghost" ? "hover:bg-accent hover:text-accent-foreground" : "",
     size === "default" ? "h-9 px-4 py-2" : "",
     size === "icon" ? "h-9 w-9" : "",
     className
