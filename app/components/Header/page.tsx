@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Menu, Sun, Moon } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +20,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-blue-400 text-white">
+    <header className="fixed top-0 left-0 right-0 bg-[#1E2337] border-b border-gray-700/50 z-[2000]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo et Menu Burger */}
@@ -46,16 +46,51 @@ export default function Header() {
 
           {/* Navigation Desktop */}
           <div className="flex items-center space-x-8">
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/pages/StationCard" className="hover:text-blue-100">
-                Stations
-              </Link>
-              <Link href="/pages/About" className="hover:text-blue-100">
-                À propos
-              </Link>
-              <Link href="/pages/Contact" className="hover:text-blue-100">
-                Contact
-              </Link>
+            <nav className="hidden md:flex items-center space-x-8 relative">
+              <div className="relative group">
+                <button className="hover:text-blue-100 py-4">Stations</button>
+                <div className="absolute left-0 top-[calc(100%+1px)] pt-2 w-48">
+                  <div className="bg-[#1E2337] border border-gray-700/50 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[2001]">
+                    <Link
+                      href="/pages/StationCard"
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10 rounded-t-lg"
+                    >
+                      Liste des stations
+                    </Link>
+                    <Link
+                      href="/localisationStation2"
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10"
+                    >
+                      Carte des stations
+                    </Link>
+                    <Link
+                      href="/pages/AdminStation"
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10 rounded-b-lg"
+                    >
+                      Administration
+                    </Link>
+                  </div>
+                </div>
+              </div>
+              <div className="relative group">
+                <button className="hover:text-blue-100 py-4">À propos</button>
+                <div className="absolute left-0 top-[calc(100%+1px)] pt-2 w-48">
+                  <div className="bg-[#1E2337] border border-gray-700/50 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[2001]">
+                    <Link
+                      href="/pages/About"
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10 rounded-t-lg"
+                    >
+                      Notre projet
+                    </Link>
+                    <Link
+                      href="/pages/Contact"
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10 rounded-b-lg"
+                    >
+                      Contact
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </nav>
             {/* Bouton de thème (visible en mobile et desktop) */}
             <button
@@ -74,7 +109,7 @@ export default function Header() {
 
         {/* Menu Mobile */}
         {isMenuOpen && (
-          <div className="md:hidden">
+          <div className="md:hidden absolute w-full bg-[#1E2337] border-b border-gray-700/50 shadow-xl z-[2001]">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
                 href="/pages/StationCard"

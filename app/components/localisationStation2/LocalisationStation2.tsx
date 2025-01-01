@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import {
   StationType,
   HighPressureType,
@@ -18,10 +18,19 @@ import {
 import { Icon, divIcon, marker as LeafletMarker, Map } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
-import { useGeolocated } from "react-geolocated";
+import type { MapComponentProps } from "@/app/components/Map/index";
+import { useRouter } from "next/navigation";
+import { Button } from "@/app/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/app/components/ui/dialog";
 
 // Import dynamique de la carte complète
-const MapComponent = dynamic(
+const MapComponent = dynamic<MapComponentProps>(
   () => import("@/app/components/Map").then((mod) => mod.default),
   {
     ssr: false,
@@ -144,36 +153,69 @@ Icon.Default.mergeOptions({
 // Styles pour la barre de recherche
 const searchBarStyles = `
   .geoapify-autocomplete-input {
-    background: #252B43;
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    font-size: 0.875rem;
-    width: 100%;
+    background: #1E2337;
+    border: 1px solid rgba(75, 85, 99, 0.5);
     color: white;
-    transition: all 0.2s;
-  }
-  .geoapify-autocomplete-input:focus {
-    outline: none;
-    border-color: rgba(59, 130, 246, 0.5);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    width: 100%;
   }
   .geoapify-autocomplete-items {
     background: #252B43;
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(75, 85, 99, 0.5);
     border-radius: 0.5rem;
-    margin-top: 0.25rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    margin-top: 0.5rem;
+    color: white;
   }
   .geoapify-autocomplete-item {
-    padding: 0.75rem;
-    cursor: pointer;
-    color: #94A3B8;
+    padding: 0.5rem 1rem;
   }
   .geoapify-autocomplete-item:hover {
-    background-color: #2A3150;
-    color: white;
+    background: #2A3150;
+  }
+  .user-location-marker {
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+  }
+  /* Styles pour les contrôles de la carte */
+  .leaflet-control-container .leaflet-top,
+  .leaflet-control-container .leaflet-bottom {
+    z-index: 400;
+  }
+  .leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+  .leaflet-control-zoom a {
+    background-color: #252B43 !important;
+    color: white !important;
+    border: 1px solid rgba(75, 85, 99, 0.5) !important;
+    transition: all 0.2s !important;
+  }
+  .leaflet-control-zoom a:hover {
+    background-color: #2A3150 !important;
+  }
+  .leaflet-control-attribution {
+    background-color: rgba(37, 43, 67, 0.8) !important;
+    color: white !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .leaflet-control-attribution a {
+    color: #60A5FA !important;
   }
 `;
 
@@ -198,17 +240,6 @@ const handleMapClick = (
 };
 
 export default function LocalisationStation2() {
-  const { coords, isGeolocationAvailable, isGeolocationEnabled, getPosition } =
-    useGeolocated({
-      positionOptions: {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 5000,
-      },
-      watchPosition: false,
-      userDecisionTimeout: 5000,
-    });
-
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationData>(defaultFormData);
@@ -216,9 +247,100 @@ export default function LocalisationStation2() {
   const mapCenter: [number, number] = [46.603354, 1.888334];
   const [stations, setStations] = useState<Station[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const { data: sessionData } = useSession();
+  const { data: sessionData, status } = useSession();
+  const mapRef = useRef<Map | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [isMapReady, setIsMapReady] = useState(false);
+  const router = useRouter();
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
-  // Ajoutons un useEffect pour réinitialiser formData et uploadedImages quand le modal se ferme
+  // Dialog d'authentification
+  const AuthDialog = () => (
+    <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+      <DialogContent className="sm:max-w-[425px] bg-[#1E2337] text-white">
+        <DialogHeader>
+          <DialogTitle>Authentification requise</DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Connectez-vous pour accéder à toutes les fonctionnalités ou
+            continuez en tant qu'invité.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 mt-4">
+          <Button
+            onClick={() => signIn("google")}
+            className="bg-white text-gray-900 hover:bg-gray-100"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="currentColor"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="currentColor"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+            Continuer avec Google
+          </Button>
+          <Button
+            onClick={() => {
+              localStorage.setItem("guestSession", "true");
+              setShowAuthDialog(false);
+            }}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Continuer en tant qu'invité
+          </Button>
+          <Button
+            onClick={() => router.push("/signin")}
+            variant="outline"
+            className="border-gray-700 text-gray-300 hover:bg-gray-800"
+          >
+            Se connecter avec un compte
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  // Vérifier si c'est un invité
+  const isGuest =
+    !sessionData && localStorage.getItem("guestSession") === "true";
+
+  // Tous les hooks doivent être appelés avant les conditions
+  const onFormDataChange = useCallback((updates: Partial<StationData>) => {
+    console.log("Mise à jour du formulaire:", updates);
+    setFormData((prev) => {
+      const newData = { ...prev, ...updates };
+      console.log("Nouveau formData:", newData);
+      return newData;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!sessionData) {
+      setShowAuthDialog(true);
+    }
+  }, [sessionData, status]);
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = searchBarStyles;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   useEffect(() => {
     if (!isDialogOpen) {
       setFormData(defaultFormData);
@@ -226,14 +348,12 @@ export default function LocalisationStation2() {
     }
   }, [isDialogOpen]);
 
-  // Chargement des stations
   useEffect(() => {
     const fetchStations = async () => {
       try {
         const response = await fetch("/api/stations");
         if (response.ok) {
           const data = await response.json();
-          console.log("Stations reçues de l'API:", data);
           setStations(
             data.map((station: Station) => ({
               ...station,
@@ -249,6 +369,136 @@ export default function LocalisationStation2() {
 
     fetchStations();
   }, []);
+
+  useEffect(() => {
+    if (isMapReady) {
+      console.log("La carte est prête à être utilisée");
+    }
+  }, [isMapReady]);
+
+  const onMapReady = useCallback((map: L.Map) => {
+    if (!map) {
+      console.error("La carte est null");
+      return;
+    }
+
+    mapRef.current = map;
+    setIsMapReady(true);
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          if (mapRef.current) {
+            mapRef.current.setView([latitude, longitude], 13);
+
+            const userIcon = divIcon({
+              className: "user-location-marker",
+              html: `<div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"></div>`,
+              iconSize: [16, 16],
+              iconAnchor: [8, 8],
+            });
+
+            if (userMarkerRef.current) {
+              userMarkerRef.current.remove();
+            }
+
+            const newMarker = LeafletMarker([latitude, longitude], {
+              icon: userIcon,
+            });
+            newMarker.addTo(mapRef.current);
+            userMarkerRef.current = newMarker;
+          }
+        },
+        (error) => {
+          console.error("Erreur de géolocalisation:", error);
+        }
+      );
+    }
+  }, []);
+
+  const handleGeolocation = () => {
+    const map = mapRef.current;
+    if (!map) {
+      toast({
+        title: "Veuillez patienter",
+        description: "La carte est en cours de chargement",
+        variant: "default",
+      });
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        map.setView([latitude, longitude], 13);
+
+        // Mettre à jour le marqueur
+        if (userMarkerRef.current) {
+          userMarkerRef.current.remove();
+        }
+
+        const userIcon = divIcon({
+          className: "user-location-marker",
+          html: `<div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"></div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        });
+
+        const newMarker = LeafletMarker([latitude, longitude], {
+          icon: userIcon,
+        });
+        newMarker.addTo(map);
+        userMarkerRef.current = newMarker;
+
+        toast({
+          title: "Localisation réussie",
+          description: "Votre position a été trouvée",
+          variant: "default",
+        });
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Erreur de géolocalisation:", error);
+        let message = "Une erreur est survenue lors de la géolocalisation";
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message =
+              "Accès refusé à la géolocalisation. Veuillez vérifier les permissions dans votre navigateur.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message =
+              "Position non disponible. Vérifiez que votre GPS est activé.";
+            break;
+          case error.TIMEOUT:
+            message =
+              "La localisation prend trop de temps. Veuillez réessayer.";
+            break;
+        }
+
+        toast({
+          title: "Erreur de localisation",
+          description: message,
+          variant: "destructive",
+        });
+        setIsLocating(false);
+      }
+    );
+  };
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#1E2337] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (!sessionData && !isGuest) {
+    return <AuthDialog />;
+  }
 
   const getMarkerIcon = (status: StationStatus, type: StationType) => {
     if (type === StationType.PARKING) {
@@ -267,119 +517,90 @@ export default function LocalisationStation2() {
     }
   };
 
-  const onFormDataChange = useCallback((updates: Partial<StationData>) => {
-    console.log("Mise à jour du formulaire:", updates);
-    setFormData((prev) => {
-      const newData = { ...prev, ...updates };
-      console.log("Nouveau formData:", newData);
-      return newData;
-    });
-  }, []);
-
-  useEffect(() => {
-    if (coords) {
-      const mapElement = document.querySelector(
-        ".leaflet-container"
-      ) as ExtendedHTMLElement;
-      if (mapElement?._leaflet_map) {
-        const userIcon = divIcon({
-          className: "user-location-marker",
-          html: `<div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg pulse-animation"></div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
-        });
-
-        if (userMarkerRef.current) {
-          userMarkerRef.current.remove();
-        }
-
-        const map = mapElement._leaflet_map as unknown as Map;
-        const userMarker = LeafletMarker([coords.latitude, coords.longitude], {
-          icon: userIcon,
-        }).addTo(map);
-
-        userMarkerRef.current = userMarker;
-        map.setView([coords.latitude, coords.longitude], 13);
-
-        // Ajouter le style pour l'animation
-        const style = document.createElement("style");
-        style.textContent = `
-          .pulse-animation {
-            animation: pulse 1.5s infinite;
-          }
-          @keyframes pulse {
-            0% {
-              transform: scale(1);
-              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
-            }
-            70% {
-              transform: scale(1.2);
-              box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
-            }
-            100% {
-              transform: scale(1);
-              box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-            }
-          }
-        `;
-        document.head.appendChild(style);
-      }
-    }
-  }, [coords]);
-
-  useEffect(() => {
-    if (!isGeolocationAvailable) {
-      toast({
-        title: "Erreur de localisation",
-        description:
-          "La géolocalisation n'est pas supportée par votre navigateur",
-        variant: "destructive",
-      });
-    } else if (!isGeolocationEnabled) {
-      toast({
-        title: "Erreur de localisation",
-        description:
-          "Veuillez autoriser l'accès à votre position dans les paramètres de votre navigateur",
-        variant: "destructive",
-      });
-    }
-  }, [isGeolocationAvailable, isGeolocationEnabled, toast]);
-
-  const handleGeolocation = () => {
-    if (getPosition) {
-      getPosition();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#1E2337]">
-      <style>{searchBarStyles}</style>
+      <style>
+        {`
+          ${searchBarStyles}
+          
+          .user-location-marker {
+            animation: pulse 2s infinite;
+          }
+          
+          @keyframes pulse {
+            0% {
+              transform: scale(0.95);
+              box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+              transform: scale(1);
+              box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+            100% {
+              transform: scale(0.95);
+              box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+          }
+        `}
+      </style>
 
-      <div className="flex flex-col md:flex-row relative">
+      <div className="flex flex-col md:flex-row relative pt-16">
         {/* Sidebar pour desktop */}
-        <div className="hidden md:block w-80 bg-[#1E2337] border-r border-gray-700/50 p-4 h-screen fixed left-0">
+        <div className="hidden md:block w-80 bg-[#1E2337] border-r border-gray-700/50 p-4 h-screen fixed left-0 z-50">
           <div className="space-y-4">
             {/* Bouton de géolocalisation */}
             <button
               onClick={handleGeolocation}
-              disabled={!isGeolocationAvailable || !isGeolocationEnabled}
-              className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 p-4 rounded-lg flex items-center justify-center gap-2 transition-all border border-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLocating}
+              className={cn(
+                "w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {isGeolocationAvailable && isGeolocationEnabled
-                ? "Me localiser"
-                : "Localisation..."}
+              {isLocating ? (
+                <svg
+                  className="w-5 h-5 text-gray-400 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              )}
+              {isLocating ? "Localisation..." : "Me localiser"}
             </button>
 
             {/* Titre */}
@@ -503,40 +724,75 @@ export default function LocalisationStation2() {
 
         {/* Contenu principal avec la carte */}
         <div className="flex-1 md:ml-80">
-          <div className="h-screen">
-            <MapComponent
-              stations={stations}
-              getMarkerIcon={getMarkerIcon}
-              center={mapCenter}
-              zoom={8}
-            />
+          <div className="h-[calc(100vh-4rem)] p-4 bg-[#1E2337]">
+            <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700/50 shadow-xl relative">
+              <MapComponent
+                stations={stations}
+                getMarkerIcon={getMarkerIcon}
+                center={mapCenter}
+                zoom={8}
+                onMapReady={onMapReady}
+              />
+            </div>
           </div>
         </div>
 
         {/* Barre de filtres mobile en bas */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1E2337] border-t border-gray-700/50 z-50">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1E2337] border-t border-gray-700/50 z-[1000]">
           {/* Barre de contrôle toujours visible */}
           <div className="flex items-center justify-between p-3 bg-[#252B43]">
             <button
               onClick={handleGeolocation}
-              disabled={!isGeolocationAvailable || !isGeolocationEnabled}
-              className="flex items-center gap-2 text-blue-400 px-4 py-2 rounded-lg bg-blue-500/20"
+              disabled={isLocating}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {isGeolocationAvailable && isGeolocationEnabled
-                ? "Me localiser"
-                : "Localisation..."}
+              {isLocating ? (
+                <svg
+                  className="w-5 h-5 text-gray-400 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              )}
+              {isLocating ? "Localisation..." : "Me localiser"}
             </button>
 
             <div className="flex-1 mx-4">

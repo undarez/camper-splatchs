@@ -83,7 +83,7 @@ const Header = () => {
             <Menubar className="flex bg-transparent border-none items-center gap-2">
               <MenubarMenu>
                 <MenubarTrigger asChild>
-                  <Button className={menuButtonClass} variant="ghost">
+                  <Button className={menuButtonClass} variant="outline">
                     Stations
                     <span className="ml-1 transform group-hover:rotate-180 transition-transform duration-200">
                       ▼
@@ -107,7 +107,7 @@ const Header = () => {
 
               <MenubarMenu>
                 <MenubarTrigger asChild>
-                  <Button className={menuButtonClass} variant="ghost">
+                  <Button className={menuButtonClass} variant="outline">
                     À propos
                     <span className="ml-1 transform group-hover:rotate-180 transition-transform duration-200">
                       ▼
@@ -126,7 +126,7 @@ const Header = () => {
               {session ? (
                 <MenubarMenu>
                   <MenubarTrigger asChild>
-                    <Button className={menuButtonClass} variant="ghost">
+                    <Button className={menuButtonClass} variant="outline">
                       {`${session.user?.name}`}
                       <span className="ml-1 transform group-hover:rotate-180 transition-transform duration-200">
                         ▼
