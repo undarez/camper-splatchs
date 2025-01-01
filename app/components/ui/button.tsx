@@ -3,10 +3,11 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "outline";
+  size?: "default" | "icon";
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", ...props }, ref) => {
+  ({ className, variant = "default", size = "default", ...props }, ref) => {
     return (
       <button
         className={cn(
@@ -17,6 +18,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variant === "outline"
             ? "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground"
             : "",
+          size === "default" ? "h-9 px-4 py-2" : "",
+          size === "icon" ? "h-9 w-9" : "",
           className
         )}
         ref={ref}
