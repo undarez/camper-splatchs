@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "outline" | "ghost" | "destructive";
-  size?: "default" | "icon";
+  size?: "default" | "sm" | "icon";
 }
 
 const buttonVariants = ({
@@ -24,6 +24,7 @@ const buttonVariants = ({
       ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
       : "",
     size === "default" ? "h-9 px-4 py-2" : "",
+    size === "sm" ? "h-8 px-3 text-xs" : "",
     size === "icon" ? "h-9 w-9" : "",
     className
   );
