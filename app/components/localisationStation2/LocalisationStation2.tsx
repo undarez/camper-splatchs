@@ -15,7 +15,12 @@ import {
   GeoapifyContext,
   GeoapifyGeocoderAutocomplete,
 } from "@geoapify/react-geocoder-autocomplete";
-import { Icon, divIcon, marker as LeafletMarker, Map } from "leaflet";
+import {
+  Icon,
+  marker as LeafletMarker,
+  Map,
+  circle as LeafletCircle,
+} from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
 import type { MapComponentProps } from "@/app/components/Map/index";
@@ -317,12 +322,7 @@ export default function LocalisationStation2() {
 
   // Tous les hooks doivent être appelés avant les conditions
   const onFormDataChange = useCallback((updates: Partial<StationData>) => {
-    console.log("Mise à jour du formulaire:", updates);
-    setFormData((prev) => {
-      const newData = { ...prev, ...updates };
-      console.log("Nouveau formData:", newData);
-      return newData;
-    });
+    setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
   useEffect(() => {
@@ -376,105 +376,111 @@ export default function LocalisationStation2() {
     }
   }, [isMapReady]);
 
-  const onMapReady = useCallback((map: L.Map) => {
-    if (!map) {
-      console.error("La carte est null");
-      return;
-    }
-
-    mapRef.current = map;
-    setIsMapReady(true);
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          if (mapRef.current) {
-            mapRef.current.setView([latitude, longitude], 13);
-
-            const userIcon = divIcon({
-              className: "user-location-marker",
-              html: `<div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"></div>`,
-              iconSize: [16, 16],
-              iconAnchor: [8, 8],
-            });
-
-            if (userMarkerRef.current) {
-              userMarkerRef.current.remove();
-            }
-
-            const newMarker = LeafletMarker([latitude, longitude], {
-              icon: userIcon,
-            });
-            newMarker.addTo(mapRef.current);
-            userMarkerRef.current = newMarker;
-          }
-        },
-        (error) => {
-          console.error("Erreur de géolocalisation:", error);
-        }
-      );
-    }
-  }, []);
-
-  const handleGeolocation = () => {
+  const handleGeolocation = useCallback(() => {
     const map = mapRef.current;
     if (!map) {
       toast({
-        title: "Veuillez patienter",
-        description: "La carte est en cours de chargement",
-        variant: "default",
+        title: "Erreur",
+        description: "La carte n'est pas encore chargée",
+        variant: "destructive",
       });
       return;
     }
 
     setIsLocating(true);
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    };
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
-        map.setView([latitude, longitude], 13);
+        const { latitude, longitude, accuracy } = position.coords;
 
-        // Mettre à jour le marqueur
-        if (userMarkerRef.current) {
-          userMarkerRef.current.remove();
+        // S'assurer que la carte est toujours valide
+        if (mapRef.current && mapRef.current.getContainer()) {
+          try {
+            // Invalider la taille de la carte pour forcer une mise à jour
+            mapRef.current.invalidateSize();
+
+            // Attendre un court instant pour s'assurer que la carte est prête
+            setTimeout(() => {
+              if (mapRef.current) {
+                // Ajuster le zoom en fonction de la précision
+                const zoomLevel =
+                  accuracy < 100 ? 16 : accuracy < 500 ? 14 : 13;
+                mapRef.current.setView([latitude, longitude], zoomLevel);
+
+                // Supprimer l'ancien marqueur s'il existe
+                if (userMarkerRef.current) {
+                  userMarkerRef.current.remove();
+                }
+
+                // Créer un marqueur personnalisé pour la position de l'utilisateur
+                const userIcon = new Icon({
+                  iconUrl: "/markers/user-location.svg",
+                  iconSize: [32, 32],
+                  iconAnchor: [16, 16],
+                  className: "user-location-marker",
+                });
+
+                const newMarker = LeafletMarker([latitude, longitude], {
+                  icon: userIcon,
+                  title: "Votre position",
+                  alt: "Votre position actuelle",
+                  zIndexOffset: 1000,
+                });
+
+                // Ajouter un cercle de précision
+                const precisionCircle = LeafletCircle([latitude, longitude], {
+                  radius: accuracy,
+                  weight: 1,
+                  color: "#3B82F6",
+                  fillColor: "#3B82F6",
+                  fillOpacity: 0.1,
+                });
+
+                newMarker.addTo(mapRef.current);
+                precisionCircle.addTo(mapRef.current);
+                userMarkerRef.current = newMarker;
+
+                toast({
+                  title: "Succès",
+                  description: `Position trouvée avec une précision de ${Math.round(
+                    accuracy
+                  )}m`,
+                  variant: "default",
+                });
+              }
+            }, 100);
+          } catch (error) {
+            console.error("Erreur lors de la mise à jour de la carte:", error);
+            toast({
+              title: "Erreur",
+              description: "Erreur lors de la mise à jour de la carte",
+              variant: "destructive",
+            });
+          }
         }
-
-        const userIcon = divIcon({
-          className: "user-location-marker",
-          html: `<div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg"></div>`,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
-        });
-
-        const newMarker = LeafletMarker([latitude, longitude], {
-          icon: userIcon,
-        });
-        newMarker.addTo(map);
-        userMarkerRef.current = newMarker;
-
-        toast({
-          title: "Localisation réussie",
-          description: "Votre position a été trouvée",
-          variant: "default",
-        });
         setIsLocating(false);
       },
       (error) => {
-        console.error("Erreur de géolocalisation:", error);
         let message = "Une erreur est survenue lors de la géolocalisation";
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
             message =
-              "Accès refusé à la géolocalisation. Veuillez vérifier les permissions dans votre navigateur.";
+              "L'accès à votre position a été refusé. Veuillez vérifier les permissions de votre navigateur.";
             break;
           case error.POSITION_UNAVAILABLE:
             message =
-              "Position non disponible. Vérifiez que votre GPS est activé.";
+              "Impossible d'obtenir votre position. Vérifiez que votre GPS est activé et que vous êtes à l'extérieur.";
             break;
           case error.TIMEOUT:
             message =
-              "La localisation prend trop de temps. Veuillez réessayer.";
+              "La demande de localisation a expiré. Veuillez réessayer.";
             break;
         }
 
@@ -484,9 +490,10 @@ export default function LocalisationStation2() {
           variant: "destructive",
         });
         setIsLocating(false);
-      }
+      },
+      options
     );
-  };
+  }, [toast]);
 
   if (status === "loading") {
     return (
@@ -540,6 +547,20 @@ export default function LocalisationStation2() {
               transform: scale(0.95);
               box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
             }
+          }
+
+          /* Ajout du style pour le curseur */
+          .leaflet-container {
+            cursor: grab;
+          }
+          .leaflet-container:active {
+            cursor: grabbing;
+          }
+          .leaflet-dragging .leaflet-container {
+            cursor: grabbing;
+          }
+          .leaflet-control-zoom {
+            cursor: pointer;
           }
         `}
       </style>
@@ -616,7 +637,7 @@ export default function LocalisationStation2() {
                   lang="fr"
                   limit={5}
                   debounceDelay={300}
-                  countryCodes={["fr"]}
+                  filterByCountryCode={["fr"]}
                   placeSelect={(value: GeoapifyResult | null) => {
                     if (value?.properties) {
                       const {
@@ -731,7 +752,10 @@ export default function LocalisationStation2() {
                 getMarkerIcon={getMarkerIcon}
                 center={mapCenter}
                 zoom={8}
-                onMapReady={onMapReady}
+                onMapReady={(map) => {
+                  mapRef.current = map;
+                  setIsMapReady(true);
+                }}
               />
             </div>
           </div>
@@ -804,7 +828,7 @@ export default function LocalisationStation2() {
                   lang="fr"
                   limit={5}
                   debounceDelay={300}
-                  countryCodes={["fr"]}
+                  filterByCountryCode={["fr"]}
                   placeSelect={(value: GeoapifyResult | null) => {
                     if (value?.properties) {
                       const {
@@ -893,7 +917,6 @@ export default function LocalisationStation2() {
         setUploadedImages={setUploadedImages}
         onSubmit={async (stationData) => {
           try {
-            console.log("Données avant envoi:", stationData); // Pour debug
             const requestData = {
               name: stationData.name,
               address: stationData.address,
@@ -939,8 +962,6 @@ export default function LocalisationStation2() {
               },
             };
 
-            console.log("Données envoyées:", requestData); // Pour debug
-
             const response = await fetch("/api/AdminStation", {
               method: "POST",
               headers: {
@@ -953,8 +974,7 @@ export default function LocalisationStation2() {
               throw new Error("Erreur lors de la création de la station");
             }
 
-            const responseData = await response.json();
-            console.log("Réponse du serveur:", responseData); // Pour debug
+            await response.json();
 
             // Rafraîchir la liste des stations après l'ajout
             const updatedStationsResponse = await fetch("/api/stations");
@@ -969,7 +989,7 @@ export default function LocalisationStation2() {
             });
             setIsDialogOpen(false);
           } catch (error) {
-            console.error("Erreur:", error);
+            console.error("Erreur lors de la création de la station:", error);
             toast({
               title: "Erreur",
               description:

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Icon } from "leaflet";
+import { Icon, Map as LeafletMap } from "leaflet";
+import { useMap } from "react-leaflet";
 import {
   StationType,
   StationStatus,
@@ -51,6 +52,7 @@ interface MapProps {
   existingLocations?: MapLocation[];
   onLocationSelect?: (location: Partial<CamperWashStation>) => void;
   zoomControl?: boolean;
+  onMapReady?: (map: LeafletMap) => void;
 }
 
 interface MapLocation {
@@ -82,6 +84,23 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
   ssr: false,
 });
 
+// Composant séparé pour gérer l'initialisation de la carte
+function MapController({
+  onMapReady,
+}: {
+  onMapReady?: (map: LeafletMap) => void;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (map && onMapReady) {
+      onMapReady(map);
+    }
+  }, [map, onMapReady]);
+
+  return null;
+}
+
 export default function Map({
   stations,
   getMarkerIcon,
@@ -90,18 +109,49 @@ export default function Map({
   existingLocations = [],
   onLocationSelect,
   zoomControl = true,
+  onMapReady,
 }: MapProps) {
-  console.log("Stations reçues dans Map:", stations);
+  const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
+    // Charger les styles de base
     Promise.all([
       import("leaflet/dist/leaflet.css"),
       import("@geoapify/geocoder-autocomplete/styles/minimal.css"),
-    ]);
+    ]).then(() => {
+      // Ajouter les styles personnalisés
+      if (typeof window !== "undefined") {
+        const styleElement = window.document.createElement("style");
+        styleElement.textContent = `
+          .leaflet-default-icon-path {
+            background-image: url(https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png);
+          }
+          .leaflet-container {
+            cursor: grab;
+          }
+          .leaflet-container:active {
+            cursor: grabbing;
+          }
+          .leaflet-marker-icon {
+            cursor: pointer;
+          }
+          .leaflet-popup-content-wrapper {
+            cursor: auto;
+          }
+          .leaflet-control-zoom a {
+            cursor: pointer;
+          }
+        `;
+        window.document.head.appendChild(styleElement);
+
+        return () => {
+          window.document.head.removeChild(styleElement);
+        };
+      }
+    });
   }, []);
 
   const renderServices = (station: Station) => {
-    console.log("Services de la station:", station.services);
     if (station.type === "STATION_LAVAGE" && station.services) {
       return (
         <div className="mt-2">
@@ -230,103 +280,118 @@ export default function Map({
   };
 
   return (
-    <MapContainer
-      center={center}
-      zoom={zoom}
-      className="h-full w-full"
-      zoomControl={zoomControl}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {stations.map((station) => (
-        <Marker
-          key={station.id}
-          position={[station.latitude, station.longitude]}
-          icon={
-            new Icon({
-              iconUrl: getMarkerIcon(station.status, station.type),
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            })
-          }
-        >
-          <Popup>
-            <div className="p-4 min-w-[250px]">
-              <h3 className="font-semibold text-lg mb-2">{station.name}</h3>
-              <p className="text-sm text-gray-600 mb-2">{station.address}</p>
-              <p className="text-xs text-gray-500 mb-2">
-                Coordonnées: {station.latitude.toFixed(6)},{" "}
-                {station.longitude.toFixed(6)}
-              </p>
-              {renderServices(station)}
-              <div className="mt-3 flex gap-2 flex-wrap">
-                <span
-                  className={`px-2 py-1 text-xs rounded-full ${
-                    station.status === "active"
-                      ? "bg-emerald-100 text-emerald-700"
-                      : station.status === "en_attente"
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {station.status === "active"
-                    ? "Active"
-                    : station.status === "en_attente"
-                    ? "En attente"
-                    : "Inactive"}
-                </span>
-                <span
-                  className={`px-2 py-1 text-xs rounded-full ${
-                    station.type === "STATION_LAVAGE"
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-purple-100 text-purple-700"
-                  }`}
-                >
-                  {station.type === "STATION_LAVAGE"
-                    ? "Station de lavage"
-                    : "Parking"}
-                </span>
-              </div>
-              {station.status === "en_attente" && (
-                <div className="mt-3">
-                  <a
-                    href="/pages/AdminStation"
-                    className="inline-block w-full text-center px-4 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition-colors"
-                  >
-                    Valider la station
-                  </a>
-                </div>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-      {existingLocations?.map((location) => (
-        <Marker
-          key={location.id}
-          position={[location.latitude, location.longitude]}
-          icon={
-            new Icon({
-              iconUrl:
-                "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-              iconSize: [32, 32],
-              iconAnchor: [16, 32],
-            })
-          }
-          eventHandlers={{
-            click: () => onLocationSelect?.(location),
+    <div className="map-container h-full w-full">
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        className="h-full w-full"
+        zoomControl={zoomControl}
+        scrollWheelZoom={true}
+        doubleClickZoom={true}
+        dragging={true}
+        minZoom={3}
+        maxZoom={18}
+      >
+        <MapController
+          onMapReady={(map) => {
+            mapRef.current = map;
+            if (onMapReady) {
+              onMapReady(map);
+            }
           }}
-        >
-          <Popup>
-            <div>
-              <h3 className="font-semibold">{location.name}</h3>
-              <p>{location.address}</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+        />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {stations.map((station) => (
+          <Marker
+            key={station.id}
+            position={[station.latitude, station.longitude]}
+            icon={
+              new Icon({
+                iconUrl: getMarkerIcon(station.status, station.type),
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+              })
+            }
+          >
+            <Popup>
+              <div className="p-4 min-w-[250px]">
+                <h3 className="font-semibold text-lg mb-2">{station.name}</h3>
+                <p className="text-sm text-gray-600 mb-2">{station.address}</p>
+                <p className="text-xs text-gray-500 mb-2">
+                  Coordonnées: {station.latitude.toFixed(6)},{" "}
+                  {station.longitude.toFixed(6)}
+                </p>
+                {renderServices(station)}
+                <div className="mt-3 flex gap-2 flex-wrap">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      station.status === "active"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : station.status === "en_attente"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {station.status === "active"
+                      ? "Active"
+                      : station.status === "en_attente"
+                      ? "En attente"
+                      : "Inactive"}
+                  </span>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      station.type === "STATION_LAVAGE"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-purple-100 text-purple-700"
+                    }`}
+                  >
+                    {station.type === "STATION_LAVAGE"
+                      ? "Station de lavage"
+                      : "Parking"}
+                  </span>
+                </div>
+                {station.status === "en_attente" && (
+                  <div className="mt-3">
+                    <a
+                      href="/pages/AdminStation"
+                      className="inline-block w-full text-center px-4 py-2 text-sm font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition-colors"
+                    >
+                      Valider la station
+                    </a>
+                  </div>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+        {existingLocations?.map((location) => (
+          <Marker
+            key={location.id}
+            position={[location.latitude, location.longitude]}
+            icon={
+              new Icon({
+                iconUrl:
+                  "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+              })
+            }
+            eventHandlers={{
+              click: () => onLocationSelect?.(location),
+            }}
+          >
+            <Popup>
+              <div>
+                <h3 className="font-semibold">{location.name}</h3>
+                <p>{location.address}</p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 }
