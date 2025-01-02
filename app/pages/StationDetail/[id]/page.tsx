@@ -11,7 +11,18 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface StationWithDetails extends Station {
-  services: Service;
+  services: Service | null;
+  parkingDetails: {
+    isPayant: boolean;
+    tarif: string | null;
+    taxeSejour: string | null;
+    hasElectricity: string;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+  } | null;
   reviews: Review[];
 }
 
@@ -27,6 +38,14 @@ const serviceLabels: Record<string, string> = {
   wasteWaterDisposal: "Évacuation eaux usées",
   blackWaterDisposal: "Évacuation eaux noires",
   maxVehicleLength: "Longueur maximale du véhicule",
+  isPayant: "Parking payant",
+  tarif: "Tarif",
+  taxeSejour: "Taxe de séjour",
+  hasElectricity: "Électricité",
+  commercesProches: "Commerces à proximité",
+  totalPlaces: "Nombre de places",
+  hasWifi: "WiFi",
+  hasChargingPoint: "Point de recharge",
 };
 
 const renderServiceValue = (key: string, value: unknown): string => {
@@ -174,8 +193,26 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
               <div>
                 <h3 className="font-medium mb-2">Services disponibles</h3>
                 <div className="grid gap-2">
-                  {station.services &&
+                  {station.type === "STATION_LAVAGE" &&
+                    station.services &&
                     Object.entries(station.services)
+                      .filter(([key]) => key !== "id" && key !== "stationId")
+                      .map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                        >
+                          <span className="text-gray-700">
+                            {serviceLabels[key] || key}
+                          </span>
+                          <span className="text-gray-600 font-medium">
+                            {renderServiceValue(key, value)}
+                          </span>
+                        </div>
+                      ))}
+                  {station.type === "PARKING" &&
+                    station.parkingDetails &&
+                    Object.entries(station.parkingDetails)
                       .filter(([key]) => key !== "id" && key !== "stationId")
                       .map(([key, value]) => (
                         <div
