@@ -38,9 +38,17 @@ interface FormDataType {
   paymentMethods?: string[];
   isPayant?: boolean;
   tarif?: string;
+  taxeSejour?: string;
   hasElectricity?: ElectricityType;
   commercesProches?: string[];
   hasChargingPoint?: boolean;
+  totalPlaces?: number;
+  hasWifi?: boolean;
+  author?: {
+    name: string;
+    email: string;
+  };
+  images?: string[];
   latitude?: number;
   longitude?: number;
   services?: {
@@ -59,16 +67,50 @@ interface FormDataType {
   parkingDetails?: {
     isPayant: boolean;
     tarif: string;
+    taxeSejour: number;
     hasElectricity: ElectricityType;
     commercesProches: string[];
     handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
   };
-  author?: {
-    name: string;
-    email: string;
-  };
-  images?: string[];
 }
+
+const modalStyles = `
+  @media (max-width: 640px) {
+    .dialog-content {
+      padding: 1rem !important;
+      margin: 0 !important;
+      width: 100% !important;
+      height: 100vh !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+    }
+
+    .dialog-content form {
+      height: calc(100vh - 4rem);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .services-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 5rem;
+    }
+
+    .action-buttons {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: #1E2337;
+      border-top: 1px solid rgba(75, 85, 99, 0.5);
+    }
+  }
+`;
 
 export default function AddPointModal({
   isOpen,
@@ -175,8 +217,28 @@ export default function AddPointModal({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      // Vérifier et formater les données du parking
+      const parkingData =
+        formData.type === "PARKING"
+          ? {
+              isPayant: Boolean(formData.isPayant),
+              tarif: formData.isPayant ? String(formData.tarif) : "0",
+              taxeSejour: formData.taxeSejour ? Number(formData.taxeSejour) : 0,
+              hasElectricity: formData.hasElectricity || "NONE",
+              commercesProches: Array.isArray(formData.commercesProches)
+                ? formData.commercesProches
+                : [],
+              handicapAccess: Boolean(formData.handicapAccess),
+              totalPlaces: Number(formData.totalPlaces) || 0,
+              hasWifi: Boolean(formData.hasWifi),
+              hasChargingPoint: Boolean(formData.hasChargingPoint),
+            }
+          : undefined;
+
+      console.log("Données du parking avant envoi:", parkingData);
+
       const dataToSubmit: FormDataType = {
-        name: formData.name,
+        name: formData.name || "Sans nom",
         address: formData.address,
         type: formData.type,
         city: formData.city || "",
@@ -201,16 +263,7 @@ export default function AddPointModal({
                 paymentMethods: formData.paymentMethods || [],
               }
             : undefined,
-        parkingDetails:
-          formData.type === "PARKING"
-            ? {
-                isPayant: formData.isPayant === true,
-                tarif: String(formData.tarif || ""),
-                hasElectricity: formData.hasElectricity as ElectricityType,
-                commercesProches: formData.commercesProches || [],
-                handicapAccess: formData.handicapAccess === true,
-              }
-            : undefined,
+        parkingDetails: parkingData,
         author: {
           name: sessionData?.user?.name || "",
           email: sessionData?.user?.email || "",
@@ -218,6 +271,7 @@ export default function AddPointModal({
         images: uploadedImages,
       };
 
+      console.log("Données envoyées:", dataToSubmit);
       await onSubmit(dataToSubmit);
       setIsSuccess(true);
       setTimeout(() => {
@@ -272,6 +326,18 @@ export default function AddPointModal({
     }
   }, [isOpen, onFormDataChange]);
 
+  useEffect(() => {
+    // Ajouter les styles au head
+    const style = document.createElement("style");
+    style.textContent = modalStyles;
+    document.head.appendChild(style);
+
+    return () => {
+      // Nettoyer les styles lors du démontage
+      document.head.removeChild(style);
+    };
+  }, []);
+
   if (isSuccess) {
     return (
       <Dialog open={isOpen}>
@@ -289,109 +355,89 @@ export default function AddPointModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#1E2337] border border-gray-700/50 text-white w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="dialog-content max-w-4xl w-full h-[90vh] overflow-y-auto bg-[#1E2337] text-white p-6">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl font-bold text-white">
+          <DialogTitle className="text-2xl font-bold">
             Ajouter un point d'intérêt
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Type de point */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-            <button
-              type="button"
-              className={`p-4 rounded-lg border ${
-                formData.type === StationType.STATION_LAVAGE
-                  ? "bg-blue-500/20 border-blue-500 text-blue-400"
-                  : "bg-[#252B43] border-gray-700/50 text-gray-400 hover:bg-[#2A3150]"
-              } transition-all`}
-              onClick={() =>
-                onFormDataChange({
-                  type: StationType.STATION_LAVAGE,
-                  highPressure: "NONE",
-                  electricity: "NONE",
-                  tirePressure: false,
-                  vacuum: false,
-                  handicapAccess: false,
-                  wasteWater: false,
-                  waterPoint: false,
-                  wasteWaterDisposal: false,
-                  blackWaterDisposal: false,
-                  maxVehicleLength: "",
-                  paymentMethods: [],
-                })
-              }
-            >
-              Station de lavage
-            </button>
-            <button
-              type="button"
-              className={`p-4 rounded-lg border ${
-                formData.type === StationType.PARKING
-                  ? "bg-purple-500/20 border-purple-500 text-purple-400"
-                  : "bg-[#252B43] border-gray-700/50 text-gray-400 hover:bg-[#2A3150]"
-              } transition-all`}
-              onClick={() =>
-                onFormDataChange({
-                  type: StationType.PARKING,
-                  isPayant: false,
-                  tarif: "",
-                  hasElectricity: "NONE",
-                  commercesProches: [],
-                  handicapAccess: false,
-                })
-              }
-            >
-              Parking
-            </button>
+        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+          {/* Type de station */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-gray-300">Type de station</Label>
+              <select
+                className="w-full bg-[#252B43] border-gray-700/50 text-white rounded-lg p-2"
+                value={formData.type}
+                onChange={(e) =>
+                  onFormDataChange({ type: e.target.value as StationType })
+                }
+                required
+              >
+                <option value={StationType.STATION_LAVAGE}>
+                  Station de lavage
+                </option>
+                <option value={StationType.PARKING}>Parking</option>
+              </select>
+            </div>
           </div>
 
-          {/* Informations générales */}
-          <div className="space-y-3 sm:space-y-4">
-            <h3 className="text-lg sm:text-xl font-semibold text-white">
-              Informations générales
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <Label className="text-gray-300">Nom</Label>
-                <Input
-                  className="bg-[#252B43] border-gray-700/50 text-white mt-1"
-                  value={formData.name}
-                  onChange={(e) => onFormDataChange({ name: e.target.value })}
-                  placeholder="Nom du point d'intérêt"
-                />
-              </div>
+          {/* Informations de base */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-gray-300">Nom</Label>
+              <Input
+                type="text"
+                className="bg-[#252B43] border-gray-700/50 text-white"
+                value={formData.name}
+                onChange={(e) => onFormDataChange({ name: e.target.value })}
+                required
+              />
+            </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-gray-300">Ville</Label>
-                  <Input
-                    className="bg-[#252B43] border-gray-700/50 text-white mt-1"
-                    value={formData.city}
-                    onChange={(e) => onFormDataChange({ city: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label className="text-gray-300">Code postal</Label>
-                  <Input
-                    className="bg-[#252B43] border-gray-700/50 text-white mt-1"
-                    value={formData.postalCode}
-                    onChange={(e) =>
-                      onFormDataChange({ postalCode: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
+            <div className="space-y-2">
+              <Label className="text-gray-300">Adresse</Label>
+              <Input
+                type="text"
+                className="bg-[#252B43] border-gray-700/50 text-white"
+                value={formData.address}
+                onChange={(e) => onFormDataChange({ address: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-300">Ville</Label>
+              <Input
+                type="text"
+                className="bg-[#252B43] border-gray-700/50 text-white"
+                value={formData.city}
+                onChange={(e) => onFormDataChange({ city: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-300">Code postal</Label>
+              <Input
+                type="text"
+                className="bg-[#252B43] border-gray-700/50 text-white"
+                value={formData.postalCode}
+                onChange={(e) =>
+                  onFormDataChange({ postalCode: e.target.value })
+                }
+                required
+              />
             </div>
           </div>
 
           {/* Services spécifiques selon le type */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">
+          <div className="services-container space-y-4 max-h-[50vh] overflow-y-auto p-4 bg-[#252B43]/50 rounded-lg">
+            <h3 className="text-lg font-semibold text-white sticky top-0 bg-[#252B43] py-2">
               Services disponibles
             </h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {formData.type === StationType.STATION_LAVAGE ? (
                 // Services pour station de lavage
                 <>
@@ -727,14 +773,69 @@ export default function AddPointModal({
                         )}
                       </div>
                       <div>
+                        <Label className="text-gray-300">Taxe de séjour</Label>
+                        <div className="grid gap-2">
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              type="number"
+                              className="bg-[#252B43] border-gray-700/50 text-white"
+                              value={formData.taxeSejour || ""}
+                              onChange={(e) =>
+                                onFormDataChange({
+                                  taxeSejour: e.target.value,
+                                })
+                              }
+                              placeholder="Taxe de séjour par jour"
+                              step="0.01"
+                              min="0"
+                            />
+                            <span className="text-gray-300 text-sm">
+                              €/jour
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">
+                          Nombre de places
+                        </Label>
+                        <Input
+                          type="number"
+                          className="bg-[#252B43] border-gray-700/50 text-white mt-1"
+                          value={formData.totalPlaces ?? ""}
+                          onChange={(e) =>
+                            onFormDataChange({
+                              totalPlaces: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="Nombre total de places"
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">WiFi</Label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                            checked={Boolean(formData.hasWifi)}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                hasWifi: e.target.checked,
+                              })
+                            }
+                          />
+                          <span className="text-gray-300">WiFi disponible</span>
+                        </div>
+                      </div>
+                      <div>
                         <Label className="text-gray-300">
                           Électricité disponible
                         </Label>
                         <select
                           className="w-full bg-[#252B43] border-gray-700/50 text-white mt-1 rounded-lg p-2"
-                          value={
-                            formData.hasElectricity || ElectricityType.NONE
-                          }
+                          value={formData.hasElectricity || "NONE"}
                           onChange={(e) =>
                             onFormDataChange({
                               hasElectricity: e.target.value as ElectricityType,
@@ -1001,20 +1102,16 @@ export default function AddPointModal({
           </div>
 
           {/* Boutons d'action */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-6">
-            <Button
-              type="submit"
-              className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600"
-              disabled={isUploading}
-            >
-              {isUploading ? "Envoi en cours..." : "Ajouter"}
-            </Button>
+          <div className="action-buttons sticky bottom-0 bg-[#1E2337] py-4 mt-6 flex justify-end gap-4">
             <Button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto bg-gray-700 hover:bg-gray-600"
+              className="bg-gray-600 hover:bg-gray-700"
             >
               Annuler
+            </Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              Ajouter
             </Button>
           </div>
         </form>

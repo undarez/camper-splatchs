@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/AuthOptions";
-import { CommerceType } from "@prisma/client";
 
 // Désactiver le cache pour cette route
 export const dynamic = "force-dynamic";
@@ -50,23 +49,48 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
+    console.log("Données reçues dans l'API:", data);
 
-    // Valider les types de commerces
-    const validCommerces =
-      data.type === "PARKING" && data.parkingDetails?.commercesProches
-        ? data.parkingDetails.commercesProches.filter((commerce: string) =>
-            Object.values(CommerceType).includes(commerce as CommerceType)
-          )
-        : [];
+    // Vérifier et formater les données du parking
+    const parkingDetails =
+      data.type === "PARKING"
+        ? {
+            create: {
+              isPayant: Boolean(data.parkingDetails.isPayant),
+              tarif:
+                data.parkingDetails.isPayant && data.parkingDetails.tarif
+                  ? parseFloat(data.parkingDetails.tarif)
+                  : null,
+              taxeSejour:
+                data.parkingDetails.taxeSejour !== undefined
+                  ? parseFloat(String(data.parkingDetails.taxeSejour))
+                  : null,
+              hasElectricity: data.parkingDetails.hasElectricity || "NONE",
+              commercesProches: Array.isArray(
+                data.parkingDetails.commercesProches
+              )
+                ? data.parkingDetails.commercesProches
+                : [],
+              handicapAccess: Boolean(data.parkingDetails.handicapAccess),
+              totalPlaces: data.parkingDetails.totalPlaces
+                ? parseInt(String(data.parkingDetails.totalPlaces))
+                : 0,
+              hasWifi: Boolean(data.parkingDetails.hasWifi),
+              hasChargingPoint: Boolean(data.parkingDetails.hasChargingPoint),
+            },
+          }
+        : undefined;
+
+    console.log("Détails du parking formatés:", parkingDetails);
 
     const station = await prisma.station.create({
       data: {
-        name: data.name,
+        name: data.name || "Sans nom",
         address: data.address,
         city: data.city,
         postalCode: data.postalCode,
-        latitude: data.latitude,
-        longitude: data.longitude,
+        latitude: Number(data.latitude),
+        longitude: Number(data.longitude),
         type: data.type,
         status: "en_attente",
         images: data.images || [],
@@ -93,18 +117,7 @@ export async function POST(req: Request) {
                 },
               }
             : undefined,
-        parkingDetails:
-          data.type === "PARKING"
-            ? {
-                create: {
-                  isPayant: data.isPayant === true,
-                  tarif: data.isPayant ? parseFloat(data.tarif) : null,
-                  hasElectricity: data.electricity || "NONE",
-                  commercesProches: validCommerces,
-                  handicapAccess: data.handicapAccess === true,
-                },
-              }
-            : undefined,
+        parkingDetails,
       },
       include: {
         services: true,
@@ -113,6 +126,7 @@ export async function POST(req: Request) {
       },
     });
 
+    console.log("Station créée:", station);
     return new NextResponse(JSON.stringify(station), {
       headers: {
         "Cache-Control":

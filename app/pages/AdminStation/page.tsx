@@ -40,9 +40,13 @@ interface Station {
     id: string;
     isPayant: boolean;
     tarif: number | null;
+    taxeSejour: number | null;
     hasElectricity: ElectricityType;
     commercesProches: string[];
     handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint?: boolean;
   } | null;
 }
 
@@ -124,6 +128,123 @@ const AdminStations = () => {
   };
 
   const renderServices = (station: Station) => {
+    if (station.type === "PARKING" && station.parkingDetails) {
+      console.log("Détails du parking:", station.parkingDetails);
+      return (
+        <TableCell>
+          <div className="flex flex-wrap gap-2">
+            {/* Tarif */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                station.parkingDetails.isPayant && station.parkingDetails.tarif
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              {station.parkingDetails.isPayant && station.parkingDetails.tarif
+                ? `${station.parkingDetails.tarif}€/jour`
+                : "Gratuit"}
+            </span>
+
+            {/* Nombre de places */}
+            <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded-full">
+              {station.parkingDetails.totalPlaces} places
+            </span>
+
+            {/* Taxe de séjour */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                station.parkingDetails.taxeSejour &&
+                station.parkingDetails.taxeSejour > 0
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Taxe séjour: {station.parkingDetails.taxeSejour || 0}€/jour
+            </span>
+
+            {/* WiFi */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                station.parkingDetails.hasWifi
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              WiFi {station.parkingDetails.hasWifi ? "✓" : "✗"}
+            </span>
+
+            {/* Électricité */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                station.parkingDetails.hasElectricity !== "NONE"
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Électricité{" "}
+              {station.parkingDetails.hasElectricity !== "NONE"
+                ? station.parkingDetails.hasElectricity === "AMP_8"
+                  ? "8A"
+                  : "15A"
+                : "✗"}
+            </span>
+
+            {/* Accès handicapé */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                station.parkingDetails.handicapAccess
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Accès handicapé{" "}
+              {station.parkingDetails.handicapAccess ? "✓" : "✗"}
+            </span>
+
+            {/* Point de recharge */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                station.parkingDetails.hasChargingPoint
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Point de recharge{" "}
+              {station.parkingDetails.hasChargingPoint ? "✓" : "✗"}
+            </span>
+
+            {/* Commerces */}
+            <div className="w-full mt-1">
+              <div className="flex flex-wrap gap-1">
+                {[
+                  "NOURRITURE",
+                  "BANQUE",
+                  "CENTRE_VILLE",
+                  "STATION_SERVICE",
+                  "LAVERIE",
+                  "GARAGE",
+                ].map((commerce) => (
+                  <span
+                    key={commerce}
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      station.parkingDetails?.commercesProches?.includes(
+                        commerce
+                      )
+                        ? "bg-purple-500/20 text-purple-400"
+                        : "bg-gray-500/20 text-gray-400"
+                    }`}
+                  >
+                    {commerce.replace(/_/g, " ")}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </TableCell>
+      );
+    }
+
     if (station.type === "STATION_LAVAGE") {
       return (
         <TableCell>
@@ -228,54 +349,6 @@ const AdminStations = () => {
                 {station.services.paymentMethods && (
                   <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-400 rounded-full">
                     Paiement: {station.services.paymentMethods.join(", ")}
-                  </span>
-                )}
-              </>
-            )}
-          </div>
-        </TableCell>
-      );
-    }
-
-    if (station.type === "PARKING") {
-      console.log("Services de parking:", station.parkingDetails);
-      return (
-        <TableCell>
-          <div className="flex flex-wrap gap-2">
-            {station.parkingDetails && (
-              <>
-                {station.parkingDetails.isPayant && (
-                  <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded-full">
-                    Payant{" "}
-                    {station.parkingDetails.tarif
-                      ? `(${station.parkingDetails.tarif}€/j)`
-                      : ""}
-                  </span>
-                )}
-                {station.parkingDetails.hasElectricity &&
-                  station.parkingDetails.hasElectricity !== "NONE" && (
-                    <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded-full">
-                      Électricité{" "}
-                      {station.parkingDetails.hasElectricity === "AMP_8"
-                        ? "8A"
-                        : "15A"}
-                    </span>
-                  )}
-                {station.parkingDetails.commercesProches &&
-                  station.parkingDetails.commercesProches.length > 0 &&
-                  station.parkingDetails.commercesProches.map(
-                    (commerce, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded-full"
-                      >
-                        {commerce}
-                      </span>
-                    )
-                  )}
-                {station.parkingDetails.handicapAccess && (
-                  <span className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded-full">
-                    Accès handicapé
                   </span>
                 )}
               </>

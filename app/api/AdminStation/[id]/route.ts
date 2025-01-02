@@ -19,36 +19,76 @@ export async function PATCH(
     const result = await prisma.$transaction(async (tx) => {
       const existingStation = await tx.station.findUnique({
         where: { id: params.id },
-        include: { services: true },
+        include: {
+          services: true,
+          parkingDetails: true,
+        },
       });
 
       if (!existingStation) {
         throw new Error("Station non trouvée");
       }
 
-      // Vérifier si un service existe déjà
-      if (existingStation.services) {
-        await tx.service.update({
-          where: { stationId: params.id },
-          data: {
-            highPressure: existingStation.services.highPressure,
-            tirePressure: existingStation.services.tirePressure,
-            vacuum: existingStation.services.vacuum,
-            handicapAccess: existingStation.services.handicapAccess,
-            wasteWater: existingStation.services.wasteWater,
-          },
-        });
-      } else {
-        await tx.service.create({
-          data: {
-            stationId: params.id,
-            highPressure: HighPressureType.NONE,
-            tirePressure: false,
-            vacuum: false,
-            handicapAccess: false,
-            wasteWater: false,
-          },
-        });
+      // Vérifier si un service existe déjà pour une station de lavage
+      if (existingStation.type === "STATION_LAVAGE") {
+        if (existingStation.services) {
+          await tx.service.update({
+            where: { stationId: params.id },
+            data: {
+              highPressure: existingStation.services.highPressure,
+              tirePressure: existingStation.services.tirePressure,
+              vacuum: existingStation.services.vacuum,
+              handicapAccess: existingStation.services.handicapAccess,
+              wasteWater: existingStation.services.wasteWater,
+            },
+          });
+        } else {
+          await tx.service.create({
+            data: {
+              stationId: params.id,
+              highPressure: HighPressureType.NONE,
+              tirePressure: false,
+              vacuum: false,
+              handicapAccess: false,
+              wasteWater: false,
+            },
+          });
+        }
+      }
+
+      // Vérifier si les détails du parking existent déjà pour un parking
+      if (existingStation.type === "PARKING") {
+        if (existingStation.parkingDetails) {
+          await tx.parkingDetails.update({
+            where: { stationId: params.id },
+            data: {
+              isPayant: existingStation.parkingDetails.isPayant,
+              tarif: existingStation.parkingDetails.tarif,
+              taxeSejour: existingStation.parkingDetails.taxeSejour,
+              hasElectricity: existingStation.parkingDetails.hasElectricity,
+              commercesProches: existingStation.parkingDetails.commercesProches,
+              handicapAccess: existingStation.parkingDetails.handicapAccess,
+              totalPlaces: existingStation.parkingDetails.totalPlaces,
+              hasWifi: existingStation.parkingDetails.hasWifi,
+              hasChargingPoint: existingStation.parkingDetails.hasChargingPoint,
+            },
+          });
+        } else {
+          await tx.parkingDetails.create({
+            data: {
+              stationId: params.id,
+              isPayant: false,
+              tarif: null,
+              taxeSejour: null,
+              hasElectricity: "NONE",
+              commercesProches: [],
+              handicapAccess: false,
+              totalPlaces: 0,
+              hasWifi: false,
+              hasChargingPoint: false,
+            },
+          });
+        }
       }
 
       // Mettre à jour la station avec le nouveau statut
@@ -65,6 +105,7 @@ export async function PATCH(
         },
         include: {
           services: true,
+          parkingDetails: true,
           author: {
             select: {
               name: true,

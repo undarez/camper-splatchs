@@ -77,11 +77,16 @@ interface StationData {
   wasteWaterDisposal: boolean;
   blackWaterDisposal: boolean;
   electricity: ElectricityType;
+  hasElectricity: ElectricityType;
   maxVehicleLength: string;
   paymentMethods: string[];
   isPayant: boolean;
   tarif: string;
   commercesProches: string[];
+  taxeSejour: string;
+  totalPlaces: number;
+  hasWifi: boolean;
+  hasChargingPoint: boolean;
 }
 
 interface Station {
@@ -112,9 +117,14 @@ interface Station {
     id: string;
     isPayant: boolean;
     tarif: number | null;
+    taxeSejour: number | null;
     hasElectricity: ElectricityType;
     commercesProches: string[];
     handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    createdAt: Date;
   } | null;
 }
 
@@ -136,11 +146,16 @@ const defaultFormData = {
   wasteWaterDisposal: false,
   blackWaterDisposal: false,
   electricity: ElectricityType.NONE,
+  hasElectricity: ElectricityType.NONE,
   maxVehicleLength: "",
   paymentMethods: [] as string[],
   isPayant: false,
   tarif: "",
   commercesProches: [] as string[],
+  taxeSejour: "",
+  totalPlaces: 0,
+  hasWifi: false,
+  hasChargingPoint: false,
 };
 
 // Correction pour les icônes Leaflet
@@ -951,9 +966,16 @@ export default function LocalisationStation2() {
                   ? {
                       isPayant: formData.isPayant,
                       tarif: formData.tarif ? Number(formData.tarif) : null,
-                      hasElectricity: formData.electricity,
-                      commercesProches: formData.commercesProches,
+                      taxeSejour: formData.taxeSejour
+                        ? Number(formData.taxeSejour)
+                        : null,
+                      hasElectricity:
+                        formData.hasElectricity || formData.electricity,
+                      commercesProches: formData.commercesProches || [],
                       handicapAccess: formData.handicapAccess,
+                      totalPlaces: Number(formData.totalPlaces) || 0,
+                      hasWifi: Boolean(formData.hasWifi),
+                      hasChargingPoint: Boolean(formData.hasChargingPoint),
                     }
                   : undefined,
               author: {
