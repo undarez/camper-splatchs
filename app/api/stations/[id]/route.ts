@@ -12,6 +12,12 @@ export async function GET(
       },
       include: {
         services: true,
+        parkingDetails: true,
+        reviews: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
       },
     });
 

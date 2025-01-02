@@ -29,7 +29,18 @@ const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
 });
 
 interface StationWithDetails extends Station {
-  services: Service;
+  services: Service | null;
+  parkingDetails: {
+    isPayant: boolean;
+    tarif: number | null;
+    taxeSejour: number | null;
+    hasElectricity: string;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+  } | null;
   reviews: Review[];
   averageRating?: number;
 }
@@ -54,6 +65,7 @@ type ServiceValueType =
   | boolean
   | Date
   | PaymentMethod[]
+  | string[]
   | null
   | undefined;
 
@@ -153,29 +165,58 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
         </div>
 
         <div className="space-y-2 text-gray-700 dark:text-gray-200">
-          {station.services &&
-            Object.entries(station.services).map(([key, value]) => {
-              if (key === "id" || key === "stationId") return null;
-              const displayValue = renderValue(key, value);
-              return (
-                <div key={key} className="flex items-center gap-2">
-                  <span
-                    className={`${
-                      typeof value === "boolean"
-                        ? value
-                          ? "text-green-500"
-                          : "text-red-500"
-                        : ""
-                    }`}
-                  >
-                    {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
-                  </span>
-                  <span className="text-gray-800 dark:text-gray-200">
-                    {displayValue}
-                  </span>
-                </div>
-              );
-            })}
+          {station.type === "STATION_LAVAGE" &&
+            station.services &&
+            Object.entries(station.services)
+              .filter(([key]) => key !== "id" && key !== "stationId")
+              .map(([key, value]) => {
+                if (key === "id" || key === "stationId") return null;
+                const displayValue = renderValue(key, value);
+                return (
+                  <div key={key} className="flex items-center gap-2">
+                    <span
+                      className={`${
+                        typeof value === "boolean"
+                          ? value
+                            ? "text-green-500"
+                            : "text-red-500"
+                          : ""
+                      }`}
+                    >
+                      {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
+                    </span>
+                    <span className="text-gray-800 dark:text-gray-200">
+                      {displayValue}
+                    </span>
+                  </div>
+                );
+              })}
+          {station.type === "PARKING" &&
+            station.parkingDetails &&
+            Object.entries(station.parkingDetails)
+              .filter(([key]) => key !== "id" && key !== "stationId")
+              .map(([key, value]) => {
+                if (key === "id" || key === "stationId") return null;
+                const displayValue = renderValue(key, value);
+                return (
+                  <div key={key} className="flex items-center gap-2">
+                    <span
+                      className={`${
+                        typeof value === "boolean"
+                          ? value
+                            ? "text-green-500"
+                            : "text-red-500"
+                          : ""
+                      }`}
+                    >
+                      {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
+                    </span>
+                    <span className="text-gray-800 dark:text-gray-200">
+                      {displayValue}
+                    </span>
+                  </div>
+                );
+              })}
         </div>
 
         <div className="mt-4 flex justify-end">
