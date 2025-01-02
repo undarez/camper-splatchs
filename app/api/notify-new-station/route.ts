@@ -5,8 +5,8 @@ import { createTransport } from "nodemailer";
 const transporter = createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
   tls: {
     rejectUnauthorized: false,
@@ -15,8 +15,8 @@ const transporter = createTransport({
 
 // Schéma simplifié
 const notificationSchema = z.object({
-  name: z.string().min(1, "Le nom est requis"),
-  address: z.string().min(1, "L'adresse est requise"),
+  name: z.string(),
+  address: z.string(),
   city: z.string().optional(),
   postalCode: z.string().optional(),
   latitude: z.number(),
@@ -50,7 +50,7 @@ const notificationSchema = z.object({
     .nullable(),
   author: z.object({
     name: z.string().nullable(),
-    email: z.string().email("Email invalide").optional(),
+    email: z.string().optional(),
   }),
 });
 
@@ -72,16 +72,16 @@ export async function POST(request: Request) {
 
     console.log("Vérification des variables d'environnement...");
     console.log(
-      "EMAIL_USER:",
-      process.env.EMAIL_USER ? "Défini" : "Non défini"
+      "GMAIL_USER:",
+      process.env.GMAIL_USER ? "Défini" : "Non défini"
     );
     console.log(
-      "EMAIL_APP_PASSWORD:",
-      process.env.EMAIL_APP_PASSWORD ? "Défini" : "Non défini"
+      "GMAIL_APP_PASSWORD:",
+      process.env.GMAIL_APP_PASSWORD ? "Défini" : "Non défini"
     );
     console.log(
-      "NEXT_PUBLIC_ADMIN_EMAIL:",
-      process.env.NEXT_PUBLIC_ADMIN_EMAIL ? "Défini" : "Non défini"
+      "ADMIN_EMAIL:",
+      process.env.ADMIN_EMAIL ? "Défini" : "Non défini"
     );
 
     // Formater les services pour l'email
@@ -305,14 +305,14 @@ export async function POST(request: Request) {
     `;
 
     if (
-      process.env.EMAIL_USER &&
-      process.env.EMAIL_APP_PASSWORD &&
-      process.env.NEXT_PUBLIC_ADMIN_EMAIL
+      process.env.GMAIL_USER &&
+      process.env.GMAIL_APP_PASSWORD &&
+      process.env.ADMIN_EMAIL
     ) {
       console.log("Configuration du transporteur nodemailer...");
       const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+        from: process.env.GMAIL_USER,
+        to: process.env.ADMIN_EMAIL,
         subject: "Nouvelle station CamperWash à valider",
         html: emailTemplate,
       };
@@ -339,9 +339,9 @@ export async function POST(request: Request) {
           success: false,
           error: "Configuration email manquante",
           missingVars: {
-            EMAIL_USER: !process.env.EMAIL_USER,
-            EMAIL_APP_PASSWORD: !process.env.EMAIL_APP_PASSWORD,
-            NEXT_PUBLIC_ADMIN_EMAIL: !process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+            GMAIL_USER: !process.env.GMAIL_USER,
+            GMAIL_APP_PASSWORD: !process.env.GMAIL_APP_PASSWORD,
+            ADMIN_EMAIL: !process.env.ADMIN_EMAIL,
           },
         },
         { status: 500 }
