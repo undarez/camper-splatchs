@@ -44,13 +44,13 @@ const renderServiceValue = (key: string, value: unknown): string => {
     return labels[value] || String(value);
   }
 
-  if (key === "electricity" && typeof value === "string") {
+  if (key === "electricity" || key === "hasElectricity") {
     const labels: Record<string, string> = {
       NONE: "Pas d'électricité",
       AMP_8: "8 Ampères",
       AMP_15: "15 Ampères",
     };
-    return labels[value] || String(value);
+    return labels[value as string] || String(value);
   }
 
   if (key === "paymentMethods" && Array.isArray(value)) {
@@ -60,6 +60,36 @@ const renderServiceValue = (key: string, value: unknown): string => {
       CARTE_BANCAIRE: "Carte bancaire",
     };
     return value.map((method) => labels[method as string] || method).join(", ");
+  }
+
+  if (key === "commercesProches" && Array.isArray(value)) {
+    const labels: Record<string, string> = {
+      NOURRITURE: "Alimentation",
+      BANQUE: "Banque",
+      CENTRE_VILLE: "Centre-ville",
+      STATION_SERVICE: "Station-service",
+      LAVERIE: "Laverie",
+      GARAGE: "Garage",
+    };
+    return value
+      .map((commerce) => labels[commerce as string] || commerce)
+      .join(", ");
+  }
+
+  if (key === "isPayant" && typeof value === "boolean") {
+    return value ? "Payant" : "Gratuit";
+  }
+
+  if (key === "tarif" && value) {
+    return `${value}€/jour`;
+  }
+
+  if (key === "taxeSejour" && value) {
+    return `${value}€/jour`;
+  }
+
+  if (key === "totalPlaces" && value) {
+    return `${value} places`;
   }
 
   if (typeof value === "boolean") {

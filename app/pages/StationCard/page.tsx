@@ -69,6 +69,7 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
       case "highPressure":
         return serviceLabels.highPressure[value as string] || String(value);
       case "electricity":
+      case "hasElectricity":
         return serviceLabels.electricity[value as string] || String(value);
       case "paymentMethods":
         if (Array.isArray(value)) {
@@ -88,9 +89,39 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
             .join(", ");
         }
         return String(value);
+      case "commercesProches":
+        if (Array.isArray(value)) {
+          const labels: Record<string, string> = {
+            NOURRITURE: "Alimentation",
+            BANQUE: "Banque",
+            CENTRE_VILLE: "Centre-ville",
+            STATION_SERVICE: "Station-service",
+            LAVERIE: "Laverie",
+            GARAGE: "Garage",
+          };
+          return value
+            .map((commerce) => labels[commerce as string] || commerce)
+            .join(", ");
+        }
+        return String(value);
+      case "isPayant":
+        return typeof value === "boolean"
+          ? value
+            ? "Payant"
+            : "Gratuit"
+          : String(value);
+      case "tarif":
+        return value ? `${value}€/jour` : "Gratuit";
+      case "taxeSejour":
+        return value ? `${value}€/jour` : "0€/jour";
+      case "totalPlaces":
+        return value ? `${value} places` : "Non spécifié";
       case "waterPoint":
       case "wasteWaterDisposal":
       case "blackWaterDisposal":
+      case "hasWifi":
+      case "hasChargingPoint":
+      case "handicapAccess":
         return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
       default:
         return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
