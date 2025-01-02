@@ -461,8 +461,620 @@ export default function AddPointModal({
             <h3 className="text-lg font-semibold text-white">
               Services disponibles
             </h3>
-            <div className="grid grid-cols-2 gap-4">
-              {/* ... rest of the services content ... */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {formData.type === StationType.STATION_LAVAGE ? (
+                // Services pour station de lavage
+                <>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-white">
+                      Services de lavage
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-300">
+                          Type de haute pression
+                        </Label>
+                        <select
+                          className="w-full bg-[#252B43] border-gray-700/50 text-white mt-1 rounded-lg p-2"
+                          value={formData.highPressure || HighPressureType.NONE}
+                          onChange={(e) =>
+                            onFormDataChange({
+                              highPressure: e.target.value as HighPressureType,
+                            })
+                          }
+                          required
+                        >
+                          <option value={HighPressureType.NONE}>Aucun</option>
+                          <option value={HighPressureType.PASSERELLE}>
+                            Passerelle
+                          </option>
+                          <option value={HighPressureType.ECHAFAUDAGE}>
+                            Échafaudage
+                          </option>
+                          <option value={HighPressureType.PORTIQUE}>
+                            Portique
+                          </option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <Label className="text-gray-300">Électricité</Label>
+                        <select
+                          className="w-full bg-[#252B43] border-gray-700/50 text-white mt-1 rounded-lg p-2"
+                          value={formData.electricity || ElectricityType.NONE}
+                          onChange={(e) =>
+                            onFormDataChange({
+                              electricity: e.target.value as ElectricityType,
+                            })
+                          }
+                        >
+                          <option value={ElectricityType.NONE}>Aucun</option>
+                          <option value={ElectricityType.AMP_8}>
+                            8 ampères
+                          </option>
+                          <option value={ElectricityType.AMP_15}>
+                            15 ampères
+                          </option>
+                        </select>
+                      </div>
+
+                      <div className="col-span-2 grid grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="tirePressure"
+                            checked={formData.tirePressure}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                tirePressure: e.target.checked,
+                              })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label
+                            htmlFor="tirePressure"
+                            className="text-gray-300"
+                          >
+                            Gonflage pneus
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="vacuum"
+                            checked={formData.vacuum}
+                            onChange={(e) =>
+                              onFormDataChange({ vacuum: e.target.checked })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label htmlFor="vacuum" className="text-gray-300">
+                            Aspirateur
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="handicapAccess"
+                            checked={formData.handicapAccess}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                handicapAccess: e.target.checked,
+                              })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label
+                            htmlFor="handicapAccess"
+                            className="text-gray-300"
+                          >
+                            Accès handicapé
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="wasteWater"
+                            checked={formData.wasteWater}
+                            onChange={(e) =>
+                              onFormDataChange({ wasteWater: e.target.checked })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label htmlFor="wasteWater" className="text-gray-300">
+                            Vidange eaux usées
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="waterPoint"
+                            checked={formData.waterPoint}
+                            onChange={(e) =>
+                              onFormDataChange({ waterPoint: e.target.checked })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label htmlFor="waterPoint" className="text-gray-300">
+                            Point d'eau
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="wasteWaterDisposal"
+                            checked={formData.wasteWaterDisposal}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                wasteWaterDisposal: e.target.checked,
+                              })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label
+                            htmlFor="wasteWaterDisposal"
+                            className="text-gray-300"
+                          >
+                            Évacuation eaux usées
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="blackWaterDisposal"
+                            checked={formData.blackWaterDisposal}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                blackWaterDisposal: e.target.checked,
+                              })
+                            }
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                          />
+                          <Label
+                            htmlFor="blackWaterDisposal"
+                            className="text-gray-300"
+                          >
+                            Évacuation eaux noires
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className="col-span-2">
+                        <Label className="text-gray-300">
+                          Moyens de paiement
+                        </Label>
+                        <div className="grid grid-cols-3 gap-4 mt-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id="payment_jeton"
+                              checked={formData.paymentMethods?.includes(
+                                "JETON"
+                              )}
+                              onChange={(e) => {
+                                const methods = e.target.checked
+                                  ? [
+                                      ...(formData.paymentMethods || []),
+                                      "JETON",
+                                    ]
+                                  : (formData.paymentMethods || []).filter(
+                                      (m) => m !== "JETON"
+                                    );
+                                onFormDataChange({ paymentMethods: methods });
+                              }}
+                              className="rounded bg-[#252B43] border-gray-700/50"
+                            />
+                            <Label
+                              htmlFor="payment_jeton"
+                              className="text-gray-300"
+                            >
+                              Jeton
+                            </Label>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id="payment_especes"
+                              checked={formData.paymentMethods?.includes(
+                                "ESPECES"
+                              )}
+                              onChange={(e) => {
+                                const methods = e.target.checked
+                                  ? [
+                                      ...(formData.paymentMethods || []),
+                                      "ESPECES",
+                                    ]
+                                  : (formData.paymentMethods || []).filter(
+                                      (m) => m !== "ESPECES"
+                                    );
+                                onFormDataChange({ paymentMethods: methods });
+                              }}
+                              className="rounded bg-[#252B43] border-gray-700/50"
+                            />
+                            <Label
+                              htmlFor="payment_especes"
+                              className="text-gray-300"
+                            >
+                              Espèces
+                            </Label>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id="payment_cb"
+                              checked={formData.paymentMethods?.includes(
+                                "CARTE_BANCAIRE"
+                              )}
+                              onChange={(e) => {
+                                const methods = e.target.checked
+                                  ? [
+                                      ...(formData.paymentMethods || []),
+                                      "CARTE_BANCAIRE",
+                                    ]
+                                  : (formData.paymentMethods || []).filter(
+                                      (m) => m !== "CARTE_BANCAIRE"
+                                    );
+                                onFormDataChange({ paymentMethods: methods });
+                              }}
+                              className="rounded bg-[#252B43] border-gray-700/50"
+                            />
+                            <Label
+                              htmlFor="payment_cb"
+                              className="text-gray-300"
+                            >
+                              Carte bancaire
+                            </Label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-span-2">
+                        <Label
+                          htmlFor="maxVehicleLength"
+                          className="text-gray-300"
+                        >
+                          Longueur maximale du véhicule (en mètres)
+                        </Label>
+                        <Input
+                          id="maxVehicleLength"
+                          type="number"
+                          value={formData.maxVehicleLength ?? ""}
+                          onChange={(e) =>
+                            onFormDataChange({
+                              maxVehicleLength: e.target.value || "",
+                            })
+                          }
+                          className="bg-[#252B43] border-gray-700/50 text-white mt-1"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // Services pour parking
+                <>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-white">
+                      Détails du parking
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-300">Tarification</Label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                            checked={formData.isPayant}
+                            onChange={(e) =>
+                              onFormDataChange({ isPayant: e.target.checked })
+                            }
+                          />
+                          <span className="text-gray-300">Parking payant</span>
+                        </div>
+                        {formData.isPayant && (
+                          <Input
+                            type="number"
+                            className="bg-[#252B43] border-gray-700/50 text-white mt-1"
+                            value={formData.tarif ?? ""}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                tarif: e.target.value || "",
+                              })
+                            }
+                            placeholder="Tarif par jour"
+                            required
+                          />
+                        )}
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">Taxe de séjour</Label>
+                        <div className="grid gap-2">
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              type="number"
+                              className="bg-[#252B43] border-gray-700/50 text-white"
+                              value={formData.taxeSejour || ""}
+                              onChange={(e) =>
+                                onFormDataChange({
+                                  taxeSejour: e.target.value,
+                                })
+                              }
+                              placeholder="Taxe de séjour par jour"
+                              step="0.01"
+                              min="0"
+                            />
+                            <span className="text-gray-300 text-sm">
+                              €/jour
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">
+                          Nombre de places
+                        </Label>
+                        <Input
+                          type="number"
+                          className="bg-[#252B43] border-gray-700/50 text-white mt-1"
+                          value={formData.totalPlaces ?? ""}
+                          onChange={(e) =>
+                            onFormDataChange({
+                              totalPlaces: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          placeholder="Nombre total de places"
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">WiFi</Label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            className="rounded bg-[#252B43] border-gray-700/50"
+                            checked={Boolean(formData.hasWifi)}
+                            onChange={(e) =>
+                              onFormDataChange({
+                                hasWifi: e.target.checked,
+                              })
+                            }
+                          />
+                          <span className="text-gray-300">WiFi disponible</span>
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-gray-300">
+                          Électricité disponible
+                        </Label>
+                        <select
+                          className="w-full bg-[#252B43] border-gray-700/50 text-white mt-1 rounded-lg p-2"
+                          value={formData.hasElectricity || "NONE"}
+                          onChange={(e) =>
+                            onFormDataChange({
+                              hasElectricity: e.target.value as ElectricityType,
+                            })
+                          }
+                          required
+                        >
+                          <option value="NONE">Aucune</option>
+                          <option value="AMP_8">8 ampères</option>
+                          <option value="AMP_15">15 ampères</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <Label className="text-gray-300">
+                      Commerces à proximité
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="commerce_nourriture"
+                          checked={formData.commercesProches?.includes(
+                            "NOURRITURE"
+                          )}
+                          onChange={(e) => {
+                            const commerces = e.target.checked
+                              ? [
+                                  ...(formData.commercesProches || []),
+                                  "NOURRITURE",
+                                ]
+                              : (formData.commercesProches || []).filter(
+                                  (c) => c !== "NOURRITURE"
+                                );
+                            onFormDataChange({ commercesProches: commerces });
+                          }}
+                          className="rounded bg-[#252B43] border-gray-700/50"
+                        />
+                        <Label
+                          htmlFor="commerce_nourriture"
+                          className="text-gray-300"
+                        >
+                          Alimentation
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="commerce_banque"
+                          checked={formData.commercesProches?.includes(
+                            "BANQUE"
+                          )}
+                          onChange={(e) => {
+                            const commerces = e.target.checked
+                              ? [...(formData.commercesProches || []), "BANQUE"]
+                              : (formData.commercesProches || []).filter(
+                                  (c) => c !== "BANQUE"
+                                );
+                            onFormDataChange({ commercesProches: commerces });
+                          }}
+                          className="rounded bg-[#252B43] border-gray-700/50"
+                        />
+                        <Label
+                          htmlFor="commerce_banque"
+                          className="text-gray-300"
+                        >
+                          Banque
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="commerce_centre_ville"
+                          checked={formData.commercesProches?.includes(
+                            "CENTRE_VILLE"
+                          )}
+                          onChange={(e) => {
+                            const commerces = e.target.checked
+                              ? [
+                                  ...(formData.commercesProches || []),
+                                  "CENTRE_VILLE",
+                                ]
+                              : (formData.commercesProches || []).filter(
+                                  (c) => c !== "CENTRE_VILLE"
+                                );
+                            onFormDataChange({ commercesProches: commerces });
+                          }}
+                          className="rounded bg-[#252B43] border-gray-700/50"
+                        />
+                        <Label
+                          htmlFor="commerce_centre_ville"
+                          className="text-gray-300"
+                        >
+                          Centre-ville
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="commerce_station"
+                          checked={formData.commercesProches?.includes(
+                            "STATION_SERVICE"
+                          )}
+                          onChange={(e) => {
+                            const commerces = e.target.checked
+                              ? [
+                                  ...(formData.commercesProches || []),
+                                  "STATION_SERVICE",
+                                ]
+                              : (formData.commercesProches || []).filter(
+                                  (c) => c !== "STATION_SERVICE"
+                                );
+                            onFormDataChange({ commercesProches: commerces });
+                          }}
+                          className="rounded bg-[#252B43] border-gray-700/50"
+                        />
+                        <Label
+                          htmlFor="commerce_station"
+                          className="text-gray-300"
+                        >
+                          Station-service
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="commerce_laverie"
+                          checked={formData.commercesProches?.includes(
+                            "LAVERIE"
+                          )}
+                          onChange={(e) => {
+                            const commerces = e.target.checked
+                              ? [
+                                  ...(formData.commercesProches || []),
+                                  "LAVERIE",
+                                ]
+                              : (formData.commercesProches || []).filter(
+                                  (c) => c !== "LAVERIE"
+                                );
+                            onFormDataChange({ commercesProches: commerces });
+                          }}
+                          className="rounded bg-[#252B43] border-gray-700/50"
+                        />
+                        <Label
+                          htmlFor="commerce_laverie"
+                          className="text-gray-300"
+                        >
+                          Laverie
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="commerce_garage"
+                          checked={formData.commercesProches?.includes(
+                            "GARAGE"
+                          )}
+                          onChange={(e) => {
+                            const commerces = e.target.checked
+                              ? [...(formData.commercesProches || []), "GARAGE"]
+                              : (formData.commercesProches || []).filter(
+                                  (c) => c !== "GARAGE"
+                                );
+                            onFormDataChange({ commercesProches: commerces });
+                          }}
+                          className="rounded bg-[#252B43] border-gray-700/50"
+                        />
+                        <Label
+                          htmlFor="commerce_garage"
+                          className="text-gray-300"
+                        >
+                          Garage
+                        </Label>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        className="rounded bg-[#252B43] border-gray-700/50"
+                        checked={formData.handicapAccess}
+                        onChange={(e) =>
+                          onFormDataChange({ handicapAccess: e.target.checked })
+                        }
+                      />
+                      <span className="text-gray-300">Accès handicapé</span>
+                    </label>
+                  </div>
+                  <div>
+                    <Label className="text-gray-300">Point de recharge</Label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        className="rounded bg-[#252B43] border-gray-700/50"
+                        checked={formData.hasChargingPoint}
+                        onChange={(e) =>
+                          onFormDataChange({
+                            hasChargingPoint: e.target.checked,
+                          })
+                        }
+                      />
+                      <span className="text-gray-300">
+                        Recharge batterie disponible
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
