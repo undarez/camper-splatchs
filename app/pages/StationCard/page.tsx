@@ -142,29 +142,29 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-      <div className="p-4">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+      <div className="p-3">
+        <div className="mb-2">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
             {station.address}
           </h3>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 mt-1">
             {[...Array(5)].map((_, i) => (
               <StarIcon
                 key={i}
-                className={`h-5 w-5 ${
+                className={`h-4 w-4 ${
                   i < (station.averageRating || 0)
                     ? "text-yellow-400"
                     : "text-gray-300 dark:text-gray-600"
                 }`}
               />
             ))}
-            <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
-              ({station.reviews?.length || 0} avis)
+            <span className="text-xs text-gray-600 dark:text-gray-300 ml-1">
+              ({station.reviews?.length || 0})
             </span>
           </div>
         </div>
 
-        <div className="space-y-2 text-gray-700 dark:text-gray-200">
+        <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 dark:text-gray-200">
           {station.type === "STATION_LAVAGE" &&
             station.services &&
             Object.entries(station.services)
@@ -172,8 +172,9 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
               .map(([key, value]) => {
                 if (key === "id" || key === "stationId") return null;
                 const displayValue = renderValue(key, value);
+                if (!displayValue) return null;
                 return (
-                  <div key={key} className="flex items-center gap-2">
+                  <div key={key} className="flex items-center gap-1 text-xs">
                     <span
                       className={`${
                         typeof value === "boolean"
@@ -185,9 +186,7 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
                     >
                       {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
                     </span>
-                    <span className="text-gray-800 dark:text-gray-200">
-                      {displayValue}
-                    </span>
+                    <span className="truncate">{displayValue}</span>
                   </div>
                 );
               })}
@@ -198,8 +197,9 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
               .map(([key, value]) => {
                 if (key === "id" || key === "stationId") return null;
                 const displayValue = renderValue(key, value);
+                if (!displayValue) return null;
                 return (
-                  <div key={key} className="flex items-center gap-2">
+                  <div key={key} className="flex items-center gap-1 text-xs">
                     <span
                       className={`${
                         typeof value === "boolean"
@@ -211,21 +211,16 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
                     >
                       {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
                     </span>
-                    <span className="text-gray-800 dark:text-gray-200">
-                      {displayValue}
-                    </span>
+                    <span className="truncate">{displayValue}</span>
                   </div>
                 );
               })}
         </div>
 
-        <div className="mt-4 flex justify-end">
+        <div className="mt-3 flex justify-end">
           {session ? (
             <Link href={`/pages/StationDetail/${station.id}`}>
-              <Button
-                className="bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700"
-                size="sm"
-              >
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 h-7">
                 Y aller
               </Button>
             </Link>
