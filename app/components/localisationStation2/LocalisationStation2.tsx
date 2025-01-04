@@ -442,9 +442,9 @@ export default function LocalisationStation2() {
 
                 // Créer un marqueur personnalisé pour la position de l'utilisateur
                 const userIcon = new Icon({
-                  iconUrl: "/markers/user-location.svg",
-                  iconSize: [32, 32],
-                  iconAnchor: [16, 16],
+                  iconUrl: "/logo.png",
+                  iconSize: [40, 40],
+                  iconAnchor: [20, 20],
                   className: "user-location-marker",
                 });
 

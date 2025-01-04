@@ -5,10 +5,11 @@ import Footer from "@/app/pages/Footer/page";
 import { Toaster } from "./components/ui/toaster";
 import Script from "next/script";
 import { Providers } from "./components/providers";
+import { Metadata } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
+export const metadata: Metadata = {
   title:
     "SplashCamper - Trouvez les meilleures stations de lavage pour camping-cars",
   description:
@@ -19,11 +20,11 @@ export const metadata = {
     title: "SplashCamper - Stations de lavage pour camping-cars",
     description:
       "Trouvez facilement les stations de lavage et parkings adaptés aux camping-cars en France",
-    url: "https://splashcamper.fr",
+    url: "https://www.splashcamper.fr",
     siteName: "SplashCamper",
     images: [
       {
-        url: "https://splashcamper.fr/logo.png",
+        url: "https://www.splashcamper.fr/logo.png",
         width: 800,
         height: 600,
       },
@@ -40,6 +41,22 @@ export const metadata = {
   },
   alternates: {
     canonical: "https://splashcamper.fr",
+  },
+  icons: {
+    icon: [
+      {
+        url: "/logo.png",
+        href: "/logo.png",
+      },
+    ],
+    shortcut: ["/logo.png"],
+    apple: [
+      {
+        url: "/logo.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
   },
 };
 
