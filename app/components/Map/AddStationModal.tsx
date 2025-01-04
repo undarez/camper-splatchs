@@ -330,8 +330,8 @@ export default function AddPointModal({
       onFormDataChange({
         type: StationType.STATION_LAVAGE,
         highPressure: HighPressureType.NONE,
-        electricity: ElectricityType.NONE,
-        hasElectricity: ElectricityType.NONE,
+        electricity: "NONE",
+        hasElectricity: "NONE",
         tirePressure: false,
         vacuum: false,
         handicapAccess: false,
@@ -749,6 +749,24 @@ export default function AddPointModal({
                   </div>
 
                   <div>
+                    <label htmlFor="taxeSejour" className="text-gray-300">
+                      Taxe de séjour (€/jour)
+                    </label>
+                    <input
+                      type="number"
+                      id="taxeSejour"
+                      className="w-full bg-[#252B43] border-gray-700/50 text-white mt-1 rounded-lg p-2"
+                      value={formData.taxeSejour}
+                      onChange={(e) =>
+                        onFormDataChange({ taxeSejour: e.target.value })
+                      }
+                      placeholder="0.00"
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
                     <label htmlFor="hasElectricity" className="text-gray-300">
                       Électricité disponible
                     </label>
@@ -765,6 +783,26 @@ export default function AddPointModal({
                       <option value="AMP_8">8 ampères</option>
                       <option value="AMP_15">15 ampères</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="waterPoint" className="text-gray-300">
+                      Eau potable
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="waterPoint"
+                        className="rounded bg-[#252B43] border-gray-700/50"
+                        checked={formData.waterPoint}
+                        onChange={(e) =>
+                          onFormDataChange({ waterPoint: e.target.checked })
+                        }
+                      />
+                      <span className="text-gray-300">
+                        Point d'eau disponible
+                      </span>
+                    </div>
                   </div>
 
                   <div>
