@@ -432,6 +432,10 @@ export default function AddPointModal({
                     totalPlaces: 0,
                     hasWifi: false,
                     hasChargingPoint: false,
+                    waterPoint: false,
+                    wasteWater: false,
+                    wasteWaterDisposal: false,
+                    blackWaterDisposal: false,
                   })
                 }
               >
@@ -801,6 +805,74 @@ export default function AddPointModal({
                       />
                       <span className="text-gray-300">
                         Point d'eau disponible
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="wasteWater" className="text-gray-300">
+                      Vidange eaux usées
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="wasteWater"
+                        className="rounded bg-[#252B43] border-gray-700/50"
+                        checked={formData.wasteWater}
+                        onChange={(e) =>
+                          onFormDataChange({ wasteWater: e.target.checked })
+                        }
+                      />
+                      <span className="text-gray-300">Vidange disponible</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="wasteWaterDisposal"
+                      className="text-gray-300"
+                    >
+                      Évacuation eaux usées
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="wasteWaterDisposal"
+                        className="rounded bg-[#252B43] border-gray-700/50"
+                        checked={formData.wasteWaterDisposal}
+                        onChange={(e) =>
+                          onFormDataChange({
+                            wasteWaterDisposal: e.target.checked,
+                          })
+                        }
+                      />
+                      <span className="text-gray-300">
+                        Évacuation disponible
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="blackWaterDisposal"
+                      className="text-gray-300"
+                    >
+                      Évacuation eaux noires
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="blackWaterDisposal"
+                        className="rounded bg-[#252B43] border-gray-700/50"
+                        checked={formData.blackWaterDisposal}
+                        onChange={(e) =>
+                          onFormDataChange({
+                            blackWaterDisposal: e.target.checked,
+                          })
+                        }
+                      />
+                      <span className="text-gray-300">
+                        Évacuation disponible
                       </span>
                     </div>
                   </div>
