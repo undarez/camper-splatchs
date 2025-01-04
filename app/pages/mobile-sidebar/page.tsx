@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Home,
@@ -14,9 +14,13 @@ import {
   Users,
   LogOut,
   Star,
+  User,
+  LogIn,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/app/components/ui/button";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 const menuItems = [
   { href: "/", label: "Accueil", icon: Home },
@@ -34,6 +38,7 @@ const menuItems = [
   },
   { href: "/pages/Contact", label: "Contact", icon: Mail },
   { href: "/pages/About", label: "À propos", icon: Info },
+  { href: "/pages/profil", label: "Profil", icon: User },
 ];
 
 const adminItems = [
@@ -61,11 +66,27 @@ const MobileSidebarComponent = ({
 }) => {
   const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(isSidebarOpen);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setOpen(isSidebarOpen);
   }, [isSidebarOpen]);
+
+  const handleSignOut = async () => {
+    setIsLoading(true);
+    try {
+      await signOut({ callbackUrl: "/signin" });
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+    }
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>
@@ -198,9 +219,26 @@ const MobileSidebarComponent = ({
 
           <div className="p-4 mt-auto">
             <div className="flex space-x-4 justify-center">
-              <Link href="#" className="text-gray-500 hover:text-gray-300">
-                <LogOut className="h-5 w-5" />
-              </Link>
+              {!session ? (
+                <Button
+                  onClick={() => router.push("/signin")}
+                  className="text-blue-500 hover:bg-blue-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
+                >
+                  <LogIn className="h-5 w-5 text-blue-500 hover:text-green-500" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSignOut}
+                  disabled={isLoading}
+                  className="font-sans text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
+                >
+                  {isLoading ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-red-600" />
+                  ) : (
+                    <LogOut className="h-5 w-5" />
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </div>

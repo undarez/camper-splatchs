@@ -162,9 +162,9 @@ const Header = () => {
                         </MenubarItem>
                       </>
                     )}
-                    <MenubarSeparator className="my-1" />
+                    <MenubarSeparator className="my-1 bg-slate-50" />
                     <MenubarItem
-                      onClick={() => signOut()}
+                      onClick={() => signOut({ callbackUrl: "/signin" })}
                       className="font-sans text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
                     >
                       Se déconnecter

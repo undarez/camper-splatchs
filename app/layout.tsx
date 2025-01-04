@@ -45,14 +45,22 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/logo.png",
-        href: "/logo.png",
+        url: "/images/logo.png",
+        href: "/images/logo.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/images/logo.png",
+        href: "/images/logo.png",
+        sizes: "48x48",
+        type: "image/png",
       },
     ],
-    shortcut: ["/logo.png"],
+    shortcut: ["/images/logo.png"],
     apple: [
       {
-        url: "/logo.png",
+        url: "/images/logo.png",
         sizes: "180x180",
         type: "image/png",
       },
@@ -77,11 +85,23 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="48x48"
+          href="/images/logo.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/images/logo.png"
+        />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.png" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SplashCamper" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body className={inter.className}>
         <Providers>
