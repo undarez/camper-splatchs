@@ -77,6 +77,14 @@ export async function POST(req: Request) {
                 : 0,
               hasWifi: Boolean(data.parkingDetails.hasWifi),
               hasChargingPoint: Boolean(data.parkingDetails.hasChargingPoint),
+              waterPoint: Boolean(data.parkingDetails.waterPoint),
+              wasteWater: Boolean(data.parkingDetails.wasteWater),
+              wasteWaterDisposal: Boolean(
+                data.parkingDetails.wasteWaterDisposal
+              ),
+              blackWaterDisposal: Boolean(
+                data.parkingDetails.blackWaterDisposal
+              ),
             },
           }
         : undefined;

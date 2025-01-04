@@ -47,6 +47,10 @@ interface Station {
     totalPlaces: number;
     hasWifi: boolean;
     hasChargingPoint?: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
   } | null;
 }
 
@@ -79,13 +83,75 @@ const AdminStations = () => {
 
   const handleStatusUpdate = async (stationId: string, newStatus: string) => {
     try {
+      const station = stations.find((s) => s.id === stationId);
+      if (!station) return;
+
+      console.log("Station avant mise à jour:", station);
+
+      // Préparer les données du parking
+      const parkingData =
+        station.type === "PARKING" && station.parkingDetails
+          ? {
+              isPayant: Boolean(station.parkingDetails.isPayant),
+              tarif: station.parkingDetails.tarif,
+              taxeSejour: station.parkingDetails.taxeSejour,
+              hasElectricity: station.parkingDetails.hasElectricity,
+              commercesProches: station.parkingDetails.commercesProches,
+              handicapAccess: Boolean(station.parkingDetails.handicapAccess),
+              totalPlaces: station.parkingDetails.totalPlaces,
+              hasWifi: Boolean(station.parkingDetails.hasWifi),
+              hasChargingPoint: Boolean(
+                station.parkingDetails.hasChargingPoint
+              ),
+              waterPoint: Boolean(station.parkingDetails.waterPoint),
+              wasteWater: Boolean(station.parkingDetails.wasteWater),
+              wasteWaterDisposal: Boolean(
+                station.parkingDetails.wasteWaterDisposal
+              ),
+              blackWaterDisposal: Boolean(
+                station.parkingDetails.blackWaterDisposal
+              ),
+            }
+          : null;
+
+      // Préparer les données des services
+      const servicesData =
+        station.type === "STATION_LAVAGE" && station.services
+          ? {
+              highPressure: station.services.highPressure,
+              tirePressure: Boolean(station.services.tirePressure),
+              vacuum: Boolean(station.services.vacuum),
+              handicapAccess: Boolean(station.services.handicapAccess),
+              wasteWater: Boolean(station.services.wasteWater),
+              waterPoint: Boolean(station.services.waterPoint),
+              wasteWaterDisposal: Boolean(station.services.wasteWaterDisposal),
+              blackWaterDisposal: Boolean(station.services.blackWaterDisposal),
+              electricity: station.services.electricity,
+              maxVehicleLength: station.services.maxVehicleLength,
+              paymentMethods: station.services.paymentMethods,
+            }
+          : null;
+
+      console.log("Données envoyées à l'API:", {
+        status: newStatus,
+        parkingDetails: parkingData,
+        services: servicesData,
+      });
+
       const response = await fetch(`/api/AdminStation/${stationId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({
+          status: newStatus,
+          parkingDetails: parkingData,
+          services: servicesData,
+        }),
       });
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour");
+
+      const updatedData = await response.json();
+      console.log("Réponse de l'API:", updatedData);
 
       await fetchStations();
       toast({
@@ -129,14 +195,17 @@ const AdminStations = () => {
 
   const renderServices = (station: Station) => {
     if (station.type === "PARKING" && station.parkingDetails) {
-      console.log("Détails du parking:", station.parkingDetails);
+      console.log(
+        "Rendu des services pour le parking:",
+        station.parkingDetails
+      );
       return (
         <TableCell>
           <div className="flex flex-wrap gap-2">
             {/* Tarif */}
             <span
               className={`px-2 py-1 text-xs rounded-full ${
-                station.parkingDetails.isPayant && station.parkingDetails.tarif
+                station.parkingDetails.isPayant
                   ? "bg-purple-500/20 text-purple-400"
                   : "bg-gray-500/20 text-gray-400"
               }`}
@@ -153,25 +222,68 @@ const AdminStations = () => {
 
             {/* Taxe de séjour */}
             <span
+              className={`px-2 py-1 text-xs rounded-full bg-purple-500/20 text-purple-400`}
+            >
+              Taxe séjour: {station.parkingDetails.taxeSejour || 0}€/jour
+            </span>
+
+            {/* Point d'eau */}
+            <span
               className={`px-2 py-1 text-xs rounded-full ${
-                station.parkingDetails.taxeSejour &&
-                station.parkingDetails.taxeSejour > 0
+                Boolean(station.parkingDetails.waterPoint)
                   ? "bg-purple-500/20 text-purple-400"
                   : "bg-gray-500/20 text-gray-400"
               }`}
             >
-              Taxe séjour: {station.parkingDetails.taxeSejour || 0}€/jour
+              Point d'eau{" "}
+              {Boolean(station.parkingDetails.waterPoint) ? "✓" : "✗"}
+            </span>
+
+            {/* Vidange eaux usées */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                Boolean(station.parkingDetails.wasteWater)
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Vidange eaux usées{" "}
+              {Boolean(station.parkingDetails.wasteWater) ? "✓" : "✗"}
+            </span>
+
+            {/* Évacuation eaux usées */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                Boolean(station.parkingDetails.wasteWaterDisposal)
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Évacuation eaux usées{" "}
+              {Boolean(station.parkingDetails.wasteWaterDisposal) ? "✓" : "✗"}
+            </span>
+
+            {/* Évacuation eaux noires */}
+            <span
+              className={`px-2 py-1 text-xs rounded-full ${
+                Boolean(station.parkingDetails.blackWaterDisposal)
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-gray-500/20 text-gray-400"
+              }`}
+            >
+              Évacuation eaux noires{" "}
+              {Boolean(station.parkingDetails.blackWaterDisposal) ? "✓" : "✗"}
             </span>
 
             {/* WiFi */}
             <span
               className={`px-2 py-1 text-xs rounded-full ${
-                station.parkingDetails.hasWifi
+                Boolean(station.parkingDetails.hasWifi)
                   ? "bg-purple-500/20 text-purple-400"
                   : "bg-gray-500/20 text-gray-400"
               }`}
             >
-              WiFi {station.parkingDetails.hasWifi ? "✓" : "✗"}
+              WiFi {Boolean(station.parkingDetails.hasWifi) ? "✓" : "✗"}
             </span>
 
             {/* Électricité */}
@@ -193,47 +305,34 @@ const AdminStations = () => {
             {/* Accès handicapé */}
             <span
               className={`px-2 py-1 text-xs rounded-full ${
-                station.parkingDetails.handicapAccess
+                Boolean(station.parkingDetails.handicapAccess)
                   ? "bg-purple-500/20 text-purple-400"
                   : "bg-gray-500/20 text-gray-400"
               }`}
             >
               Accès handicapé{" "}
-              {station.parkingDetails.handicapAccess ? "✓" : "✗"}
+              {Boolean(station.parkingDetails.handicapAccess) ? "✓" : "✗"}
             </span>
 
             {/* Point de recharge */}
             <span
               className={`px-2 py-1 text-xs rounded-full ${
-                station.parkingDetails.hasChargingPoint
+                Boolean(station.parkingDetails.hasChargingPoint)
                   ? "bg-purple-500/20 text-purple-400"
                   : "bg-gray-500/20 text-gray-400"
               }`}
             >
               Point de recharge{" "}
-              {station.parkingDetails.hasChargingPoint ? "✓" : "✗"}
+              {Boolean(station.parkingDetails.hasChargingPoint) ? "✓" : "✗"}
             </span>
 
             {/* Commerces */}
             <div className="w-full mt-1">
               <div className="flex flex-wrap gap-1">
-                {[
-                  "NOURRITURE",
-                  "BANQUE",
-                  "CENTRE_VILLE",
-                  "STATION_SERVICE",
-                  "LAVERIE",
-                  "GARAGE",
-                ].map((commerce) => (
+                {station.parkingDetails.commercesProches.map((commerce) => (
                   <span
                     key={commerce}
-                    className={`px-2 py-1 text-xs rounded-full ${
-                      station.parkingDetails?.commercesProches?.includes(
-                        commerce
-                      )
-                        ? "bg-purple-500/20 text-purple-400"
-                        : "bg-gray-500/20 text-gray-400"
-                    }`}
+                    className="px-2 py-1 text-xs bg-purple-500/20 text-purple-400 rounded-full"
                   >
                     {commerce.replace(/_/g, " ")}
                   </span>

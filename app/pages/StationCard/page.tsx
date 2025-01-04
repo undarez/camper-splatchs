@@ -40,6 +40,10 @@ interface StationWithDetails extends Station {
     totalPlaces: number;
     hasWifi: boolean;
     hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
   } | null;
   reviews: Review[];
   averageRating?: number;
@@ -129,14 +133,48 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
       case "totalPlaces":
         return value ? `${value} places` : "Non spécifié";
       case "waterPoint":
+      case "wasteWater":
       case "wasteWaterDisposal":
       case "blackWaterDisposal":
       case "hasWifi":
       case "hasChargingPoint":
       case "handicapAccess":
-        return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
+        return Boolean(value) ? "✓" : "✗";
       default:
-        return typeof value === "boolean" ? (value ? "✓" : "✗") : String(value);
+        return typeof value === "boolean"
+          ? Boolean(value)
+            ? "✓"
+            : "✗"
+          : String(value);
+    }
+  };
+
+  const renderServiceLabel = (key: string): string => {
+    switch (key) {
+      case "waterPoint":
+        return "Point d'eau";
+      case "wasteWater":
+        return "Vidange eaux usées";
+      case "wasteWaterDisposal":
+        return "Évacuation eaux usées";
+      case "blackWaterDisposal":
+        return "Évacuation eaux noires";
+      case "hasWifi":
+        return "WiFi";
+      case "hasChargingPoint":
+        return "Point de recharge";
+      case "handicapAccess":
+        return "Accès handicapé";
+      case "hasElectricity":
+        return "Électricité";
+      case "isPayant":
+        return "Payant";
+      case "totalPlaces":
+        return "Places";
+      case "commercesProches":
+        return "Commerces";
+      default:
+        return key;
     }
   };
 
@@ -172,46 +210,54 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
               .map(([key, value]) => {
                 if (key === "id" || key === "stationId") return null;
                 const displayValue = renderValue(key, value);
-                if (!displayValue) return null;
+                if (!displayValue && typeof value !== "boolean") return null;
                 return (
                   <div key={key} className="flex items-center gap-1 text-xs">
-                    <span
-                      className={`${
-                        typeof value === "boolean"
-                          ? value
-                            ? "text-green-500"
-                            : "text-red-500"
-                          : ""
-                      }`}
-                    >
-                      {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
-                    </span>
-                    <span className="truncate">{displayValue}</span>
+                    {typeof value === "boolean" ? (
+                      <>
+                        <span
+                          className={value ? "text-green-500" : "text-red-500"}
+                        >
+                          {value ? "✓" : "✗"}
+                        </span>
+                        <span className="truncate">
+                          {renderServiceLabel(key)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="truncate">{displayValue}</span>
+                    )}
                   </div>
                 );
               })}
           {station.type === "PARKING" &&
             station.parkingDetails &&
             Object.entries(station.parkingDetails)
-              .filter(([key]) => key !== "id" && key !== "stationId")
+              .filter(
+                ([key]) =>
+                  key !== "id" && key !== "stationId" && key !== "createdAt"
+              )
               .map(([key, value]) => {
-                if (key === "id" || key === "stationId") return null;
+                if (key === "id" || key === "stationId" || key === "createdAt")
+                  return null;
                 const displayValue = renderValue(key, value);
-                if (!displayValue) return null;
+                if (!displayValue && typeof value !== "boolean") return null;
                 return (
                   <div key={key} className="flex items-center gap-1 text-xs">
-                    <span
-                      className={`${
-                        typeof value === "boolean"
-                          ? value
-                            ? "text-green-500"
-                            : "text-red-500"
-                          : ""
-                      }`}
-                    >
-                      {typeof value === "boolean" ? (value ? "✓" : "✗") : ""}
-                    </span>
-                    <span className="truncate">{displayValue}</span>
+                    {typeof value === "boolean" ? (
+                      <>
+                        <span
+                          className={value ? "text-green-500" : "text-red-500"}
+                        >
+                          {value ? "✓" : "✗"}
+                        </span>
+                        <span className="truncate">
+                          {renderServiceLabel(key)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="truncate">{displayValue}</span>
+                    )}
                   </div>
                 );
               })}

@@ -14,7 +14,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    const { status } = await request.json();
+    const { status, parkingDetails, services } = await request.json();
+    console.log("Données reçues dans PATCH:", { parkingDetails, services });
 
     const result = await prisma.$transaction(async (tx) => {
       const existingStation = await tx.station.findUnique({
@@ -30,64 +31,99 @@ export async function PATCH(
       }
 
       // Vérifier si un service existe déjà pour une station de lavage
-      if (existingStation.type === "STATION_LAVAGE") {
+      if (existingStation.type === "STATION_LAVAGE" && services) {
         if (existingStation.services) {
           await tx.service.update({
             where: { stationId: params.id },
             data: {
-              highPressure: existingStation.services.highPressure,
-              tirePressure: existingStation.services.tirePressure,
-              vacuum: existingStation.services.vacuum,
-              handicapAccess: existingStation.services.handicapAccess,
-              wasteWater: existingStation.services.wasteWater,
+              highPressure: services.highPressure,
+              tirePressure: services.tirePressure,
+              vacuum: services.vacuum,
+              handicapAccess: services.handicapAccess,
+              wasteWater: services.wasteWater,
+              waterPoint: services.waterPoint,
+              wasteWaterDisposal: services.wasteWaterDisposal,
+              blackWaterDisposal: services.blackWaterDisposal,
+              electricity: services.electricity,
+              maxVehicleLength: services.maxVehicleLength,
+              paymentMethods: services.paymentMethods,
             },
           });
         } else {
           await tx.service.create({
             data: {
               stationId: params.id,
-              highPressure: HighPressureType.NONE,
-              tirePressure: false,
-              vacuum: false,
-              handicapAccess: false,
-              wasteWater: false,
+              highPressure: services.highPressure || HighPressureType.NONE,
+              tirePressure: services.tirePressure || false,
+              vacuum: services.vacuum || false,
+              handicapAccess: services.handicapAccess || false,
+              wasteWater: services.wasteWater || false,
+              waterPoint: services.waterPoint || false,
+              wasteWaterDisposal: services.wasteWaterDisposal || false,
+              blackWaterDisposal: services.blackWaterDisposal || false,
+              electricity: services.electricity || "NONE",
+              maxVehicleLength: services.maxVehicleLength || null,
+              paymentMethods: services.paymentMethods || [],
             },
           });
         }
       }
 
       // Vérifier si les détails du parking existent déjà pour un parking
-      if (existingStation.type === "PARKING") {
+      if (existingStation.type === "PARKING" && parkingDetails) {
+        console.log("Mise à jour des détails du parking:", parkingDetails);
         if (existingStation.parkingDetails) {
-          await tx.parkingDetails.update({
+          const updatedParkingDetails = await tx.parkingDetails.update({
             where: { stationId: params.id },
             data: {
-              isPayant: existingStation.parkingDetails.isPayant,
-              tarif: existingStation.parkingDetails.tarif,
-              taxeSejour: existingStation.parkingDetails.taxeSejour,
-              hasElectricity: existingStation.parkingDetails.hasElectricity,
-              commercesProches: existingStation.parkingDetails.commercesProches,
-              handicapAccess: existingStation.parkingDetails.handicapAccess,
-              totalPlaces: existingStation.parkingDetails.totalPlaces,
-              hasWifi: existingStation.parkingDetails.hasWifi,
-              hasChargingPoint: existingStation.parkingDetails.hasChargingPoint,
+              isPayant: Boolean(parkingDetails.isPayant),
+              tarif: parkingDetails.tarif
+                ? parseFloat(String(parkingDetails.tarif))
+                : null,
+              taxeSejour: parkingDetails.taxeSejour
+                ? parseFloat(String(parkingDetails.taxeSejour))
+                : null,
+              hasElectricity: parkingDetails.hasElectricity || "NONE",
+              commercesProches: parkingDetails.commercesProches || [],
+              handicapAccess: Boolean(parkingDetails.handicapAccess),
+              totalPlaces: parkingDetails.totalPlaces
+                ? parseInt(String(parkingDetails.totalPlaces))
+                : 0,
+              hasWifi: Boolean(parkingDetails.hasWifi),
+              hasChargingPoint: Boolean(parkingDetails.hasChargingPoint),
+              waterPoint: Boolean(parkingDetails.waterPoint),
+              wasteWater: Boolean(parkingDetails.wasteWater),
+              wasteWaterDisposal: Boolean(parkingDetails.wasteWaterDisposal),
+              blackWaterDisposal: Boolean(parkingDetails.blackWaterDisposal),
             },
           });
+          console.log("Détails du parking mis à jour:", updatedParkingDetails);
         } else {
-          await tx.parkingDetails.create({
+          const createdParkingDetails = await tx.parkingDetails.create({
             data: {
               stationId: params.id,
-              isPayant: false,
-              tarif: null,
-              taxeSejour: null,
-              hasElectricity: "NONE",
-              commercesProches: [],
-              handicapAccess: false,
-              totalPlaces: 0,
-              hasWifi: false,
-              hasChargingPoint: false,
+              isPayant: Boolean(parkingDetails.isPayant),
+              tarif: parkingDetails.tarif
+                ? parseFloat(String(parkingDetails.tarif))
+                : null,
+              taxeSejour: parkingDetails.taxeSejour
+                ? parseFloat(String(parkingDetails.taxeSejour))
+                : null,
+              hasElectricity: parkingDetails.hasElectricity || "NONE",
+              commercesProches: parkingDetails.commercesProches || [],
+              handicapAccess: Boolean(parkingDetails.handicapAccess),
+              totalPlaces: parkingDetails.totalPlaces
+                ? parseInt(String(parkingDetails.totalPlaces))
+                : 0,
+              hasWifi: Boolean(parkingDetails.hasWifi),
+              hasChargingPoint: Boolean(parkingDetails.hasChargingPoint),
+              waterPoint: Boolean(parkingDetails.waterPoint),
+              wasteWater: Boolean(parkingDetails.wasteWater),
+              wasteWaterDisposal: Boolean(parkingDetails.wasteWaterDisposal),
+              blackWaterDisposal: Boolean(parkingDetails.blackWaterDisposal),
             },
           });
+          console.log("Détails du parking créés:", createdParkingDetails);
         }
       }
 

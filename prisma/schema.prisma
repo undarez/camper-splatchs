@@ -107,19 +107,23 @@ model Station {
 }
 
 model ParkingDetails {
-  id               String          @id @default(cuid())
-  isPayant         Boolean         @default(false)
-  tarif            Float?
-  taxeSejour       Float?
-  hasElectricity   ElectricityType @default(NONE)
-  commercesProches CommerceType[]
-  handicapAccess   Boolean         @default(false)
-  station          Station         @relation(fields: [stationId], references: [id], onDelete: Cascade)
-  stationId        String          @unique
-  createdAt        DateTime        @default(now())
-  totalPlaces      Int             @default(0)
-  hasWifi          Boolean         @default(false)
-  hasChargingPoint Boolean         @default(false)
+  id                 String          @id @default(cuid())
+  isPayant           Boolean         @default(false)
+  tarif              Float?
+  taxeSejour         Float?
+  hasElectricity     ElectricityType @default(NONE)
+  commercesProches   CommerceType[]
+  handicapAccess     Boolean         @default(false)
+  station            Station         @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  stationId          String          @unique
+  createdAt          DateTime        @default(now())
+  totalPlaces        Int             @default(0)
+  hasWifi            Boolean         @default(false)
+  hasChargingPoint   Boolean         @default(false)
+  waterPoint         Boolean         @default(false)
+  wasteWater         Boolean         @default(false)
+  wasteWaterDisposal Boolean         @default(false)
+  blackWaterDisposal Boolean         @default(false)
 }
 
 model Review {

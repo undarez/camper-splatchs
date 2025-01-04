@@ -72,6 +72,10 @@ interface FormDataType {
     totalPlaces: number;
     hasWifi: boolean;
     hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
   };
 }
 
@@ -249,9 +253,15 @@ export default function AddPointModal({
                 ? formData.commercesProches
                 : [],
               handicapAccess: Boolean(formData.handicapAccess),
-              totalPlaces: Number(formData.totalPlaces) || 0,
+              totalPlaces: formData.totalPlaces
+                ? parseInt(String(formData.totalPlaces))
+                : 0,
               hasWifi: Boolean(formData.hasWifi),
               hasChargingPoint: Boolean(formData.hasChargingPoint),
+              waterPoint: Boolean(formData.waterPoint),
+              wasteWater: Boolean(formData.wasteWater),
+              wasteWaterDisposal: Boolean(formData.wasteWaterDisposal),
+              blackWaterDisposal: Boolean(formData.blackWaterDisposal),
             }
           : undefined;
 
