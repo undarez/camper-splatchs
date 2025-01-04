@@ -3,8 +3,9 @@
 import { signIn } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
 import { Icons } from "@/app/components/Icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 function AuthForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -72,6 +73,20 @@ function AuthForm() {
 }
 
 export default function AuthPage() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">

@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -290,30 +291,29 @@ const ValidatedStations = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const stationsPerPage = 6;
 
-  useEffect(() => {
-    async function fetchStations() {
-      try {
-        setError(null);
-        const response = await fetch("/api/stations");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Stations reçues:", data);
-        setStations(data);
-        setTotalPages(Math.ceil(data.length / stationsPerPage));
-      } catch (error) {
-        console.error("Erreur lors de la récupération des stations:", error);
-        setError(
-          error instanceof Error ? error.message : "Une erreur est survenue"
-        );
-      } finally {
-        setLoading(false);
+  const fetchStations = async () => {
+    try {
+      const response = await fetch("/api/stations");
+      if (!response.ok) {
+        throw new Error("Erreur lors du chargement des stations");
       }
+      const data = await response.json();
+      setStations(data);
+      setTotalPages(Math.ceil(data.length / stationsPerPage));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchStations();
   }, []);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   const filteredStations = stations.filter((station) => {
     console.log("Filtrage station:", station.status, statusFilter);

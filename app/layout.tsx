@@ -9,10 +9,38 @@ import { Providers } from "./components/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "SplashCamper",
+  title:
+    "SplashCamper - Trouvez les meilleures stations de lavage pour camping-cars",
   description:
-    "Trouvez les meilleures stations de lavage pour votre camping-car",
-  manifest: "/manifest.json",
+    "SplashCamper est votre guide pour trouver les stations de lavage et parkings adaptés aux camping-cars en France. Localisez facilement les points d'eau, aires de vidange et services pour votre véhicule.",
+  keywords:
+    "camping-car, station lavage, parking camping-car, aire de service, vidange camping-car, point d'eau camping-car, France, voyage",
+  openGraph: {
+    title: "SplashCamper - Stations de lavage pour camping-cars",
+    description:
+      "Trouvez facilement les stations de lavage et parkings adaptés aux camping-cars en France",
+    url: "https://splashcamper.fr",
+    siteName: "SplashCamper",
+    images: [
+      {
+        url: "https://splashcamper.fr/logo.png",
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SplashCamper - Stations de lavage pour camping-cars",
+    description:
+      "Trouvez facilement les stations de lavage et parkings adaptés aux camping-cars en France",
+    images: ["https://splashcamper.fr/logo.png"],
+  },
+  alternates: {
+    canonical: "https://splashcamper.fr",
+  },
 };
 
 export const viewport = {

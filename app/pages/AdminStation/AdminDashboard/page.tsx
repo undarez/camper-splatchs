@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
 } from "@/app/components/ui/card";
 import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    Area,
+    AreaChart,
 } from "recharts";
 
 interface ChartData {
@@ -34,6 +35,7 @@ interface TooltipData {
 }
 
 const AdminDashboard = () => {
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalStations: 0,
     activeStations: 0,
@@ -64,11 +66,17 @@ const AdminDashboard = () => {
           "Erreur lors de la récupération des statistiques:",
           error
         );
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStats();
   }, []);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   const activeStationsPercentage =
     (stats.activeStations / stats.totalStations) * 100 || 0;

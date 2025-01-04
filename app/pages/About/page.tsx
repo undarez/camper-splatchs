@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 interface Stats {
   totalStations: number;
@@ -15,6 +16,7 @@ export default function About() {
     totalUsers: 0,
     totalParkings: 0,
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -36,6 +38,18 @@ export default function About() {
     const interval = setInterval(fetchStats, 30000); // Mise à jour toutes les 30 secondes
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4">

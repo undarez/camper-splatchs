@@ -33,6 +33,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/app/components/ui/dialog";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic<MapComponentProps>(
@@ -273,6 +274,7 @@ export default function LocalisationStation2() {
   const [isMapReady, setIsMapReady] = useState(false);
   const router = useRouter();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Dialog d'authentification
   const AuthDialog = () => (
@@ -365,6 +367,7 @@ export default function LocalisationStation2() {
 
   useEffect(() => {
     const fetchStations = async () => {
+      setLoading(true);
       try {
         const response = await fetch("/api/stations");
         if (response.ok) {
@@ -379,6 +382,10 @@ export default function LocalisationStation2() {
         }
       } catch (error) {
         console.error("Erreur lors de la récupération des stations:", error);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 2000);
       }
     };
 
@@ -509,6 +516,10 @@ export default function LocalisationStation2() {
       options
     );
   }, [toast]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (status === "loading") {
     return (

@@ -13,6 +13,7 @@ import {
 } from "@/app/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { StationType, HighPressureType, ElectricityType } from "@prisma/client";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 interface Station {
   id: string;
@@ -460,12 +461,12 @@ const AdminStations = () => {
     return <TableCell />;
   };
 
-  if (session?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-    return <div>Accès non autorisé</div>;
+  if (loading) {
+    return <LoadingScreen />;
   }
 
-  if (loading) {
-    return <div>Chargement...</div>;
+  if (session?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    return <div>Accès non autorisé</div>;
   }
 
   return (

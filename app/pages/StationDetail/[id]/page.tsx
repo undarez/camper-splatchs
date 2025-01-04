@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import { Station, Review, Service } from "@prisma/client";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButton";
 import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
@@ -9,6 +11,7 @@ import { Badge } from "@/app/components/ui/badge";
 import { StarIcon } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { Button } from "@/app/components/ui/button";
 
 interface StationWithDetails extends Station {
   services: Service | null;
@@ -120,34 +123,46 @@ const renderServiceValue = (key: string, value: unknown): string => {
 
 const StationDetail = ({ params }: { params: { id: string } }) => {
   const [station, setStation] = useState<StationWithDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchStation = async () => {
       try {
+        setLoading(true);
         const response = await fetch(`/api/stations/${params.id}`);
         const data = await response.json();
         setStation(data);
 
-        // Enregistrer la visite
-        await fetch("/api/visits", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ stationId: params.id }),
-        });
+        // Enregistrer la visite seulement si l'utilisateur est connecté
+        if (session?.user) {
+          await fetch("/api/visits", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ stationId: params.id }),
+          });
+        }
       } catch (error) {
         console.error("Erreur lors de la récupération de la station:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStation();
-  }, [params.id]);
+  }, [params.id, session]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (!station) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Chargement...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-lg text-gray-600 mb-4">Station non trouvée</p>
+        <Button onClick={() => window.history.back()}>Retour</Button>
       </div>
     );
   }

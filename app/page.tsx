@@ -1,11 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import Statistics from "@/app/components/Statistics";
 import Image from "next/image";
 import Services from "@/app/components/Services";
 import Link from "next/link";
 
 export default function Home() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simuler un temps de chargement pour montrer le loader
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <main className="bg-gradient-to-b from-[#1a1f37] to-[#111827]">
       {/* Hero Section */}

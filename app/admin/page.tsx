@@ -1,4 +1,23 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
+
 export default function AdminPage() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="container mx-auto px-4 py-6 sm:py-8">
       <div className="bg-[#1E2337] rounded-lg shadow-lg p-4 sm:p-6">
