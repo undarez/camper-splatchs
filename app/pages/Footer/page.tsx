@@ -78,7 +78,7 @@ export default function Footer() {
             </h3>
             <div className="flex space-x-3">
               <Link
-                href="#"
+                href="https://www.facebook.com/profile.php?id=61570891016497"
                 className="bg-[#1E2337] p-2 rounded-lg hover:bg-blue-500 transition-all"
               >
                 <svg

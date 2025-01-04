@@ -375,7 +375,7 @@ const ValidatedStations = () => {
                   }`}
                 >
                   <ViewColumnsIcon className="h-4 w-4 mr-2" />
-                  <span className="flex-1">Vue cartes</span>
+                  <span className="flex-1">Vue Fiches Stations</span>
                 </Button>
                 <Button
                   onClick={() => setViewMode("map")}
@@ -387,7 +387,7 @@ const ValidatedStations = () => {
                   }`}
                 >
                   <MapIcon className="h-4 w-4 mr-2" />
-                  <span className="flex-1">Vue carte</span>
+                  <span className="flex-1">Vue Map interactive</span>
                 </Button>
               </div>
             </div>
