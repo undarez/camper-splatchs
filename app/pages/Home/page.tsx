@@ -3,6 +3,8 @@
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import GoogleAdsense from "@/app/components/GoogleAdsense";
+import Statistics from "@/app/components/Statistics";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -111,6 +113,54 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Section SEO pour Google AdSense */}
+      <div className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            Station de lavage camping-car en France
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">
+                Trouvez la station idéale
+              </h3>
+              <p className="text-gray-300 mb-4">
+                SplashCamper vous aide à localiser les meilleures stations de
+                lavage adaptées aux camping-cars. Notre plateforme recense les
+                installations spécialement conçues pour les grands gabarits,
+                vous permettant de laver votre camping-car en toute sérénité.
+              </p>
+              <ul className="list-disc list-inside text-gray-300 space-y-2">
+                <li>Stations de lavage camping-car autour de vous</li>
+                <li>Points d'eau et aires de service</li>
+                <li>Équipements adaptés aux grands véhicules</li>
+                <li>Informations détaillées et mises à jour</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-4">
+                Services disponibles
+              </h3>
+              <p className="text-gray-300 mb-4">
+                Notre application vous permet de trouver facilement :
+              </p>
+              <ul className="list-disc list-inside text-gray-300 space-y-2">
+                <li>Portiques de lavage grand gabarit</li>
+                <li>Aires de service complètes</li>
+                <li>Points de vidange eaux usées</li>
+                <li>Stations haute pression adaptées</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Insertion de la publicité après le contenu */}
+      <GoogleAdsense slot="1234567890" />
+
+      {/* Section statistiques */}
+      <Statistics />
 
       {/* CTA Section */}
       <div className="bg-blue-600 text-white py-16">
