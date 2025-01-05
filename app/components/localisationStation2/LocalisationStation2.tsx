@@ -987,6 +987,10 @@ export default function LocalisationStation2() {
                       totalPlaces: Number(formData.totalPlaces) || 0,
                       hasWifi: Boolean(formData.hasWifi),
                       hasChargingPoint: Boolean(formData.hasChargingPoint),
+                      waterPoint: formData.waterPoint,
+                      wasteWater: formData.wasteWater,
+                      wasteWaterDisposal: formData.wasteWaterDisposal,
+                      blackWaterDisposal: formData.blackWaterDisposal,
                     }
                   : undefined,
               author: {

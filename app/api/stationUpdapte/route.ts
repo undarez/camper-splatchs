@@ -77,6 +77,13 @@ export async function POST(request: Request) {
           hasElectricity: data.electricity || ElectricityType.NONE,
           commercesProches: data.commercesProches || [],
           handicapAccess: data.handicapAccess || false,
+          totalPlaces: data.totalPlaces || 0,
+          hasWifi: data.hasWifi || false,
+          hasChargingPoint: data.hasChargingPoint || false,
+          waterPoint: data.waterPoint || false,
+          wasteWater: data.wasteWater || false,
+          wasteWaterDisposal: data.wasteWaterDisposal || false,
+          blackWaterDisposal: data.blackWaterDisposal || false,
         },
       };
     }

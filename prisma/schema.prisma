@@ -112,11 +112,8 @@ model ParkingDetails {
   tarif              Float?
   taxeSejour         Float?
   hasElectricity     ElectricityType @default(NONE)
-  commercesProches   CommerceType[]
+  commercesProches   String[]
   handicapAccess     Boolean         @default(false)
-  station            Station         @relation(fields: [stationId], references: [id], onDelete: Cascade)
-  stationId          String          @unique
-  createdAt          DateTime        @default(now())
   totalPlaces        Int             @default(0)
   hasWifi            Boolean         @default(false)
   hasChargingPoint   Boolean         @default(false)
@@ -124,6 +121,9 @@ model ParkingDetails {
   wasteWater         Boolean         @default(false)
   wasteWaterDisposal Boolean         @default(false)
   blackWaterDisposal Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  station            Station         @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  stationId          String          @unique
 }
 
 model Review {
