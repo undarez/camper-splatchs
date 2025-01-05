@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Station, Review, Service, PaymentMethod } from "@prisma/client";
-import { StarIcon } from "@heroicons/react/24/solid";
+import { FunnelIcon, StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
-  FunnelIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -180,30 +179,44 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-      <div className="p-3">
-        <div className="mb-2">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-            {station.address}
-          </h3>
-          <div className="flex items-center gap-1 mt-1">
-            {[...Array(5)].map((_, i) => (
-              <StarIcon
-                key={i}
-                className={`h-4 w-4 ${
-                  i < (station.averageRating || 0)
-                    ? "text-yellow-400"
-                    : "text-gray-300 dark:text-gray-600"
-                }`}
-              />
-            ))}
-            <span className="text-xs text-gray-600 dark:text-gray-300 ml-1">
-              ({station.reviews?.length || 0})
-            </span>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+      <div className="p-4">
+        {/* En-tête avec adresse et note */}
+        <div className="mb-3">
+          <div className="flex justify-between items-start">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+              {station.address}
+            </h3>
+            <div className="flex items-center gap-1">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                {station.averageRating?.toFixed(1) || "N/A"}
+              </span>
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <StarIcon
+                    key={i}
+                    className={`h-4 w-4 ${
+                      i < (station.averageRating || 0)
+                        ? "text-yellow-400"
+                        : "text-gray-300 dark:text-gray-600"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                ({station.reviews?.length || 0})
+              </span>
+            </div>
           </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {station.type === "STATION_LAVAGE"
+              ? "Station de lavage"
+              : "Parking"}
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 dark:text-gray-200">
+        {/* Grille des services */}
+        <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 dark:text-gray-300 mb-4">
           {station.type === "STATION_LAVAGE" &&
             station.services &&
             Object.entries(station.services)
@@ -213,7 +226,10 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
                 const displayValue = renderValue(key, value);
                 if (!displayValue && typeof value !== "boolean") return null;
                 return (
-                  <div key={key} className="flex items-center gap-1 text-xs">
+                  <div
+                    key={key}
+                    className="flex items-center gap-2 text-xs bg-gray-50 dark:bg-gray-700/50 p-2 rounded"
+                  >
                     {typeof value === "boolean" ? (
                       <>
                         <span
@@ -244,7 +260,10 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
                 const displayValue = renderValue(key, value);
                 if (!displayValue && typeof value !== "boolean") return null;
                 return (
-                  <div key={key} className="flex items-center gap-1 text-xs">
+                  <div
+                    key={key}
+                    className="flex items-center gap-2 text-xs bg-gray-50 dark:bg-gray-700/50 p-2 rounded"
+                  >
                     {typeof value === "boolean" ? (
                       <>
                         <span
@@ -264,11 +283,12 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
               })}
         </div>
 
-        <div className="mt-3 flex justify-end">
+        {/* Bouton d'action */}
+        <div className="flex justify-end">
           {session ? (
             <Link href={`/pages/StationDetail/${station.id}`}>
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 h-7">
-                Y aller
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2">
+                <MapIcon className="h-4 w-4" />Y aller
               </Button>
             </Link>
           ) : (

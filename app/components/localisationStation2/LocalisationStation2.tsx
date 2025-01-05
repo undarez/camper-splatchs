@@ -770,7 +770,7 @@ export default function LocalisationStation2() {
         </div>
 
         {/* Contenu principal avec la carte */}
-        <div className="flex-1 md:ml-80">
+        <div className="flex-1 md:ml-20">
           <div className="h-[calc(100vh-4rem)] p-4 bg-[#1E2337]">
             <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700/50 shadow-xl relative">
               <MapComponent

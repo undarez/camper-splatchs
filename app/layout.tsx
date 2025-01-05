@@ -11,15 +11,15 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title:
-    "SplashCamper - Trouvez les meilleures stations de lavage pour camping-cars",
+    "SplashCamper - Station de lavage camping-car | Trouvez les stations près de chez vous",
   description:
-    "SplashCamper est votre guide pour trouver les stations de lavage et parkings adaptés aux camping-cars en France. Localisez facilement les points d'eau, aires de vidange et services pour votre véhicule.",
+    "Application de station de lavage camping-car en France. Trouvez facilement où laver son camping-car : stations de lavage camping-car autour de moi, aires de service, points d'eau et parkings adaptés.",
   keywords:
-    "camping-car, station lavage, parking camping-car, aire de service, vidange camping-car, point d'eau camping-car, France, voyage",
+    "station lavage camping-car, laver son camping-car, station de lavage camping-car autour de moi, application station lavage camping-car, aire de service camping-car, point d'eau camping-car, parking camping-car, France, voyage",
   openGraph: {
-    title: "SplashCamper - Stations de lavage pour camping-cars",
+    title: "SplashCamper - Station de lavage camping-car en France",
     description:
-      "Trouvez facilement les stations de lavage et parkings adaptés aux camping-cars en France",
+      "Application pour trouver les stations de lavage camping-car autour de vous. Service gratuit pour localiser où laver son camping-car en France.",
     url: "https://www.splashcamper.fr",
     siteName: "SplashCamper",
     images: [
@@ -34,9 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SplashCamper - Stations de lavage pour camping-cars",
+    title: "SplashCamper - Station de lavage camping-car",
     description:
-      "Trouvez facilement les stations de lavage et parkings adaptés aux camping-cars en France",
+      "Trouvez facilement où laver votre camping-car avec notre application gratuite de localisation de stations de lavage",
     images: ["https://splashcamper.fr/logo.png"],
   },
   alternates: {
@@ -102,6 +102,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SplashCamper" />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9668851625466214"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body className={inter.className}>
         <Providers>
