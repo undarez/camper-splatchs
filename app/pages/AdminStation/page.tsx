@@ -194,6 +194,31 @@ const AdminStations = () => {
     }
   };
 
+  const handleValidate = async (stationId: string) => {
+    try {
+      const response = await fetch("/api/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stationId }),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la validation");
+
+      await fetchStations();
+      toast({
+        title: "Succès",
+        description: "Station validée avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la validation de la station", error);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la validation de la station",
+        variant: "destructive",
+      });
+    }
+  };
+
   const renderServices = (station: Station) => {
     if (station.type === "PARKING" && station.parkingDetails) {
       console.log(
@@ -505,12 +530,22 @@ const AdminStations = () => {
                     </select>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDelete(station.id)}
-                    >
-                      Supprimer
-                    </Button>
+                    <div className="flex gap-2">
+                      {station.status === "en_attente" && (
+                        <Button
+                          variant="default"
+                          onClick={() => handleValidate(station.id)}
+                        >
+                          Valider
+                        </Button>
+                      )}
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleDelete(station.id)}
+                      >
+                        Supprimer
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

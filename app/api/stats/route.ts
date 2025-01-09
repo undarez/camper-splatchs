@@ -1,12 +1,26 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
-    // Données simulées pour la démo
+    const [totalStations, totalUsers, totalReviews, totalVisits] =
+      await Promise.all([
+        prisma.station.count(),
+        prisma.user.count(),
+        prisma.review.count(),
+        prisma.visit.count(),
+      ]);
+
     const stats = {
-      totalStations: 15,
-      totalUsers: 45,
-      totalParkings: 8,
+      totalStations,
+      totalUsers,
+      totalReviews,
+      totalVisits,
+      totalParkings: await prisma.station.count({
+        where: {
+          hasParking: true,
+        },
+      }),
     };
 
     return NextResponse.json(stats);

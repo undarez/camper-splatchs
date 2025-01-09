@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Station, Review, Service, PaymentMethod } from "@prisma/client";
-import { FunnelIcon, StarIcon } from "@heroicons/react/24/solid";
+import { StarIcon } from "@heroicons/react/24/solid";
 import {
   MapIcon,
   ViewColumnsIcon,
@@ -9,8 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { Skeleton } from "@/app/components/ui/skeleton";
-import ConnectYou from "../auth/connect-you/page";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import dynamic from "next/dynamic";
 import { Button } from "@/app/components/ui/button";
 import {
@@ -179,7 +178,91 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative ${
+        !session ? "blur-[3px]" : ""
+      }`}
+    >
+      {!session && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#1E2337]">
+          <div className="w-full max-w-md p-6">
+            <div className="bg-[#2563EB] rounded-t-xl p-8 text-center">
+              <div className="w-12 h-12 bg-white/10 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-semibold text-white">
+                Espace Membre
+              </h2>
+            </div>
+
+            <div className="bg-[#252B43] rounded-b-xl p-6">
+              <div className="space-y-3 mb-6">
+                {[
+                  "Accès à la carte interactive",
+                  "Localisation des stations",
+                  "Navigation détaillée",
+                  "Recherche avancée",
+                ].map((feature, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-gray-300"
+                  >
+                    <svg
+                      className="w-4 h-4 text-[#2563EB]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {feature}
+                  </div>
+                ))}
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => signIn("google")}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-900 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                  </svg>
+                  Continuer avec Google
+                </button>
+                <button
+                  onClick={() => signIn()}
+                  className="w-full px-4 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  Se connecter avec un compte
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contenu de la carte */}
       <div className="p-4">
         {/* En-tête avec adresse et note */}
         <div className="mb-3">
@@ -292,7 +375,13 @@ const StationCard = ({ station }: { station: StationWithDetails }) => {
               </Button>
             </Link>
           ) : (
-            <ConnectYou />
+            <Button
+              onClick={() => {}}
+              className="bg-gray-400 text-white text-sm px-4 py-2 rounded-lg cursor-not-allowed opacity-50 flex items-center gap-2"
+              disabled
+            >
+              <MapIcon className="h-4 w-4" />Y aller
+            </Button>
           )}
         </div>
       </div>
@@ -309,6 +398,7 @@ const ValidatedStations = () => {
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: session } = useSession();
   const stationsPerPage = 6;
 
   const fetchStations = async () => {
@@ -376,7 +466,51 @@ const ValidatedStations = () => {
   }
 
   return (
-    <div className="relative z-0 min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="relative z-0 min-h-screen bg-[#1E2337]">
+      {!session && (
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 mb-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-full">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="text-white font-medium">Mode Invité</p>
+                <p className="text-sm text-white/80">
+                  Connectez-vous pour accéder à toutes les fonctionnalités
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => signIn("google")}
+                className="px-4 py-2 bg-white text-gray-900 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                </svg>
+                Se connecter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
         <div
@@ -443,18 +577,31 @@ const ValidatedStations = () => {
                   <ViewColumnsIcon className="h-4 w-4 mr-2" />
                   <span className="flex-1">Vue Fiches Stations</span>
                 </Button>
-                <Button
-                  onClick={() => setViewMode("map")}
-                  variant={viewMode === "map" ? "default" : "ghost"}
-                  className={`justify-start w-full ${
-                    viewMode === "map"
-                      ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <MapIcon className="h-4 w-4 mr-2" />
-                  <span className="flex-1">Vue Map interactive</span>
-                </Button>
+                {session ? (
+                  <Button
+                    onClick={() => setViewMode("map")}
+                    variant={viewMode === "map" ? "default" : "ghost"}
+                    className={`justify-start w-full ${
+                      viewMode === "map"
+                        ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    <MapIcon className="h-4 w-4 mr-2" />
+                    <span className="flex-1">Vue Map interactive</span>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    className="justify-start w-full text-gray-400 cursor-not-allowed"
+                    disabled
+                  >
+                    <MapIcon className="h-4 w-4 mr-2" />
+                    <span className="flex-1">
+                      Vue Map interactive (Connexion requise)
+                    </span>
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -472,77 +619,44 @@ const ValidatedStations = () => {
         {/* Contenu principal */}
         <main className="flex-1 min-h-screen">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-blue-500 to-blue-700 rounded-lg shadow-lg mb-4">
-              <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 shadow-lg border border-white/20 transition-all duration-200 flex items-center gap-2"
-                aria-label="Ouvrir les filtres"
-              >
-                <FunnelIcon className="h-5 w-5 text-white" />
-                <span className="text-white text-sm hidden sm:inline">
-                  Filtres
-                </span>
-              </button>
-              <div className="flex-1 flex justify-center">
-                <h1 className="text-lg sm:text-xl font-bold text-white">
-                  Stations
-                </h1>
+            {viewMode === "cards" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+                {currentStations.map((station) => (
+                  <StationCard key={station.id} station={station} />
+                ))}
               </div>
-            </div>
+            ) : session ? (
+              <div className="h-[calc(100vh-180px)] rounded-lg overflow-hidden shadow-lg">
+                <MapView
+                  stations={stations.map((station) => ({
+                    ...station,
+                    validatedBy: station.validatedBy || "",
+                  }))}
+                />
+              </div>
+            ) : null}
 
-            {/* Vue des cartes */}
-            <div
-              className={`w-full transition-all duration-300 ${
-                isSidebarOpen ? "md:pl-4" : ""
-              }`}
-            >
-              {viewMode === "cards" ? (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-                    {currentStations.map((station) => (
-                      <div
-                        className="w-full transform transition-all duration-200 hover:scale-[1.02]"
-                        key={station.id}
-                      >
-                        <StationCard station={station} />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Pagination avec meilleur responsive */}
-                  {filteredStations.length > stationsPerPage && (
-                    <div className="flex justify-center mt-4 sm:mt-6 gap-1 sm:gap-2 flex-wrap">
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <Button
-                          key={i + 1}
-                          onClick={() => setCurrentPage(i + 1)}
-                          variant={
-                            currentPage === i + 1 ? "default" : "outline"
-                          }
-                          size="sm"
-                          className={`min-w-[2.5rem] h-8 px-2 sm:px-3 ${
-                            currentPage === i + 1
-                              ? "bg-blue-500 dark:bg-blue-600 text-white transform scale-105 shadow-lg"
-                              : "hover:bg-blue-50 dark:hover:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
-                          }`}
-                        >
-                          {i + 1}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="h-[calc(100vh-180px)] rounded-lg overflow-hidden shadow-lg">
-                  <MapView
-                    stations={stations.map((station) => ({
-                      ...station,
-                      validatedBy: station.validatedBy || "",
-                    }))}
-                  />
+            {/* Pagination */}
+            {viewMode === "cards" &&
+              filteredStations.length > stationsPerPage && (
+                <div className="flex justify-center mt-4 sm:mt-6 gap-1 sm:gap-2 flex-wrap">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <Button
+                      key={i + 1}
+                      onClick={() => setCurrentPage(i + 1)}
+                      variant={currentPage === i + 1 ? "default" : "outline"}
+                      size="sm"
+                      className={`min-w-[2.5rem] h-8 px-2 sm:px-3 ${
+                        currentPage === i + 1
+                          ? "bg-blue-500 dark:bg-blue-600 text-white transform scale-105 shadow-lg"
+                          : "hover:bg-blue-50 dark:hover:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+                      }`}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
                 </div>
               )}
-            </div>
           </div>
         </main>
       </div>
