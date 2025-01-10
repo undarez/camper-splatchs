@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { theme, setTheme } = useTheme();
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -20,8 +21,17 @@ export default function Header() {
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, [session, status]);
+
   const handleSignOut = async () => {
     await signOut({ redirect: false });
+    setIsAuthenticated(false);
     router.push("/auth/signin");
   };
 
@@ -104,10 +114,10 @@ export default function Header() {
             </nav>
 
             {/* Bouton de connexion/profil */}
-            {status === "authenticated" && session ? (
+            {isAuthenticated ? (
               <div className="relative group">
                 <button className="hover:text-blue-100 py-4">
-                  {session.user?.name || session.user?.email || "Profil"}
+                  {session?.user?.name || session?.user?.email || "Profil"}
                 </button>
                 <div className="absolute right-0 top-[calc(100%+1px)] pt-2 w-48">
                   <div className="bg-[#1E2337] border border-gray-700/50 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[2001]">
