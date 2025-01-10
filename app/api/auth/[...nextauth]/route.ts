@@ -4,6 +4,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { Role } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
 const handler = NextAuth({
   providers: [
@@ -24,6 +25,16 @@ const handler = NextAuth({
 
         const supabase = createRouteHandlerClient({ cookies });
 
+        // Vérifier d'abord si l'utilisateur existe dans Prisma
+        const prismaUser = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!prismaUser) {
+          throw new Error("Compte non trouvé");
+        }
+
+        // Ensuite vérifier les credentials avec Supabase
         const {
           data: { user },
           error,
@@ -36,15 +47,11 @@ const handler = NextAuth({
           throw new Error("Identifiants invalides");
         }
 
-        if (!user.user_metadata.isActive) {
-          throw new Error("Compte non activé. Veuillez vérifier votre email.");
-        }
-
         return {
-          id: user.id,
-          email: user.email,
-          name: user.user_metadata.name,
-          role: user.user_metadata.role as Role,
+          id: prismaUser.id,
+          email: prismaUser.email,
+          name: prismaUser.name,
+          role: prismaUser.role,
         };
       },
     }),
@@ -55,38 +62,43 @@ const handler = NextAuth({
         const supabase = createRouteHandlerClient({ cookies });
 
         try {
-          // Vérifier si l'utilisateur existe déjà dans Supabase
-          const {
-            data: { session },
-            error: sessionError,
-          } = await supabase.auth.getSession();
+          // Vérifier si l'utilisateur existe déjà dans Prisma
+          let prismaUser = await prisma.user.findUnique({
+            where: { email: user.email || "" },
+          });
 
-          if (sessionError) {
-            console.error(
-              "Erreur lors de la vérification de la session:",
-              sessionError
-            );
-            return false;
-          }
-
-          if (!session) {
-            // L'utilisateur n'existe pas, on le crée
-            const { error: createError } = await supabase.auth.signUp({
-              email: user.email || "",
-              password: Math.random().toString(36).slice(-8),
-              options: {
-                data: {
-                  name: user.name,
-                  role: "USER",
-                  isActive: true,
+          if (!prismaUser) {
+            // Créer l'utilisateur dans Supabase
+            const { data: supabaseUser, error: createError } =
+              await supabase.auth.signUp({
+                email: user.email || "",
+                password: Math.random().toString(36).slice(-8),
+                options: {
+                  data: {
+                    name: user.name,
+                    role: "USER",
+                    isActive: true,
+                  },
                 },
-              },
-            });
+              });
 
-            if (createError) {
-              console.error("Erreur lors de la création:", createError);
+            if (createError || !supabaseUser.user) {
+              console.error(
+                "Erreur lors de la création Supabase:",
+                createError
+              );
               return false;
             }
+
+            // Créer l'utilisateur dans Prisma
+            prismaUser = await prisma.user.create({
+              data: {
+                id: supabaseUser.user.id,
+                email: user.email || "",
+                name: user.name || "",
+                role: "USER",
+              },
+            });
           }
 
           return true;
