@@ -97,7 +97,7 @@ export function SignUpForm() {
         description: "Votre compte a été créé avec succès.",
       });
 
-      router.push("/profil");
+      router.push("/pages/profil");
     } catch (error) {
       console.error("Erreur détaillée:", error);
       toast({
