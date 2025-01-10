@@ -2,10 +2,15 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { Role } from "@prisma/client";
 
 const handler = NextAuth({
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
     Credentials({
       name: "credentials",
       credentials: {
@@ -45,6 +50,53 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const supabase = createRouteHandlerClient({ cookies });
+
+        try {
+          // Vérifier si l'utilisateur existe déjà dans Supabase
+          const {
+            data: { session },
+            error: sessionError,
+          } = await supabase.auth.getSession();
+
+          if (sessionError) {
+            console.error(
+              "Erreur lors de la vérification de la session:",
+              sessionError
+            );
+            return false;
+          }
+
+          if (!session) {
+            // L'utilisateur n'existe pas, on le crée
+            const { error: createError } = await supabase.auth.signUp({
+              email: user.email || "",
+              password: Math.random().toString(36).slice(-8),
+              options: {
+                data: {
+                  name: user.name,
+                  role: "USER",
+                  isActive: true,
+                },
+              },
+            });
+
+            if (createError) {
+              console.error("Erreur lors de la création:", createError);
+              return false;
+            }
+          }
+
+          return true;
+        } catch (error) {
+          console.error("Erreur lors de l'authentification Google:", error);
+          return false;
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role as Role;
