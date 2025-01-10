@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -13,12 +13,17 @@ export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push("/auth/signin");
+  };
 
   if (!isMounted) {
     return null;
@@ -99,10 +104,10 @@ export default function Header() {
             </nav>
 
             {/* Bouton de connexion/profil */}
-            {session ? (
+            {status === "authenticated" && session ? (
               <div className="relative group">
                 <button className="hover:text-blue-100 py-4">
-                  {session.user?.name || "Profil"}
+                  {session.user?.name || session.user?.email || "Profil"}
                 </button>
                 <div className="absolute right-0 top-[calc(100%+1px)] pt-2 w-48">
                   <div className="bg-[#1E2337] border border-gray-700/50 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[2001]">
@@ -113,7 +118,7 @@ export default function Header() {
                       Mon profil
                     </Link>
                     <button
-                      onClick={() => router.push("/auth/signin")}
+                      onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 rounded-b-lg"
                     >
                       Se déconnecter
@@ -123,7 +128,7 @@ export default function Header() {
               </div>
             ) : (
               <Button
-                onClick={() => router.push("/signin")}
+                onClick={() => router.push("/auth/signin")}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Se connecter
