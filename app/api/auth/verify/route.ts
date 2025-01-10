@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url);
-    const token = url.searchParams.get("token");
+    const requestUrl = new URL(request.url);
+    const token = requestUrl.searchParams.get("token");
 
     if (!token) {
       return NextResponse.json({ error: "Token manquant" }, { status: 400 });
@@ -13,7 +13,6 @@ export async function GET(request: Request) {
 
     const supabase = createRouteHandlerClient({ cookies });
 
-    // Appeler la fonction de confirmation avec débogage
     const { data: userData, error } = await supabase.rpc("confirm_user_email", {
       user_token: token,
     });
@@ -26,9 +25,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // Log pour le débogage
-    console.log("Données utilisateur:", userData);
-
     if (!userData) {
       return NextResponse.json(
         { error: "Token invalide ou expiré" },
@@ -36,7 +32,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // Mettre à jour directement avec l'API auth
     const { error: updateError } = await supabase.auth.updateUser({
       data: { email_verified: true },
     });
