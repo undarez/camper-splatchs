@@ -2,14 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Menu, Sun, Moon } from "lucide-react";
-import Link from "next/link";
+import { Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { Button } from "@/app/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { data: session } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -92,7 +97,40 @@ export default function Header() {
                 </div>
               </div>
             </nav>
-            {/* Bouton de thème (visible en mobile et desktop) */}
+
+            {/* Bouton de connexion/profil */}
+            {session ? (
+              <div className="relative group">
+                <button className="hover:text-blue-100 py-4">
+                  {session.user?.name || "Profil"}
+                </button>
+                <div className="absolute right-0 top-[calc(100%+1px)] pt-2 w-48">
+                  <div className="bg-[#1E2337] border border-gray-700/50 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[2001]">
+                    <Link
+                      href="/pages/profil"
+                      className="block px-4 py-2 text-sm text-white hover:bg-white/10 rounded-t-lg"
+                    >
+                      Mon profil
+                    </Link>
+                    <button
+                      onClick={() => router.push("/auth/signin")}
+                      className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 rounded-b-lg"
+                    >
+                      Se déconnecter
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Button
+                onClick={() => router.push("/signin")}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Se connecter
+              </Button>
+            )}
+
+            {/* Bouton de thème */}
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 shadow-lg border border-white/20 transition-all duration-200"

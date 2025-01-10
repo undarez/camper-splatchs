@@ -97,7 +97,7 @@ export function SignUpForm() {
         description: "Votre compte a été créé avec succès.",
       });
 
-      router.push("/auth/signin");
+      router.push("/signin");
     } catch (error) {
       console.error("Erreur détaillée:", error);
       toast({
