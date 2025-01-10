@@ -14,6 +14,18 @@ import {
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { User, Role } from "@prisma/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../../components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 export default function AdminUsers() {
   const { data: session } = useSession();
@@ -62,6 +74,22 @@ export default function AdminUsers() {
     } catch (error) {
       console.error("Erreur:", error);
       toast.error("Erreur lors de la mise à jour de l'utilisateur");
+    }
+  };
+
+  const handleDelete = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+      setUsers(users.filter((user) => user.id !== userId));
+      toast.success("Utilisateur supprimé avec succès");
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error("Erreur lors de la suppression de l'utilisateur");
     }
   };
 
@@ -197,30 +225,67 @@ export default function AdminUsers() {
                       )}
                     </TableCell>
                     <TableCell className="px-2 sm:px-4">
-                      {editingUser?.id === user.id ? (
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <Button
-                            onClick={() => handleSave(editingUser)}
-                            className="bg-green-600 hover:bg-green-700 text-sm sm:text-base py-1 h-8 sm:h-10"
-                          >
-                            Sauvegarder
-                          </Button>
-                          <Button
-                            onClick={handleCancel}
-                            variant="outline"
-                            className="border-gray-600 text-white hover:bg-gray-700 text-sm sm:text-base py-1 h-8 sm:h-10"
-                          >
-                            Annuler
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          onClick={() => handleEdit(user)}
-                          className="bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-1 h-8 sm:h-10"
-                        >
-                          Modifier
-                        </Button>
-                      )}
+                      <div className="flex gap-2">
+                        {editingUser?.id === user.id ? (
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <Button
+                              onClick={() => handleSave(editingUser)}
+                              className="bg-green-600 hover:bg-green-700 text-sm sm:text-base py-1 h-8 sm:h-10"
+                            >
+                              Sauvegarder
+                            </Button>
+                            <Button
+                              onClick={handleCancel}
+                              variant="outline"
+                              className="border-gray-600 text-white hover:bg-gray-700 text-sm sm:text-base py-1 h-8 sm:h-10"
+                            >
+                              Annuler
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <Button
+                              onClick={() => handleEdit(user)}
+                              className="bg-blue-600 hover:bg-blue-700 text-sm sm:text-base py-1 h-8 sm:h-10"
+                            >
+                              Modifier
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="h-8 sm:h-10"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-gray-800 text-white border border-gray-700">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Supprimer l'utilisateur
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Êtes-vous sûr de vouloir supprimer cet
+                                    utilisateur ? Cette action est irréversible.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="bg-gray-700 text-white hover:bg-gray-600">
+                                    Annuler
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(user.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Supprimer
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

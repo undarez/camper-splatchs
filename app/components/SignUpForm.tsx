@@ -16,9 +16,11 @@ import {
 import { Input } from "@/app/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import ReCaptcha from "react-google-recaptcha";
 
 const formSchema = z
   .object({
+    name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
     email: z.string().email("Adresse e-mail invalide"),
     password: z
       .string()
@@ -38,18 +40,33 @@ type FormData = z.infer<typeof formSchema>;
 
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
+  };
+
   async function onSubmit(values: FormData) {
+    if (!captchaToken) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez valider le captcha",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -59,8 +76,10 @@ export function SignUpForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          name: values.name,
           email: values.email,
           password: values.password,
+          captchaToken,
         }),
       });
 
@@ -75,12 +94,10 @@ export function SignUpForm() {
 
       toast({
         title: "Inscription réussie!",
-        description:
-          "Veuillez vérifier votre email pour activer votre compte. Un lien de vérification vous a été envoyé.",
-        duration: 6000,
+        description: "Votre compte a été créé avec succès.",
       });
 
-      router.push("/signin?registered=true");
+      router.push("/profil");
     } catch (error) {
       console.error("Erreur détaillée:", error);
       toast({
@@ -101,12 +118,33 @@ export function SignUpForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nom d'utilisateur</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Votre nom"
+                  {...field}
+                  className="bg-[#1E2337] border-gray-700 text-white placeholder-gray-500"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Adresse e-mail</FormLabel>
               <FormControl>
-                <Input placeholder="exemple@email.com" {...field} />
+                <Input
+                  placeholder="exemple@email.com"
+                  {...field}
+                  className="bg-[#1E2337] border-gray-700 text-white placeholder-gray-500"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -119,7 +157,11 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Mot de passe</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input
+                  type="password"
+                  {...field}
+                  className="bg-[#1E2337] border-gray-700 text-white placeholder-gray-500"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -132,13 +174,30 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Confirmer le mot de passe</FormLabel>
               <FormControl>
-                <Input type="password" {...field} />
+                <Input
+                  type="password"
+                  {...field}
+                  className="bg-[#1E2337] border-gray-700 text-white placeholder-gray-500"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={isLoading}>
+
+        <div className="flex justify-center my-4">
+          <ReCaptcha
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+            onChange={handleCaptchaChange}
+            theme="dark"
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700"
+          disabled={isLoading || !captchaToken}
+        >
           {isLoading ? "Inscription en cours..." : "S'inscrire"}
         </Button>
       </form>

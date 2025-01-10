@@ -26,21 +26,18 @@ interface ContactData {
   message: string;
 }
 
-export async function sendVerificationEmail(
-  email: string,
-  verificationToken: string
-) {
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${verificationToken}`;
+export async function sendVerificationEmail(email: string, token: string) {
+  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?token=${token}`;
 
   const emailTemplate = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #1E2337; color: white;">
       <div style="text-align: center; padding: 40px 20px; background: linear-gradient(to right, #2ABED9, #1B4B82);">
-        <h1 style="margin: 0; font-size: 28px; color: white;">Vérification de votre compte CamperWash</h1>
+        <h1 style="margin: 0; font-size: 28px; color: white;">Vérification de votre compte CamperSplatchs</h1>
       </div>
       
       <div style="padding: 40px 20px;">
         <div style="background-color: #252B43; padding: 30px; border-radius: 10px; margin-bottom: 30px;">
-          <h2 style="color: #2ABED9; margin-top: 0; font-size: 20px;">Bienvenue sur CamperWash !</h2>
+          <h2 style="color: #2ABED9; margin-top: 0; font-size: 20px;">Bienvenue sur CamperSplatchs !</h2>
           <p style="color: #E5E7EB; margin-bottom: 20px;">
             Merci de vous être inscrit. Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :
           </p>
@@ -66,7 +63,7 @@ export async function sendVerificationEmail(
       
       <div style="text-align: center; padding: 20px; border-top: 1px solid #374151;">
         <p style="color: #9CA3AF; margin: 0; font-size: 14px;">
-          © ${new Date().getFullYear()} CamperWash. Tous droits réservés.
+          © ${new Date().getFullYear()} CamperSplatchs. Tous droits réservés.
         </p>
       </div>
     </div>
@@ -74,17 +71,17 @@ export async function sendVerificationEmail(
 
   try {
     const mailOptions = {
-      from: `"CamperWash" <${process.env.GMAIL_USER}>`,
+      from: `"CamperSplatchs" <${process.env.GMAIL_USER}>`,
       to: email,
-      subject: "Vérifiez votre adresse email - CamperWash",
+      subject: "Vérifiez votre adresse email - CamperSplatchs",
       html: emailTemplate,
     };
 
     await transporter.sendMail(mailOptions);
-    return { success: true as const };
+    return true;
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email de vérification:", error);
-    return { success: false as const, error };
+    return false;
   }
 }
 

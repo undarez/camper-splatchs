@@ -1,62 +1,57 @@
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { hash } from "bcryptjs";
-import prisma from "@/lib/prisma";
-import { z } from "zod";
-import { Role } from "@prisma/client";
-
-const userSchema = z.object({
-  email: z.string().email("Email invalide"),
-  password: z
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-});
+import { sendVerificationEmail } from "@/app/lib/server/emailService";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, password } = userSchema.parse(body);
+    const { email, password, name } = await request.json();
+    const supabase = createRouteHandlerClient({ cookies });
+    const verificationToken = uuidv4();
 
-    // Vérifier si l'email existe déjà
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+    // Créer l'utilisateur dans Supabase
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          role: "USER",
+          isActive: false,
+          verificationToken,
+        },
+      },
     });
 
-    if (existingUser) {
+    if (error) {
       return NextResponse.json(
-        { error: "Cet email est déjà utilisé" },
+        { error: "Erreur lors de la création du compte" },
         { status: 400 }
       );
     }
 
-    const hashedPassword = await hash(password, 10);
+    // Envoyer l'email de vérification avec Nodemailer
+    const emailSent = await sendVerificationEmail(email, verificationToken);
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        hashedPassword,
-        role: Role.USER,
-      },
-    });
+    if (!emailSent) {
+      // Si l'email n'a pas pu être envoyé, on supprime l'utilisateur
+      await supabase.auth.admin.deleteUser(user?.id || "");
+      return NextResponse.json(
+        { error: "Erreur lors de l'envoi de l'email de vérification" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
+      message: "Vérifiez votre email pour activer votre compte",
+      user,
     });
   } catch (error) {
-    console.error("SIGNUP_ERROR", error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Données invalides", details: error.errors },
-        { status: 400 }
-      );
-    }
-    return NextResponse.json(
-      { error: "Une erreur est survenue lors de l'inscription" },
-      { status: 500 }
-    );
+    console.error("Erreur lors de la création du compte", error);
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

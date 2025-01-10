@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
 import AuthWrapper from "@/app/components/AuthWrapper";
 import { useState, useEffect } from "react";
 import {
@@ -14,6 +12,7 @@ import {
 } from "@/app/components/ui/dialog";
 import { Button } from "@/app/components/ui/button";
 import { useRouter } from "next/navigation";
+import { AuthForm } from "@/app/components/AuthForm";
 
 export default function SignIn() {
   const [showModal, setShowModal] = useState(false);
@@ -103,84 +102,7 @@ export default function SignIn() {
                   </p>
                 </div>
 
-                <div className="space-y-6">
-                  {/* Google Sign In */}
-                  <button
-                    onClick={() => signIn("google")}
-                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white hover:bg-gray-50 text-gray-900 rounded-lg transition-colors"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                    </svg>
-                    Continuer avec Google
-                  </button>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-600"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-[#252B43] text-gray-400">
-                        Ou continuez avec
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Email form */}
-                  <form className="space-y-4">
-                    <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium text-gray-300 mb-1"
-                      >
-                        Adresse e-mail
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        placeholder="exemple@email.com"
-                        className="w-full px-4 py-2 bg-[#1E2337] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-gray-300 mb-1"
-                      >
-                        Mot de passe
-                      </label>
-                      <input
-                        type="password"
-                        id="password"
-                        placeholder="••••••••"
-                        className="w-full px-4 py-2 bg-[#1E2337] border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                    >
-                      Se connecter
-                    </button>
-                  </form>
-
-                  <div className="text-center">
-                    <p className="text-gray-400">
-                      Vous n'avez pas de compte ?{" "}
-                      <Link
-                        href="/signup"
-                        className="text-blue-400 hover:text-blue-300"
-                      >
-                        Créer un compte
-                      </Link>
-                    </p>
-                  </div>
-                </div>
+                <AuthForm />
               </div>
             </div>
           </div>
