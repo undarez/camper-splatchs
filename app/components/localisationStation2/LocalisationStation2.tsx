@@ -565,6 +565,23 @@ export default function LocalisationStation2() {
     }
   };
 
+  // Convertir les stations au type StationWithOptionalFields
+  const convertedStations: StationWithOptionalFields[] = stations.map(
+    (station) => ({
+      id: station.id,
+      name: station.name,
+      address: station.address,
+      city: station.city,
+      postalCode: station.postalCode,
+      latitude: station.latitude,
+      longitude: station.longitude,
+      status: station.status,
+      type: station.type,
+      services: station.services,
+      parkingDetails: station.parkingDetails,
+    })
+  );
+
   return (
     <div className="min-h-screen bg-[#1E2337]">
       <style>
@@ -789,7 +806,7 @@ export default function LocalisationStation2() {
           <div className="h-[calc(100vh-4rem)] p-4 bg-[#1E2337]">
             <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700/50 shadow-xl relative">
               <MapComponent
-                stations={stations}
+                stations={convertedStations}
                 getMarkerIcon={getMarkerIcon}
                 center={mapCenter}
                 zoom={8}
