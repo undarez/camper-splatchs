@@ -24,6 +24,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
 import type { MapComponentProps } from "@/app/components/Map/index";
+import { StationWithOptionalFields } from "@/app/components/Map/index";
 import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
@@ -504,39 +505,7 @@ export default function LocalisationStation2() {
   }, [toast]);
 
   // Fonction pour créer le contenu du popup
-  const createPopupContent = (station: {
-    name: string;
-    address: string;
-    latitude: number;
-    longitude: number;
-    services?: {
-      id: string;
-      highPressure: HighPressureType;
-      tirePressure: boolean;
-      vacuum: boolean;
-      handicapAccess: boolean;
-      wasteWater: boolean;
-      waterPoint: boolean;
-      wasteWaterDisposal: boolean;
-      blackWaterDisposal: boolean;
-      electricity: ElectricityType;
-      maxVehicleLength: number | null;
-      paymentMethods: string[];
-    } | null;
-    parkingDetails?: {
-      id: string;
-      isPayant: boolean;
-      tarif: number | null;
-      taxeSejour: number | null;
-      hasElectricity: ElectricityType;
-      commercesProches: string[];
-      handicapAccess: boolean;
-      totalPlaces: number;
-      hasWifi: boolean;
-      hasChargingPoint: boolean;
-      createdAt: Date;
-    } | null;
-  }) => {
+  const createPopupContent = (station: StationWithOptionalFields) => {
     const shouldBlur = !sessionData || !isValidGuest;
     return `
       <div class="p-4 max-w-xs">
