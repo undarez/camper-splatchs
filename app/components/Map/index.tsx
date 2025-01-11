@@ -4,11 +4,17 @@ import { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { divIcon, icon, marker, Map as LeafletMap } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Station, StationStatus, StationType } from "@prisma/client";
+import {
+  ElectricityType,
+  HighPressureType,
+  PaymentMethod,
+  StationStatus,
+  StationType,
+} from "@prisma/client";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
 import { Button } from "@/app/components/ui/button";
 
-export type StationWithOptionalFields = Partial<Station> & {
+export interface StationWithOptionalFields {
   id: string;
   name: string;
   address: string;
@@ -18,7 +24,29 @@ export type StationWithOptionalFields = Partial<Station> & {
   longitude: number;
   status: StationStatus;
   type: StationType;
-};
+  services: {
+    id: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    paymentMethods: PaymentMethod[];
+  } | null;
+  parkingDetails: {
+    id: string;
+    isPayant: boolean;
+    tarif: number | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+  } | null;
+}
 
 export interface MapComponentProps {
   stations: StationWithOptionalFields[];

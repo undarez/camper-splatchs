@@ -9,16 +9,23 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/app/components/ui/dropdown-menu";
-import { MapPin, Navigation } from "lucide-react";
+import { Navigation, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface NavigationButtonProps {
   lat: number;
   lng: number;
   address: string;
+  className?: string;
 }
 
-const NavigationButton = ({ lat, lng, address }: NavigationButtonProps) => {
+const NavigationButton = ({
+  lat,
+  lng,
+  address,
+  className,
+}: NavigationButtonProps) => {
   const navigationApps = [
     {
       name: "Google Maps",
@@ -79,7 +86,10 @@ const NavigationButton = ({ lat, lng, address }: NavigationButtonProps) => {
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center gap-2"
+            className={cn(
+              "flex items-center gap-2 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white border-none shadow-md hover:shadow-lg transition-all duration-200",
+              className
+            )}
           >
             <Navigation className="h-4 w-4" />
             <span className="hidden sm:inline">Y aller</span>
@@ -108,23 +118,13 @@ const NavigationButton = ({ lat, lng, address }: NavigationButtonProps) => {
           ))}
           <DropdownMenuItem
             onClick={handleShare}
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white rounded-md mt-2"
           >
-            <MapPin className="h-4 w-4" />
+            <Share2 className="h-4 w-4" />
             Partager l&apos;emplacement
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        className="hidden sm:flex items-center gap-2"
-        onClick={handleShare}
-      >
-        <MapPin className="h-4 w-4" />
-        Partager
-      </Button>
     </div>
   );
 };

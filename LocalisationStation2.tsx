@@ -8,6 +8,7 @@ import {
   HighPressureType,
   ElectricityType,
   StationStatus,
+  PaymentMethod,
 } from "@prisma/client";
 import AddStationModal from "@/app/components/Map/AddStationModal";
 import { cn } from "@/lib/utils";
@@ -491,8 +492,11 @@ export default function LocalisationStation2() {
       return `
         <div class="p-4 max-w-xs">
           <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
+          <p class="text-sm text-gray-600">Type: ${
+            station.type === "STATION_LAVAGE" ? "Station de lavage" : "Parking"
+          }</p>
           <div class="mt-2">
-            <p class="text-sm text-gray-600">Connectez-vous pour voir les détails de la station</p>
+            <p class="text-sm text-gray-600 italic">Connectez-vous pour voir l'adresse exacte et les détails complets</p>
             <button onclick="window.signIn()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
               Se connecter
             </button>
@@ -508,6 +512,24 @@ export default function LocalisationStation2() {
         <p class="text-sm mb-2">Coordonnées : ${station.latitude.toFixed(
           6
         )}, ${station.longitude.toFixed(6)}</p>
+        ${
+          station.services
+            ? `
+          <div class="mt-2 text-sm">
+            <p class="font-semibold">Services disponibles :</p>
+            <ul class="list-disc pl-4">
+              ${
+                station.services.tirePressure
+                  ? "<li>Gonflage des pneus</li>"
+                  : ""
+              }
+              ${station.services.vacuum ? "<li>Aspirateur</li>" : ""}
+              ${station.services.waterPoint ? "<li>Point d'eau</li>" : ""}
+            </ul>
+          </div>
+        `
+            : ""
+        }
       </div>
     `;
   };
@@ -522,8 +544,35 @@ export default function LocalisationStation2() {
       postalCode: station.postalCode,
       latitude: station.latitude,
       longitude: station.longitude,
-      status: station.status,
-      type: station.type,
+      status: station.status as StationStatus,
+      type: station.type as StationType,
+      services: station.services
+        ? {
+            id: station.services.id,
+            highPressure: station.services.highPressure as HighPressureType,
+            tirePressure: station.services.tirePressure,
+            vacuum: station.services.vacuum,
+            handicapAccess: station.services.handicapAccess,
+            wasteWater: station.services.wasteWater,
+            waterPoint: station.services.waterPoint,
+            wasteWaterDisposal: station.services.wasteWaterDisposal,
+            blackWaterDisposal: station.services.blackWaterDisposal,
+            electricity: station.services.electricity as ElectricityType,
+            maxVehicleLength: station.services.maxVehicleLength,
+            paymentMethods: station.services.paymentMethods as PaymentMethod[],
+          }
+        : null,
+      parkingDetails: station.parkingDetails
+        ? {
+            id: station.parkingDetails.id,
+            isPayant: station.parkingDetails.isPayant,
+            tarif: station.parkingDetails.tarif,
+            hasElectricity: station.parkingDetails
+              .hasElectricity as ElectricityType,
+            commercesProches: station.parkingDetails.commercesProches,
+            handicapAccess: station.parkingDetails.handicapAccess,
+          }
+        : null,
     })
   );
 

@@ -4,6 +4,7 @@ import { Station, Service, Review } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { Card } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
+import Link from "next/link";
 
 interface StationWithDetails extends Station {
   services: Service | null;
@@ -43,12 +44,11 @@ export default function StationCard({ station }: StationCardProps) {
             <p className="text-gray-800 font-medium mb-2">
               Connectez-vous pour voir les détails complets
             </p>
-            <Button
-              onClick={() => (window.location.href = "/auth/signin")}
-              className="bg-blue-500 text-white hover:bg-blue-600"
-            >
-              Se connecter
-            </Button>
+            <Link href="/signin">
+              <Button className="bg-blue-500 text-white hover:bg-blue-600">
+                Se connecter
+              </Button>
+            </Link>
           </div>
         )}
         <div className={shouldBlur ? "blur-md" : ""}>

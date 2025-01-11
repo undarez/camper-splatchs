@@ -5,7 +5,6 @@ import { useSession } from "next-auth/react";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import { Station, Review, Service } from "@prisma/client";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButton";
-import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
 import { Carousel } from "@/app/components/ui/carousel";
 import { Badge } from "@/app/components/ui/badge";
 import {
@@ -23,10 +22,12 @@ import {
   Wind,
   Trash2,
   Droplets,
+  Share2,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/app/components/ui/button";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 interface StationWithDetails extends Station {
   services: Service | null;
@@ -179,7 +180,9 @@ const getServiceIcon = (service: string) => {
 const StationDetail = ({ params }: { params: { id: string } }) => {
   const [station, setStation] = useState<StationWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [reviewsCount, setReviewsCount] = useState(0);
   const { data: session } = useSession();
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     const fetchStation = async () => {
@@ -188,6 +191,7 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
         const response = await fetch(`/api/stations/${params.id}`);
         const data = await response.json();
         setStation(data);
+        setReviewsCount(data.reviews?.length || 0);
 
         // Enregistrer la visite seulement si l'utilisateur est connecté
         if (session?.user) {
@@ -207,7 +211,51 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
     };
 
     fetchStation();
-  }, [params.id, session]);
+
+    // Mettre à jour la subscription Supabase pour les avis
+    const reviewsSubscription = supabase
+      .channel("reviews-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Review",
+          filter: `stationId=eq.${params.id}`,
+        },
+        async (_payload) => {
+          // Mettre à jour le nombre d'avis et la station
+          const response = await fetch(`/api/stations/${params.id}`);
+          const updatedStation = await response.json();
+          setStation(updatedStation);
+          setReviewsCount(updatedStation.reviews?.length || 0);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      // Nettoyer la subscription lors du démontage du composant
+      supabase.removeChannel(reviewsSubscription);
+    };
+  }, [params.id, session, supabase]);
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: station?.name,
+          text: `Découvrez ${station?.name} sur Splatch Camper`,
+          url: window.location.href,
+        });
+      } else {
+        // Fallback - Copier le lien dans le presse-papier
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Lien copié dans le presse-papier !");
+      }
+    } catch (error) {
+      console.error("Erreur lors du partage:", error);
+    }
+  };
 
   if (loading) {
     return <LoadingScreen />;
@@ -223,128 +271,151 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid gap-6">
-        {/* En-tête */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{station.name}</h1>
-          <Badge
-            variant="outline"
-            className={cn({
-              "bg-green-100 text-green-800": station.status === "active",
-              "bg-yellow-100 text-yellow-800": station.status === "en_attente",
-              "bg-red-100 text-red-800": station.status === "inactive",
-            })}
-          >
-            {station.status}
-          </Badge>
+    <div className="container mx-auto px-4 py-8 bg-gray-50">
+      <div className="max-w-5xl mx-auto">
+        {/* En-tête avec informations principales */}
+        <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-800">
+                {station.name}
+              </h1>
+              <p className="text-gray-500 mt-1">{station.address}</p>
+            </div>
+            <Badge
+              variant="outline"
+              className={cn("px-4 py-2 text-sm font-medium rounded-full", {
+                "bg-green-100 text-green-800": station.status === "active",
+                "bg-yellow-100 text-yellow-800":
+                  station.status === "en_attente",
+                "bg-red-100 text-red-800": station.status === "inactive",
+              })}
+            >
+              {station.status === "active"
+                ? "Active"
+                : station.status === "en_attente"
+                ? "En attente"
+                : "Inactive"}
+            </Badge>
+          </div>
+
+          {/* Tags et caractéristiques principales */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {station.type === "STATION_LAVAGE" && (
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                Station de lavage
+              </span>
+            )}
+            {station.type === "PARKING" && (
+              <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                Parking
+              </span>
+            )}
+            {station.services?.handicapAccess && (
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                Accès handicapé
+              </span>
+            )}
+          </div>
+
+          {/* Statistiques */}
+          <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-4">
+            <div className="text-center">
+              <p className="text-2xl font-semibold text-blue-600">
+                {reviewsCount}
+              </p>
+              <p className="text-sm text-gray-500">Avis</p>
+            </div>
+            <div className="text-center border-l border-gray-100">
+              <p className="text-2xl font-semibold text-blue-600">
+                {station.parkingDetails?.totalPlaces || "N/A"}
+              </p>
+              <p className="text-sm text-gray-500">Places</p>
+            </div>
+          </div>
         </div>
 
-        {/* Informations principales */}
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Carte d'informations */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <h2 className="text-xl font-semibold">Informations</h2>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-2">Adresse</h3>
-                <p className="text-gray-600">{station.address}</p>
-                <div className="mt-4">
-                  <NavigationButton
-                    lat={station.latitude}
-                    lng={station.longitude}
-                    address={station.address}
-                  />
-                </div>
+        {/* Services disponibles */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Services disponibles</h2>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleShare}
+                  className="bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Partager
+                </Button>
+                <NavigationButton
+                  lat={station.latitude}
+                  lng={station.longitude}
+                  address={station.address}
+                  className="bg-gradient-to-br from-violet-500 to-indigo-600 hover:from-violet-600 hover:to-indigo-700 text-white font-medium shadow-md hover:shadow-lg transition-all duration-200 px-4 py-2 rounded-md"
+                />
               </div>
-
-              <div>
-                <h3 className="font-medium mb-2">Services disponibles</h3>
-                <div className="grid gap-2">
-                  {station.type === "STATION_LAVAGE" &&
-                    station.services &&
-                    Object.entries(station.services)
-                      .filter(([key]) => key !== "id" && key !== "stationId")
-                      .map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
-                        >
-                          <div className="flex items-center space-x-3">
-                            {getServiceIcon(key)}
-                            <span className="text-gray-700 dark:text-gray-200 font-medium">
-                              {serviceLabels[key] || key}
-                            </span>
-                          </div>
-                          <span className="text-gray-600 dark:text-gray-300 font-medium">
-                            {renderServiceValue(key, value)}
-                          </span>
-                        </div>
-                      ))}
-                  {station.type === "PARKING" &&
-                    station.parkingDetails &&
-                    Object.entries(station.parkingDetails)
-                      .filter(([key]) => key !== "id" && key !== "stationId")
-                      .map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
-                        >
-                          <div className="flex items-center space-x-3">
-                            {getServiceIcon(key)}
-                            <span className="text-gray-700 dark:text-gray-200 font-medium">
-                              {serviceLabels[key] || key}
-                            </span>
-                          </div>
-                          <span className="text-gray-600 dark:text-gray-300 font-medium">
-                            {renderServiceValue(key, value)}
-                          </span>
-                        </div>
-                      ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="space-y-3">
+              {station.type === "STATION_LAVAGE" &&
+                station.services &&
+                Object.entries(station.services)
+                  .filter(([key]) => key !== "id" && key !== "stationId")
+                  .map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        {getServiceIcon(key)}
+                        <span className="text-gray-700 font-medium">
+                          {serviceLabels[key] || key}
+                        </span>
+                      </div>
+                      <span className="text-gray-600">
+                        {renderServiceValue(key, value)}
+                      </span>
+                    </div>
+                  ))}
+            </div>
+          </div>
 
           {/* Photos */}
           {station.images && station.images.length > 0 && (
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <h2 className="text-xl font-semibold">Photos</h2>
-              </CardHeader>
-              <CardContent>
-                <Carousel className="w-full">
-                  {station.images.map((image, index) => (
-                    <div key={index} className="relative aspect-video">
-                      <Image
-                        src={image}
-                        alt={`${station.name} ${index + 1}`}
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    </div>
-                  ))}
-                </Carousel>
-              </CardContent>
-            </Card>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h2 className="text-xl font-semibold mb-4">Photos</h2>
+              <Carousel className="w-full">
+                {station.images.map((image, index) => (
+                  <div
+                    key={index}
+                    className="relative aspect-video rounded-lg overflow-hidden"
+                  >
+                    <Image
+                      src={image}
+                      alt={`${station.name} ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </Carousel>
+            </div>
           )}
         </div>
 
         {/* Avis */}
         {station.reviews && station.reviews.length > 0 && (
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <h2 className="text-xl font-semibold">Avis des utilisateurs</h2>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                {station.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="p-4 bg-gray-50 rounded-lg space-y-2"
-                  >
+          <div className="bg-white rounded-xl p-6 shadow-sm mt-6">
+            <h2 className="text-xl font-semibold mb-4">
+              Avis des utilisateurs
+            </h2>
+            <div className="grid gap-4">
+              {station.reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-2 mb-2">
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <StarIcon
@@ -357,15 +428,15 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
                         />
                       ))}
                     </div>
-                    <p className="text-gray-700">{review.content}</p>
-                    <p className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500">
                       {new Date(review.createdAt).toLocaleDateString()}
-                    </p>
+                    </span>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <p className="text-gray-700">{review.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
