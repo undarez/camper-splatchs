@@ -23,10 +23,7 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
-import type {
-  MapComponentProps,
-  StationWithOptionalFields,
-} from "@/app/components/Map/index";
+import type { MapComponentProps } from "@/app/components/Map/index";
 import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
@@ -507,39 +504,61 @@ export default function LocalisationStation2() {
   }, [toast]);
 
   // Fonction pour créer le contenu du popup
-  const createPopupContent = (station: StationWithOptionalFields) => {
-    const shouldBlur = !sessionData && !isValidGuest;
-
+  const createPopupContent = (station: {
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+    services?: {
+      id: string;
+      highPressure: HighPressureType;
+      tirePressure: boolean;
+      vacuum: boolean;
+      handicapAccess: boolean;
+      wasteWater: boolean;
+      waterPoint: boolean;
+      wasteWaterDisposal: boolean;
+      blackWaterDisposal: boolean;
+      electricity: ElectricityType;
+      maxVehicleLength: number | null;
+      paymentMethods: string[];
+    } | null;
+    parkingDetails?: {
+      id: string;
+      isPayant: boolean;
+      tarif: number | null;
+      taxeSejour: number | null;
+      hasElectricity: ElectricityType;
+      commercesProches: string[];
+      handicapAccess: boolean;
+      totalPlaces: number;
+      hasWifi: boolean;
+      hasChargingPoint: boolean;
+      createdAt: Date;
+    } | null;
+  }) => {
+    const shouldBlur = !sessionData || !isValidGuest;
     return `
-      <div class="p-4 min-w-[250px] ${shouldBlur ? "relative" : ""}">
+      <div class="p-4 max-w-xs">
+        <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
+        <p class="text-sm text-gray-600 mb-2">${station.address}</p>
+        <div class="${shouldBlur ? "blur-[8px] select-none" : ""}">
+          <p class="text-sm mb-2">Coordonnées : ${station.latitude.toFixed(
+            6
+          )}, ${station.longitude.toFixed(6)}</p>
+        </div>
         ${
           shouldBlur
             ? `
-          <div class="absolute inset-0 bg-white/50 backdrop-blur-md z-10 flex flex-col items-center justify-center p-4 text-center">
-            <p class="text-gray-800 font-medium mb-2">Connectez-vous pour voir les détails complets</p>
-            <button onclick="window.location.href='/auth/signin'" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+          <div class="mt-4">
+            <p class="text-sm text-gray-600 mb-2">Connectez-vous pour voir les coordonnées exactes</p>
+            <button onclick="window.location.href='/auth/signin'" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
               Se connecter
             </button>
           </div>
         `
             : ""
         }
-        <div class="${shouldBlur ? "blur-md" : ""}">
-          <h3 class="font-semibold text-lg mb-2">${station.name}</h3>
-          <p class="text-sm text-gray-600 mb-2">${station.address}</p>
-          <p class="text-xs text-gray-500 mb-2">
-            Coordonnées: ${station.latitude.toFixed(
-              6
-            )}, ${station.longitude.toFixed(6)}
-          </p>
-          <div class="mt-3">
-            <a href="/pages/StationDetail/${
-              station.id
-            }" class="text-blue-500 hover:underline">
-              Voir plus de détails
-            </a>
-          </div>
-        </div>
       </div>
     `;
   };
