@@ -58,7 +58,9 @@ export function AuthForm() {
           description: "Connexion réussie",
         });
         router.push("/");
-        router.refresh();
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
       }
     } catch (error) {
       console.error("Erreur de connexion:", error);

@@ -35,7 +35,8 @@ export default function SignIn() {
   };
 
   const handleGuestMode = () => {
-    router.push("/pages/StationCard");
+    localStorage.setItem("guestSession", "true");
+    router.push("/");
   };
 
   return (

@@ -8,7 +8,22 @@ import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/Navig
 import { Card, CardContent, CardHeader } from "@/app/components/ui/card";
 import { Carousel } from "@/app/components/ui/carousel";
 import { Badge } from "@/app/components/ui/badge";
-import { StarIcon } from "lucide-react";
+import {
+  StarIcon,
+  Droplet,
+  Wifi,
+  Plug,
+  ShoppingBag,
+  Accessibility,
+  CreditCard,
+  Euro,
+  Calendar,
+  Ruler,
+  Wrench,
+  Wind,
+  Trash2,
+  Droplets,
+} from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/app/components/ui/button";
@@ -121,6 +136,46 @@ const renderServiceValue = (key: string, value: unknown): string => {
   return value ? String(value) : "Non spécifié";
 };
 
+interface ServiceIcons {
+  waterPoint: JSX.Element;
+  hasWifi: JSX.Element;
+  hasElectricity: JSX.Element;
+  commercesProches: JSX.Element;
+  handicapAccess: JSX.Element;
+  paymentMethods: JSX.Element;
+  isPayant: JSX.Element;
+  taxeSejour: JSX.Element;
+  maxVehicleLength: JSX.Element;
+  tirePressure: JSX.Element;
+  vacuum: JSX.Element;
+  wasteWater: JSX.Element;
+  wasteWaterDisposal: JSX.Element;
+  blackWaterDisposal: JSX.Element;
+  maintenance: JSX.Element;
+}
+
+const getServiceIcon = (service: string) => {
+  const icons: ServiceIcons = {
+    waterPoint: <Droplet className="h-5 w-5 text-blue-500" />,
+    hasWifi: <Wifi className="h-5 w-5 text-green-500" />,
+    hasElectricity: <Plug className="h-5 w-5 text-yellow-500" />,
+    commercesProches: <ShoppingBag className="h-5 w-5 text-purple-500" />,
+    handicapAccess: <Accessibility className="h-5 w-5 text-blue-600" />,
+    paymentMethods: <CreditCard className="h-5 w-5 text-gray-600" />,
+    isPayant: <Euro className="h-5 w-5 text-green-600" />,
+    taxeSejour: <Calendar className="h-5 w-5 text-orange-500" />,
+    maxVehicleLength: <Ruler className="h-5 w-5 text-indigo-500" />,
+    tirePressure: <Wind className="h-5 w-5 text-cyan-500" />,
+    vacuum: <Wind className="h-5 w-5 text-purple-500" />,
+    wasteWater: <Droplets className="h-5 w-5 text-red-500" />,
+    wasteWaterDisposal: <Trash2 className="h-5 w-5 text-brown-500" />,
+    blackWaterDisposal: <Trash2 className="h-5 w-5 text-gray-700" />,
+    maintenance: <Wrench className="h-5 w-5 text-gray-500" />,
+  };
+
+  return icons[service as keyof ServiceIcons] || null;
+};
+
 const StationDetail = ({ params }: { params: { id: string } }) => {
   const [station, setStation] = useState<StationWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -215,12 +270,15 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
                       .map(([key, value]) => (
                         <div
                           key={key}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
                         >
-                          <span className="text-gray-700">
-                            {serviceLabels[key] || key}
-                          </span>
-                          <span className="text-gray-600 font-medium">
+                          <div className="flex items-center space-x-3">
+                            {getServiceIcon(key)}
+                            <span className="text-gray-700 dark:text-gray-200 font-medium">
+                              {serviceLabels[key] || key}
+                            </span>
+                          </div>
+                          <span className="text-gray-600 dark:text-gray-300 font-medium">
                             {renderServiceValue(key, value)}
                           </span>
                         </div>
@@ -232,12 +290,15 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
                       .map(([key, value]) => (
                         <div
                           key={key}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                          className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm"
                         >
-                          <span className="text-gray-700">
-                            {serviceLabels[key] || key}
-                          </span>
-                          <span className="text-gray-600 font-medium">
+                          <div className="flex items-center space-x-3">
+                            {getServiceIcon(key)}
+                            <span className="text-gray-700 dark:text-gray-200 font-medium">
+                              {serviceLabels[key] || key}
+                            </span>
+                          </div>
+                          <span className="text-gray-600 dark:text-gray-300 font-medium">
                             {renderServiceValue(key, value)}
                           </span>
                         </div>

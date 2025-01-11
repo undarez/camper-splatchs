@@ -8,7 +8,7 @@ import { Station, StationStatus, StationType } from "@prisma/client";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
 import { Button } from "@/app/components/ui/button";
 
-type StationWithOptionalFields = Partial<Station> & {
+export type StationWithOptionalFields = Partial<Station> & {
   id: string;
   name: string;
   address: string;
@@ -26,6 +26,7 @@ export interface MapComponentProps {
   center: [number, number];
   zoom: number;
   onMapReady?: (map: LeafletMap) => void;
+  createPopupContent: (station: StationWithOptionalFields) => string;
 }
 
 function MapEvents({ onMapReady }: { onMapReady?: (map: LeafletMap) => void }) {
@@ -44,6 +45,7 @@ const Map = ({
   center,
   zoom,
   onMapReady,
+  createPopupContent,
 }: MapComponentProps) => {
   const mapRef = useRef<LeafletMap | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
@@ -102,13 +104,11 @@ const Map = ({
             })}
           >
             <Popup>
-              <div className="p-2">
-                <h3 className="font-bold">{station.name}</h3>
-                <p>{station.address}</p>
-                <p>
-                  {station.city}, {station.postalCode}
-                </p>
-              </div>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: createPopupContent(station),
+                }}
+              />
             </Popup>
           </Marker>
         ))}
