@@ -1,13 +1,12 @@
 "use client";
+
 import { useState, useEffect } from "react";
-import { Station, Review, Service, PaymentMethod } from "@prisma/client";
-import { StarIcon } from "@heroicons/react/24/solid";
+import { Station, Review, Service } from "@prisma/client";
 import {
   MapIcon,
   ViewColumnsIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { useSession, signIn } from "next-auth/react";
 import dynamic from "next/dynamic";
@@ -20,6 +19,7 @@ import {
   SelectValue,
 } from "@/app/components/ui/select";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
+import StationCard from "@/app/components/StationCard";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -48,348 +48,7 @@ interface StationWithDetails extends Station {
   averageRating?: number;
 }
 
-const serviceLabels: { [key: string]: { [key: string]: string } } = {
-  highPressure: {
-    NONE: "Aucune haute pression",
-    PASSERELLE: "Passerelle",
-    ECHAFAUDAGE: "Échafaudage",
-    PORTIQUE: "Portique",
-  },
-  electricity: {
-    NONE: "Pas d'électricité",
-    AMP_8: "8 Ampères",
-    AMP_15: "15 Ampères",
-  },
-};
-
-type ServiceValueType =
-  | string
-  | number
-  | boolean
-  | Date
-  | PaymentMethod[]
-  | string[]
-  | null
-  | undefined;
-
-const StationCard = ({ station }: { station: StationWithDetails }) => {
-  const { data: session } = useSession();
-
-  if (!station) return null;
-
-  const renderValue = (key: string, value: ServiceValueType): string => {
-    if (value === null || value === undefined) return "";
-
-    switch (key) {
-      case "highPressure":
-        return serviceLabels.highPressure[value as string] || String(value);
-      case "electricity":
-      case "hasElectricity":
-        return serviceLabels.electricity[value as string] || String(value);
-      case "paymentMethods":
-        if (Array.isArray(value)) {
-          return value
-            .map((method) => {
-              switch (method) {
-                case "JETON":
-                  return "Jeton";
-                case "ESPECES":
-                  return "Espèces";
-                case "CARTE_BANCAIRE":
-                  return "Carte bancaire";
-                default:
-                  return method;
-              }
-            })
-            .join(", ");
-        }
-        return String(value);
-      case "commercesProches":
-        if (Array.isArray(value)) {
-          const labels: Record<string, string> = {
-            NOURRITURE: "Alimentation",
-            BANQUE: "Banque",
-            CENTRE_VILLE: "Centre-ville",
-            STATION_SERVICE: "Station-service",
-            LAVERIE: "Laverie",
-            GARAGE: "Garage",
-          };
-          return value
-            .map((commerce) => labels[commerce as string] || commerce)
-            .join(", ");
-        }
-        return String(value);
-      case "isPayant":
-        return typeof value === "boolean"
-          ? value
-            ? "Payant"
-            : "Gratuit"
-          : String(value);
-      case "tarif":
-        return value ? `${value}€/jour` : "Gratuit";
-      case "taxeSejour":
-        return value ? `${value}€/jour` : "0€/jour";
-      case "totalPlaces":
-        return value ? `${value} places` : "Non spécifié";
-      case "waterPoint":
-      case "wasteWater":
-      case "wasteWaterDisposal":
-      case "blackWaterDisposal":
-      case "hasWifi":
-      case "hasChargingPoint":
-      case "handicapAccess":
-        return Boolean(value) ? "✓" : "✗";
-      default:
-        return typeof value === "boolean"
-          ? Boolean(value)
-            ? "✓"
-            : "✗"
-          : String(value);
-    }
-  };
-
-  const renderServiceLabel = (key: string): string => {
-    switch (key) {
-      case "waterPoint":
-        return "Point d'eau";
-      case "wasteWater":
-        return "Vidange eaux usées";
-      case "wasteWaterDisposal":
-        return "Évacuation eaux usées";
-      case "blackWaterDisposal":
-        return "Évacuation eaux noires";
-      case "hasWifi":
-        return "WiFi";
-      case "hasChargingPoint":
-        return "Point de recharge";
-      case "handicapAccess":
-        return "Accès handicapé";
-      case "hasElectricity":
-        return "Électricité";
-      case "isPayant":
-        return "Payant";
-      case "totalPlaces":
-        return "Places";
-      case "commercesProches":
-        return "Commerces";
-      default:
-        return key;
-    }
-  };
-
-  return (
-    <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative ${
-        !session ? "blur-[3px]" : ""
-      }`}
-    >
-      {!session && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#1E2337]">
-          <div className="w-full max-w-md p-6">
-            <div className="bg-[#2563EB] rounded-t-xl p-8 text-center">
-              <div className="w-12 h-12 bg-white/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-semibold text-white">
-                Espace Membre
-              </h2>
-            </div>
-
-            <div className="bg-[#252B43] rounded-b-xl p-6">
-              <div className="space-y-3 mb-6">
-                {[
-                  "Accès à la carte interactive",
-                  "Localisation des stations",
-                  "Navigation détaillée",
-                  "Recherche avancée",
-                ].map((feature, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 text-gray-300"
-                  >
-                    <svg
-                      className="w-4 h-4 text-[#2563EB]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    {feature}
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => signIn("google")}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-900 rounded-lg transition-colors"
-                >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                  </svg>
-                  Continuer avec Google
-                </button>
-                <button
-                  onClick={() => signIn()}
-                  className="w-full px-4 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg transition-colors"
-                >
-                  Se connecter avec un compte
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Contenu de la carte */}
-      <div className="p-4">
-        {/* En-tête avec adresse et note */}
-        <div className="mb-3">
-          <div className="flex justify-between items-start">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
-              {station.address}
-            </h3>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                {station.averageRating?.toFixed(1) || "N/A"}
-              </span>
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <StarIcon
-                    key={i}
-                    className={`h-4 w-4 ${
-                      i < (station.averageRating || 0)
-                        ? "text-yellow-400"
-                        : "text-gray-300 dark:text-gray-600"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                ({station.reviews?.length || 0})
-              </span>
-            </div>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {station.type === "STATION_LAVAGE"
-              ? "Station de lavage"
-              : "Parking"}
-          </p>
-        </div>
-
-        {/* Grille des services */}
-        <div className="grid grid-cols-2 gap-2 text-sm text-gray-700 dark:text-gray-300 mb-4">
-          {station.type === "STATION_LAVAGE" &&
-            station.services &&
-            Object.entries(station.services)
-              .filter(([key]) => key !== "id" && key !== "stationId")
-              .map(([key, value]) => {
-                if (key === "id" || key === "stationId") return null;
-                const displayValue = renderValue(key, value);
-                if (!displayValue && typeof value !== "boolean") return null;
-                return (
-                  <div
-                    key={key}
-                    className="flex items-center gap-2 text-xs bg-gray-50 dark:bg-gray-700/50 p-2 rounded"
-                  >
-                    {typeof value === "boolean" ? (
-                      <>
-                        <span
-                          className={value ? "text-green-500" : "text-red-500"}
-                        >
-                          {value ? "✓" : "✗"}
-                        </span>
-                        <span className="truncate">
-                          {renderServiceLabel(key)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="truncate">{displayValue}</span>
-                    )}
-                  </div>
-                );
-              })}
-          {station.type === "PARKING" &&
-            station.parkingDetails &&
-            Object.entries(station.parkingDetails)
-              .filter(
-                ([key]) =>
-                  key !== "id" && key !== "stationId" && key !== "createdAt"
-              )
-              .map(([key, value]) => {
-                if (key === "id" || key === "stationId" || key === "createdAt")
-                  return null;
-                const displayValue = renderValue(key, value);
-                if (!displayValue && typeof value !== "boolean") return null;
-                return (
-                  <div
-                    key={key}
-                    className="flex items-center gap-2 text-xs bg-gray-50 dark:bg-gray-700/50 p-2 rounded"
-                  >
-                    {typeof value === "boolean" ? (
-                      <>
-                        <span
-                          className={value ? "text-green-500" : "text-red-500"}
-                        >
-                          {value ? "✓" : "✗"}
-                        </span>
-                        <span className="truncate">
-                          {renderServiceLabel(key)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="truncate">{displayValue}</span>
-                    )}
-                  </div>
-                );
-              })}
-        </div>
-
-        {/* Bouton d'action */}
-        <div className="flex justify-end">
-          {session ? (
-            <Link href={`/pages/StationDetail/${station.id}`}>
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded-lg transition-colors duration-200 flex items-center gap-2">
-                <MapIcon className="h-4 w-4" />Y aller
-              </Button>
-            </Link>
-          ) : (
-            <Button
-              onClick={() => {}}
-              className="bg-gray-400 text-white text-sm px-4 py-2 rounded-lg cursor-not-allowed opacity-50 flex items-center gap-2"
-              disabled
-            >
-              <MapIcon className="h-4 w-4" />Y aller
-            </Button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ValidatedStations = () => {
+const StationCardPage = () => {
   const [stations, setStations] = useState<StationWithDetails[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -426,7 +85,6 @@ const ValidatedStations = () => {
   }
 
   const filteredStations = stations.filter((station) => {
-    console.log("Filtrage station:", station.status, statusFilter);
     return statusFilter === "all" || station.status === statusFilter;
   });
 
@@ -436,17 +94,6 @@ const ValidatedStations = () => {
     indexOfFirstStation,
     indexOfLastStation
   );
-
-  console.log("Stations filtrées:", filteredStations);
-  console.log("Stations actuelles:", currentStations);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -664,4 +311,4 @@ const ValidatedStations = () => {
   );
 };
 
-export default ValidatedStations;
+export default StationCardPage;

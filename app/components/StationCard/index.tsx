@@ -1,12 +1,33 @@
 "use client";
 
-import { Station } from "@prisma/client";
+import { Station, Service, Review } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { Card } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 
+interface StationWithDetails extends Station {
+  services: Service | null;
+  parkingDetails: {
+    isPayant: boolean;
+    tarif: number | null;
+    taxeSejour: number | null;
+    hasElectricity: string;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+  } | null;
+  reviews: Review[];
+  averageRating?: number;
+}
+
 interface StationCardProps {
-  station: Station;
+  station: Station | StationWithDetails;
 }
 
 export default function StationCard({ station }: StationCardProps) {
