@@ -34,6 +34,10 @@ export default function SignIn() {
     router.push("/pages/Juridique/regles-de-confidentialite");
   };
 
+  const handleGuestMode = () => {
+    router.push("/pages/StationCard");
+  };
+
   return (
     <AuthWrapper>
       <Dialog open={showModal} onOpenChange={setShowModal}>
@@ -103,6 +107,17 @@ export default function SignIn() {
                 </div>
 
                 <AuthForm />
+
+                <div className="mt-6 text-center">
+                  <p className="text-gray-400 mb-4">Ou continuez sans compte</p>
+                  <Button
+                    onClick={handleGuestMode}
+                    variant="outline"
+                    className="w-full border-gray-600 text-white hover:bg-gray-700"
+                  >
+                    Mode invité
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

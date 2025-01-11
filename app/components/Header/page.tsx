@@ -7,28 +7,33 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Header() {
   const [isMounted, setIsMounted] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsMounted(true);
-    router.refresh();
-  }, [router]);
+  }, []);
 
   useEffect(() => {
-    if (status === "loading") {
-      router.refresh();
-    }
-  }, [status, router]);
+    const refreshSession = async () => {
+      if (status === "loading") {
+        await update();
+        router.refresh();
+      }
+    };
+    refreshSession();
+  }, [status, update, router, pathname]);
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
+    await update();
     router.refresh();
     router.push("/auth/signin");
   };
