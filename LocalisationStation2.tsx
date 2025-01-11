@@ -27,14 +27,8 @@ import type {
   MapComponentProps,
   StationWithOptionalFields,
 } from "@/app/components/Map/index";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/app/components/ui/dialog";
-import { Button } from "@/app/components/ui/button";
+import { checkGuestSession } from "./app/utils/guestSession";
+import AuthDialog from "@/app/components/AuthDialog";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic<MapComponentProps>(
@@ -260,104 +254,12 @@ export default function LocalisationStation2() {
   const [isMapReady, setIsMapReady] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [isGuest, setIsGuest] = useState(false);
-
-  // Dialog d'authentification
-  const AuthDialog = () => (
-    <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-      <DialogContent className="sm:max-w-[425px] bg-[#1E2337] text-white">
-        <DialogHeader>
-          <DialogTitle>Authentification requise</DialogTitle>
-          <DialogDescription className="text-gray-400">
-            Connectez-vous pour accéder à toutes les fonctionnalités ou
-            continuez en tant qu'invité.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col gap-4">
-          <Button
-            onClick={() => signIn()}
-            className="w-full bg-blue-500 hover:bg-blue-600"
-          >
-            Se connecter
-          </Button>
-          <Button
-            onClick={() => {
-              localStorage.setItem("guestSession", "true");
-              setShowAuthDialog(false);
-              setIsGuest(true);
-            }}
-            variant="outline"
-            className="w-full"
-          >
-            Continuer en tant qu'invité
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+  const [guestSessionId, setGuestSessionId] = useState<string | null>(null);
 
   // Tous les hooks doivent être appelés avant les conditions
   const onFormDataChange = useCallback((updates: Partial<StationData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!sessionData && !isGuest) {
-      setShowAuthDialog(true);
-    }
-  }, [sessionData, status, isGuest]);
-
-  // Vérifier le statut d'invité au chargement
-  useEffect(() => {
-    const isGuestSession = localStorage.getItem("guestSession") === "true";
-    if (isGuestSession) {
-      setIsGuest(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.textContent = searchBarStyles;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isDialogOpen) {
-      setFormData(defaultFormData);
-      setUploadedImages([]);
-    }
-  }, [isDialogOpen]);
-
-  useEffect(() => {
-    const fetchStations = async () => {
-      try {
-        const response = await fetch("/api/stations");
-        if (response.ok) {
-          const data = await response.json();
-          setStations(
-            data.map((station: Station) => ({
-              ...station,
-              services: station.services || null,
-              parkingDetails: station.parkingDetails || null,
-            }))
-          );
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des stations:", error);
-      }
-    };
-
-    fetchStations();
-  }, []);
-
-  useEffect(() => {
-    if (isMapReady) {
-      console.log("La carte est prête à être utilisée");
-    }
-  }, [isMapReady]);
 
   const handleGeolocation = useCallback(() => {
     const map = mapRef.current;
@@ -382,26 +284,20 @@ export default function LocalisationStation2() {
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
 
-        // S'assurer que la carte est toujours valide
         if (mapRef.current && mapRef.current.getContainer()) {
           try {
-            // Invalider la taille de la carte pour forcer une mise à jour
             mapRef.current.invalidateSize();
 
-            // Attendre un court instant pour s'assurer que la carte est prête
             setTimeout(() => {
               if (mapRef.current) {
-                // Ajuster le zoom en fonction de la précision
                 const zoomLevel =
                   accuracy < 100 ? 16 : accuracy < 500 ? 14 : 13;
                 mapRef.current.setView([latitude, longitude], zoomLevel);
 
-                // Supprimer l'ancien marqueur s'il existe
                 if (userMarkerRef.current) {
                   userMarkerRef.current.remove();
                 }
 
-                // Créer un marqueur personnalisé pour la position de l'utilisateur
                 const userIcon = new Icon({
                   iconUrl: "/markers/user-location.svg",
                   iconSize: [32, 32],
@@ -416,7 +312,6 @@ export default function LocalisationStation2() {
                   zIndexOffset: 1000,
                 });
 
-                // Ajouter un cercle de précision
                 const precisionCircle = LeafletCircle([latitude, longitude], {
                   radius: accuracy,
                   weight: 1,
@@ -478,6 +373,81 @@ export default function LocalisationStation2() {
     );
   }, [toast]);
 
+  // Vérifier la session au chargement
+  useEffect(() => {
+    const checkSession = async () => {
+      const sessionId = sessionStorage.getItem("guestSessionId");
+      if (sessionId) {
+        const isValid = await checkGuestSession();
+        if (isValid) {
+          setGuestSessionId(sessionId);
+          setIsGuest(true);
+          setShowAuthDialog(false);
+        } else {
+          sessionStorage.removeItem("guestSessionId");
+          setShowAuthDialog(true);
+        }
+      }
+    };
+
+    checkSession();
+  }, []);
+
+  // Sauvegarder la session dans sessionStorage quand elle est créée
+  useEffect(() => {
+    if (guestSessionId) {
+      sessionStorage.setItem("guestSessionId", guestSessionId);
+    }
+  }, [guestSessionId]);
+
+  // Ajouter signIn à l'objet window
+  useEffect(() => {
+    const signInFunction = signIn;
+    (window as Window & { signIn?: typeof signIn }).signIn = signInFunction;
+    return () => {
+      delete (window as Window & { signIn?: typeof signIn }).signIn;
+    };
+  }, []);
+
+  // Vérifier le statut d'authentification
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!sessionData && !isGuest) {
+      setShowAuthDialog(true);
+    }
+  }, [sessionData, status, isGuest]);
+
+  // Charger les stations
+  useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const response = await fetch("/api/stations");
+        if (response.ok) {
+          const data = await response.json();
+          setStations(
+            data.map((station: Station) => ({
+              ...station,
+              services: station.services || null,
+              parkingDetails: station.parkingDetails || null,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des stations:", error);
+      }
+    };
+
+    fetchStations();
+  }, []);
+
+  // Vérifier si la carte est prête
+  useEffect(() => {
+    if (isMapReady) {
+      console.log("La carte est prête à être utilisée");
+    }
+  }, [isMapReady]);
+
+  // Gérer le chargement
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-[#1E2337] flex items-center justify-center">
@@ -486,8 +456,14 @@ export default function LocalisationStation2() {
     );
   }
 
-  if (!sessionData && !isGuest) {
-    return <AuthDialog />;
+  // Afficher la modale d'authentification si nécessaire
+  if (!sessionData && !isGuest && showAuthDialog) {
+    return (
+      <AuthDialog
+        isOpen={showAuthDialog}
+        onClose={() => setShowAuthDialog(false)}
+      />
+    );
   }
 
   const getMarkerIcon = (status: StationStatus, type: StationType) => {
@@ -510,21 +486,28 @@ export default function LocalisationStation2() {
   // Fonction pour créer le contenu du popup
   const createPopupContent = (station: StationWithOptionalFields) => {
     const isAuthenticated = sessionData !== null;
-    return `
-      <div class="p-4 max-w-xs">
-        <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
-        ${
-          isAuthenticated
-            ? `
+
+    if (!isAuthenticated) {
+      return `
+        <div class="p-4 max-w-xs">
+          <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
           <div class="mt-2">
             <p class="text-sm text-gray-600">Connectez-vous pour voir les détails de la station</p>
-            <button onclick="window.location.href='/auth/signin'" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
+            <button onclick="window.signIn()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
               Se connecter
             </button>
           </div>
-        `
-            : ""
-        }
+        </div>
+      `;
+    }
+
+    return `
+      <div class="p-4 max-w-xs">
+        <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
+        <p class="text-sm text-gray-600 mb-2">${station.address}</p>
+        <p class="text-sm mb-2">Coordonnées : ${station.latitude.toFixed(
+          6
+        )}, ${station.longitude.toFixed(6)}</p>
       </div>
     `;
   };
