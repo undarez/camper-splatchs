@@ -23,7 +23,10 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
-import type { MapComponentProps } from "@/app/components/Map/index";
+import type {
+  MapComponentProps,
+  StationWithOptionalFields,
+} from "@/app/components/Map/index";
 import { useRouter } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
 import {
@@ -524,6 +527,49 @@ export default function LocalisationStation2() {
     }
   };
 
+  // Fonction pour créer le contenu du popup
+  const createPopupContent = (station: StationWithOptionalFields) => {
+    const shouldBlur = !sessionData && !isGuest;
+    return `
+      <div class="p-4 max-w-xs">
+        <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
+        <p class="text-sm text-gray-600 mb-2">${station.address}</p>
+        <div class="${shouldBlur ? "blur-[8px] select-none" : ""}">
+          <p class="text-sm mb-2">Coordonnées : ${station.latitude.toFixed(
+            6
+          )}, ${station.longitude.toFixed(6)}</p>
+        </div>
+        ${
+          shouldBlur
+            ? `
+          <div class="mt-4">
+            <p class="text-sm text-gray-600 mb-2">Connectez-vous pour voir les coordonnées exactes</p>
+            <button onclick="window.location.href='/auth/signin'" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
+              Se connecter
+            </button>
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+  };
+
+  // Convertir les stations au type StationWithOptionalFields
+  const convertedStations = stations.map((station) => ({
+    id: station.id,
+    name: station.name,
+    address: station.address,
+    city: station.city,
+    postalCode: station.postalCode,
+    latitude: station.latitude,
+    longitude: station.longitude,
+    status: station.status,
+    type: station.type,
+    services: station.services,
+    parkingDetails: station.parkingDetails,
+  }));
+
   return (
     <div className="min-h-screen bg-[#1E2337]">
       <style>
@@ -748,7 +794,7 @@ export default function LocalisationStation2() {
           <div className="h-[calc(100vh-4rem)] p-4 bg-[#1E2337]">
             <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700/50 shadow-xl relative">
               <MapComponent
-                stations={stations}
+                stations={convertedStations}
                 getMarkerIcon={getMarkerIcon}
                 center={mapCenter}
                 zoom={8}
@@ -756,6 +802,7 @@ export default function LocalisationStation2() {
                   mapRef.current = map;
                   setIsMapReady(true);
                 }}
+                createPopupContent={createPopupContent}
               />
             </div>
           </div>
