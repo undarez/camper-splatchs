@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Station, Review, Service } from "@prisma/client";
 import {
   MapIcon,
   ViewColumnsIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Skeleton } from "@/app/components/ui/skeleton";
 import { useSession } from "next-auth/react";
-import dynamic from "next/dynamic";
 import { Button } from "@/app/components/ui/button";
+import { Skeleton } from "@/app/components/ui/skeleton";
+import dynamic from "next/dynamic";
 import {
   Select,
   SelectContent,
@@ -57,43 +57,41 @@ const StationCardPage = () => {
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { data: session } = useSession();
+  const { data: sessionData } = useSession();
   const stationsPerPage = 6;
 
-  const fetchStations = async () => {
-    try {
-      const response = await fetch("/api/stations");
-      if (!response.ok) {
-        throw new Error("Erreur lors du chargement des stations");
-      }
-      const data = await response.json();
-      setStations(data);
-      setTotalPages(Math.ceil(data.length / stationsPerPage));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const hasFullAccess = useCallback(() => {
+    return !!sessionData?.user;
+  }, [sessionData]);
 
   useEffect(() => {
+    const fetchStations = async () => {
+      try {
+        const response = await fetch(
+          "/api/stations?include=parkingDetails,services,reviews"
+        );
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement des stations");
+        }
+        const data = await response.json();
+        setStations(data);
+        setTotalPages(Math.ceil(data.length / stationsPerPage));
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Une erreur est survenue"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Charger les stations même pour les invités
     fetchStations();
-  }, []);
+  }, [stationsPerPage]);
 
   if (loading) {
     return <LoadingScreen />;
   }
-
-  const filteredStations = stations.filter((station) => {
-    return statusFilter === "all" || station.status === statusFilter;
-  });
-
-  const indexOfLastStation = currentPage * stationsPerPage;
-  const indexOfFirstStation = indexOfLastStation - stationsPerPage;
-  const currentStations = filteredStations.slice(
-    indexOfFirstStation,
-    indexOfLastStation
-  );
 
   if (error) {
     return (
@@ -112,9 +110,20 @@ const StationCardPage = () => {
     );
   }
 
+  const filteredStations = stations.filter((station) => {
+    return statusFilter === "all" || station.status === statusFilter;
+  });
+
+  const indexOfLastStation = currentPage * stationsPerPage;
+  const indexOfFirstStation = indexOfLastStation - stationsPerPage;
+  const currentStations = filteredStations.slice(
+    indexOfFirstStation,
+    indexOfLastStation
+  );
+
   return (
     <div className="relative z-0 min-h-screen bg-[#1E2337]">
-      {!session && (
+      {!hasFullAccess() && (
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 mb-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -210,7 +219,7 @@ const StationCardPage = () => {
                   <ViewColumnsIcon className="h-4 w-4 mr-2" />
                   <span className="flex-1">Vue Fiches Stations</span>
                 </Button>
-                {session ? (
+                {hasFullAccess() ? (
                   <Button
                     onClick={() => setViewMode("map")}
                     variant={viewMode === "map" ? "default" : "ghost"}
@@ -255,10 +264,27 @@ const StationCardPage = () => {
             {viewMode === "cards" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                 {currentStations.map((station) => (
-                  <StationCard key={station.id} station={station} />
+                  <div key={station.id} className="relative group">
+                    <StationCard station={station} />
+                    {!hasFullAccess() && (
+                      <div className="absolute inset-0 bg-[#1E2337]/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="text-center p-4">
+                          <p className="text-white text-sm mb-3">
+                            Connectez-vous pour voir les détails
+                          </p>
+                          <Button
+                            onClick={() => (window.location.href = "/signin")}
+                            className="bg-blue-500 hover:bg-blue-600"
+                          >
+                            Se connecter
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
-            ) : session ? (
+            ) : hasFullAccess() ? (
               <div className="h-[calc(100vh-180px)] rounded-lg overflow-hidden shadow-lg">
                 <MapView
                   stations={stations.map((station) => ({
@@ -269,7 +295,7 @@ const StationCardPage = () => {
               </div>
             ) : null}
 
-            {/* Pagination */}
+            {/* Pagination (seulement en vue cartes) */}
             {viewMode === "cards" &&
               filteredStations.length > stationsPerPage && (
                 <div className="flex justify-center mt-4 sm:mt-6 gap-1 sm:gap-2 flex-wrap">

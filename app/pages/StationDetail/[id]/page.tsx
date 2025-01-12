@@ -16,7 +16,6 @@ import {
   Accessibility,
   CreditCard,
   Euro,
-  Calendar,
   Ruler,
   Wrench,
   Wind,
@@ -45,10 +44,15 @@ interface StationWithDetails extends Station {
   reviews: Review[];
 }
 
+interface ServiceValue {
+  value: boolean | string | number | string[] | Date | PaymentMethod[] | null;
+  key: string;
+}
+
+type PaymentMethod = "CARTE_BANCAIRE" | "ESPECES" | "JETON";
+
 const serviceLabels: Record<string, string> = {
   highPressure: "Type de haute pression",
-  electricity: "Type d'électricité",
-  paymentMethods: "Modes de paiement",
   tirePressure: "Gonflage pneus",
   vacuum: "Aspirateur",
   handicapAccess: "Accès handicapé",
@@ -56,125 +60,89 @@ const serviceLabels: Record<string, string> = {
   waterPoint: "Point d'eau",
   wasteWaterDisposal: "Évacuation eaux usées",
   blackWaterDisposal: "Évacuation eaux noires",
-  maxVehicleLength: "Longueur maximale du véhicule",
+  maxVehicleLength: "Longueur max. véhicule",
+  hasWifi: "WiFi",
+  hasElectricity: "Électricité",
   isPayant: "Parking payant",
   tarif: "Tarif",
   taxeSejour: "Taxe de séjour",
-  hasElectricity: "Électricité",
-  commercesProches: "Commerces à proximité",
   totalPlaces: "Nombre de places",
-  hasWifi: "WiFi",
   hasChargingPoint: "Point de recharge",
+  commercesProches: "Commerces à proximité",
+  paymentMethods: "Moyens de paiement",
 };
 
-const renderServiceValue = (key: string, value: unknown): string => {
-  if (key === "maxVehicleLength" && typeof value === "number") {
-    return `${value} mètres`;
+const renderServiceIcon = (key: string): JSX.Element | null => {
+  switch (key) {
+    case "highPressure":
+      return <Wrench className="h-5 w-5 text-blue-500" />;
+    case "tirePressure":
+      return <Wind className="h-5 w-5 text-green-500" />;
+    case "vacuum":
+      return <Wind className="h-5 w-5 text-purple-500" />;
+    case "handicapAccess":
+      return <Accessibility className="h-5 w-5 text-blue-500" />;
+    case "wasteWater":
+      return <Droplet className="h-5 w-5 text-blue-500" />;
+    case "waterPoint":
+      return <Droplet className="h-5 w-5 text-cyan-500" />;
+    case "wasteWaterDisposal":
+      return <Droplets className="h-5 w-5 text-blue-500" />;
+    case "blackWaterDisposal":
+      return <Trash2 className="h-5 w-5 text-gray-500" />;
+    case "maxVehicleLength":
+      return <Ruler className="h-5 w-5 text-orange-500" />;
+    case "hasWifi":
+      return <Wifi className="h-5 w-5 text-blue-500" />;
+    case "hasElectricity":
+      return <Plug className="h-5 w-5 text-yellow-500" />;
+    case "isPayant":
+      return <Euro className="h-5 w-5 text-green-500" />;
+    case "commercesProches":
+      return <ShoppingBag className="h-5 w-5 text-purple-500" />;
+    case "paymentMethods":
+      return <CreditCard className="h-5 w-5 text-indigo-500" />;
+    default:
+      return null;
   }
+};
 
-  if (key === "highPressure" && typeof value === "string") {
-    const labels: Record<string, string> = {
-      NONE: "Aucune haute pression",
-      PASSERELLE: "Passerelle",
-      ECHAFAUDAGE: "Échafaudage",
-      PORTIQUE: "Portique",
-    };
-    return labels[value] || String(value);
-  }
-
-  if (key === "electricity" || key === "hasElectricity") {
-    const labels: Record<string, string> = {
-      NONE: "Pas d'électricité",
-      AMP_8: "8 Ampères",
-      AMP_15: "15 Ampères",
-    };
-    return labels[value as string] || String(value);
-  }
-
-  if (key === "paymentMethods" && Array.isArray(value)) {
-    const labels: Record<string, string> = {
-      JETON: "Jeton",
-      ESPECES: "Espèces",
-      CARTE_BANCAIRE: "Carte bancaire",
-    };
-    return value.map((method) => labels[method as string] || method).join(", ");
-  }
-
-  if (key === "commercesProches" && Array.isArray(value)) {
-    const labels: Record<string, string> = {
-      NOURRITURE: "Alimentation",
-      BANQUE: "Banque",
-      CENTRE_VILLE: "Centre-ville",
-      STATION_SERVICE: "Station-service",
-      LAVERIE: "Laverie",
-      GARAGE: "Garage",
-    };
-    return value
-      .map((commerce) => labels[commerce as string] || commerce)
-      .join(", ");
-  }
-
-  if (key === "isPayant" && typeof value === "boolean") {
-    return value ? "Payant" : "Gratuit";
-  }
-
-  if (key === "tarif" && value) {
-    return `${value}€/jour`;
-  }
-
-  if (key === "taxeSejour" && value) {
-    return `${value}€/jour`;
-  }
-
-  if (key === "totalPlaces" && value) {
-    return `${value} places`;
-  }
-
+const renderServiceValue = (
+  key: string,
+  value: ServiceValue["value"]
+): string => {
   if (typeof value === "boolean") {
     return value ? "Disponible" : "Non disponible";
   }
-
-  return value ? String(value) : "Non spécifié";
-};
-
-interface ServiceIcons {
-  waterPoint: JSX.Element;
-  hasWifi: JSX.Element;
-  hasElectricity: JSX.Element;
-  commercesProches: JSX.Element;
-  handicapAccess: JSX.Element;
-  paymentMethods: JSX.Element;
-  isPayant: JSX.Element;
-  taxeSejour: JSX.Element;
-  maxVehicleLength: JSX.Element;
-  tirePressure: JSX.Element;
-  vacuum: JSX.Element;
-  wasteWater: JSX.Element;
-  wasteWaterDisposal: JSX.Element;
-  blackWaterDisposal: JSX.Element;
-  maintenance: JSX.Element;
-}
-
-const getServiceIcon = (service: string) => {
-  const icons: ServiceIcons = {
-    waterPoint: <Droplet className="h-5 w-5 text-blue-500" />,
-    hasWifi: <Wifi className="h-5 w-5 text-green-500" />,
-    hasElectricity: <Plug className="h-5 w-5 text-yellow-500" />,
-    commercesProches: <ShoppingBag className="h-5 w-5 text-purple-500" />,
-    handicapAccess: <Accessibility className="h-5 w-5 text-blue-600" />,
-    paymentMethods: <CreditCard className="h-5 w-5 text-gray-600" />,
-    isPayant: <Euro className="h-5 w-5 text-green-600" />,
-    taxeSejour: <Calendar className="h-5 w-5 text-orange-500" />,
-    maxVehicleLength: <Ruler className="h-5 w-5 text-indigo-500" />,
-    tirePressure: <Wind className="h-5 w-5 text-cyan-500" />,
-    vacuum: <Wind className="h-5 w-5 text-purple-500" />,
-    wasteWater: <Droplets className="h-5 w-5 text-red-500" />,
-    wasteWaterDisposal: <Trash2 className="h-5 w-5 text-brown-500" />,
-    blackWaterDisposal: <Trash2 className="h-5 w-5 text-gray-700" />,
-    maintenance: <Wrench className="h-5 w-5 text-gray-500" />,
-  };
-
-  return icons[service as keyof ServiceIcons] || null;
+  if (key === "maxVehicleLength" && typeof value === "number") {
+    return `${value}m`;
+  }
+  if (key === "tarif" && value) {
+    return `${value}€`;
+  }
+  if (key === "taxeSejour" && value) {
+    return `${value}€/jour`;
+  }
+  if (key === "totalPlaces" && typeof value === "number") {
+    return `${value} places`;
+  }
+  if (key === "paymentMethods" && Array.isArray(value)) {
+    const methodLabels: Record<PaymentMethod, string> = {
+      CARTE_BANCAIRE: "Carte bancaire",
+      ESPECES: "Espèces",
+      JETON: "Jeton",
+    };
+    return value
+      .map((method) => methodLabels[method as PaymentMethod] || method)
+      .join(", ");
+  }
+  if (value instanceof Date) {
+    return value.toLocaleDateString();
+  }
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+  return value?.toString() || "Non spécifié";
 };
 
 const StationDetail = ({ params }: { params: { id: string } }) => {
@@ -339,7 +307,9 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Services disponibles</h2>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+                Services disponibles
+              </h2>
               <div className="flex gap-2">
                 <Button
                   onClick={handleShare}
@@ -357,26 +327,55 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
               </div>
             </div>
             <div className="space-y-3">
-              {station.type === "STATION_LAVAGE" &&
-                station.services &&
-                Object.entries(station.services)
-                  .filter(([key]) => key !== "id" && key !== "stationId")
-                  .map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        {getServiceIcon(key)}
-                        <span className="text-gray-700 font-medium">
-                          {serviceLabels[key] || key}
+              {station.type === "STATION_LAVAGE" && station.services && (
+                <>
+                  {Object.entries(station.services)
+                    .filter(
+                      ([key]) =>
+                        key !== "id" &&
+                        key !== "stationId" &&
+                        key !== "createdAt"
+                    )
+                    .map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          {renderServiceIcon(key)}
+                          <span className="text-gray-700 font-medium">
+                            {serviceLabels[key] || key}
+                          </span>
+                        </div>
+                        <span className="text-gray-600">
+                          {renderServiceValue(key, value)}
                         </span>
                       </div>
-                      <span className="text-gray-600">
-                        {renderServiceValue(key, value)}
-                      </span>
-                    </div>
-                  ))}
+                    ))}
+                </>
+              )}
+              {station.type === "PARKING" && station.parkingDetails && (
+                <>
+                  {Object.entries(station.parkingDetails)
+                    .filter(([key]) => key !== "id" && key !== "stationId")
+                    .map(([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          {renderServiceIcon(key)}
+                          <span className="text-gray-700 font-medium">
+                            {serviceLabels[key] || key}
+                          </span>
+                        </div>
+                        <span className="text-gray-600">
+                          {renderServiceValue(key, value)}
+                        </span>
+                      </div>
+                    ))}
+                </>
+              )}
             </div>
           </div>
 

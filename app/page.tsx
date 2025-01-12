@@ -6,6 +6,7 @@ import Statistics from "@/app/components/Statistics";
 import Image from "next/image";
 import Services from "@/app/components/Services";
 import Link from "next/link";
+import PrivacyPolicyModal from "@/app/components/PrivacyPolicyModal";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -25,6 +26,7 @@ export default function Home() {
 
   return (
     <main className="bg-gradient-to-b from-[#1a1f37] to-[#111827]">
+      <PrivacyPolicyModal />
       {/* Hero Section */}
       <div className="relative h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 z-0">

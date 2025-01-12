@@ -920,7 +920,11 @@ export default function LocalisationStation2() {
                       veuillez vous connecter
                     </p>
                     <button
-                      onClick={() => signIn()}
+                      onClick={() =>
+                        signIn(undefined, {
+                          callbackUrl: "/localisationStation2",
+                        })
+                      }
                       className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors text-lg"
                     >
                       Se connecter
