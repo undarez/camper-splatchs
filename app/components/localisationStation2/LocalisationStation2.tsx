@@ -766,6 +766,7 @@ export default function LocalisationStation2() {
                   debounceDelay={300}
                   filterByCountryCode={["fr"]}
                   placeSelect={(value: GeoapifyResult | null) => {
+                    console.log("Place sélectionnée:", value);
                     if (value?.properties) {
                       const {
                         lat,
@@ -775,6 +776,14 @@ export default function LocalisationStation2() {
                         city,
                         postcode,
                       } = value.properties;
+                      console.log("Mise à jour du formData avec:", {
+                        lat,
+                        lon,
+                        formatted,
+                        address_line1,
+                        city,
+                        postcode,
+                      });
                       setFormData((prev) => ({
                         ...prev,
                         lat,
@@ -783,7 +792,11 @@ export default function LocalisationStation2() {
                         city: city || "",
                         postalCode: postcode || "",
                       }));
-                      setIsDialogOpen(true);
+                      // Forcer l'ouverture de la modal après la mise à jour du formData
+                      setTimeout(() => {
+                        setIsDialogOpen(true);
+                        console.log("État de la modal:", isDialogOpen);
+                      }, 100);
                     }
                   }}
                 />
@@ -1050,115 +1063,114 @@ export default function LocalisationStation2() {
         </div>
       </div>
 
-      {/* Modal - Masquer pour les invités */}
-      {!isValidGuest && (
-        <AddStationModal
-          isOpen={isDialogOpen}
-          onClose={() => {
-            setIsDialogOpen(false);
-            setFormData(defaultFormData);
-            setUploadedImages([]);
-          }}
-          formData={formData}
-          onFormDataChange={onFormDataChange}
-          uploadedImages={uploadedImages}
-          setUploadedImages={setUploadedImages}
-          onSubmit={async (stationData) => {
-            try {
-              const requestData = {
-                name: stationData.name,
-                address: stationData.address,
-                city: stationData.city,
-                postalCode: stationData.postalCode,
-                latitude:
-                  Number(stationData.latitude) || Number(stationData.lat) || 0,
-                longitude:
-                  Number(stationData.longitude) || Number(stationData.lng) || 0,
-                type: stationData.type,
-                images: uploadedImages,
-                services:
-                  stationData.type === "STATION_LAVAGE"
-                    ? {
-                        highPressure: formData.highPressure,
-                        tirePressure: formData.tirePressure,
-                        vacuum: formData.vacuum,
-                        handicapAccess: formData.handicapAccess,
-                        wasteWater: formData.wasteWater,
-                        waterPoint: formData.waterPoint,
-                        wasteWaterDisposal: formData.wasteWaterDisposal,
-                        blackWaterDisposal: formData.blackWaterDisposal,
-                        electricity: formData.electricity,
-                        maxVehicleLength: formData.maxVehicleLength
-                          ? Number(formData.maxVehicleLength)
-                          : null,
-                        paymentMethods: formData.paymentMethods,
-                      }
-                    : undefined,
-                parkingDetails:
-                  stationData.type === "PARKING"
-                    ? {
-                        isPayant: formData.isPayant,
-                        tarif: formData.tarif ? Number(formData.tarif) : null,
-                        taxeSejour: formData.taxeSejour
-                          ? Number(formData.taxeSejour)
-                          : null,
-                        hasElectricity:
-                          formData.hasElectricity || formData.electricity,
-                        commercesProches: formData.commercesProches || [],
-                        handicapAccess: formData.handicapAccess,
-                        totalPlaces: Number(formData.totalPlaces) || 0,
-                        hasWifi: Boolean(formData.hasWifi),
-                        hasChargingPoint: Boolean(formData.hasChargingPoint),
-                        waterPoint: formData.waterPoint,
-                        wasteWater: formData.wasteWater,
-                        wasteWaterDisposal: formData.wasteWaterDisposal,
-                        blackWaterDisposal: formData.blackWaterDisposal,
-                      }
-                    : undefined,
-                author: {
-                  name: sessionData?.user?.name || "",
-                  email: sessionData?.user?.email || "",
-                },
-              };
+      {/* Modal - Modification de la condition */}
+      <AddStationModal
+        isOpen={isDialogOpen}
+        onClose={() => {
+          console.log("Fermeture de la modal");
+          setIsDialogOpen(false);
+          setFormData(defaultFormData);
+          setUploadedImages([]);
+        }}
+        formData={formData}
+        onFormDataChange={onFormDataChange}
+        uploadedImages={uploadedImages}
+        setUploadedImages={setUploadedImages}
+        onSubmit={async (stationData) => {
+          try {
+            const requestData = {
+              name: stationData.name,
+              address: stationData.address,
+              city: stationData.city,
+              postalCode: stationData.postalCode,
+              latitude:
+                Number(stationData.latitude) || Number(stationData.lat) || 0,
+              longitude:
+                Number(stationData.longitude) || Number(stationData.lng) || 0,
+              type: stationData.type,
+              images: uploadedImages,
+              services:
+                stationData.type === "STATION_LAVAGE"
+                  ? {
+                      highPressure: formData.highPressure,
+                      tirePressure: formData.tirePressure,
+                      vacuum: formData.vacuum,
+                      handicapAccess: formData.handicapAccess,
+                      wasteWater: formData.wasteWater,
+                      waterPoint: formData.waterPoint,
+                      wasteWaterDisposal: formData.wasteWaterDisposal,
+                      blackWaterDisposal: formData.blackWaterDisposal,
+                      electricity: formData.electricity,
+                      maxVehicleLength: formData.maxVehicleLength
+                        ? Number(formData.maxVehicleLength)
+                        : null,
+                      paymentMethods: formData.paymentMethods,
+                    }
+                  : undefined,
+              parkingDetails:
+                stationData.type === "PARKING"
+                  ? {
+                      isPayant: formData.isPayant,
+                      tarif: formData.tarif ? Number(formData.tarif) : null,
+                      taxeSejour: formData.taxeSejour
+                        ? Number(formData.taxeSejour)
+                        : null,
+                      hasElectricity:
+                        formData.hasElectricity || formData.electricity,
+                      commercesProches: formData.commercesProches || [],
+                      handicapAccess: formData.handicapAccess,
+                      totalPlaces: Number(formData.totalPlaces) || 0,
+                      hasWifi: Boolean(formData.hasWifi),
+                      hasChargingPoint: Boolean(formData.hasChargingPoint),
+                      waterPoint: formData.waterPoint,
+                      wasteWater: formData.wasteWater,
+                      wasteWaterDisposal: formData.wasteWaterDisposal,
+                      blackWaterDisposal: formData.blackWaterDisposal,
+                    }
+                  : undefined,
+              author: {
+                name: sessionData?.user?.name || "",
+                email: sessionData?.user?.email || "",
+              },
+            };
 
-              const response = await fetch("/api/AdminStation", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(requestData),
-              });
+            const response = await fetch("/api/AdminStation", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(requestData),
+            });
 
-              if (!response.ok) {
-                throw new Error("Erreur lors de la création de la station");
-              }
-
-              await response.json();
-
-              // Rafraîchir la liste des stations après l'ajout
-              const updatedStationsResponse = await fetch("/api/stations");
-              if (updatedStationsResponse.ok) {
-                const updatedStations = await updatedStationsResponse.json();
-                setStations(updatedStations);
-              }
-
-              toast({
-                title: "Succès",
-                description: "Station ajoutée avec succès",
-              });
-              setIsDialogOpen(false);
-            } catch (error) {
-              console.error("Erreur lors de la création de la station:", error);
-              toast({
-                title: "Erreur",
-                description:
-                  "Une erreur est survenue lors de la création de la station",
-                variant: "destructive",
-              });
+            if (!response.ok) {
+              throw new Error("Erreur lors de la création de la station");
             }
-          }}
-        />
-      )}
+
+            await response.json();
+
+            // Rafraîchir la liste des stations après l'ajout
+            const updatedStationsResponse = await fetch("/api/stations");
+            if (updatedStationsResponse.ok) {
+              const updatedStations = await updatedStationsResponse.json();
+              setStations(updatedStations);
+            }
+
+            toast({
+              title: "Succès",
+              description: "Station ajoutée avec succès",
+            });
+            setIsDialogOpen(false);
+          } catch (error) {
+            console.error("Erreur lors de la création de la station:", error);
+            toast({
+              title: "Erreur",
+              description:
+                "Une erreur est survenue lors de la création de la station",
+              variant: "destructive",
+            });
+          }
+        }}
+      />
     </div>
   );
 }
