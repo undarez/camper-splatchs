@@ -145,7 +145,7 @@ const renderServiceValue = (
   return value?.toString() || "Non spécifié";
 };
 
-export function StationDetail({ params }: { params: { id: string } }) {
+export default function Page({ params }: { params: { id: string } }) {
   const [station, setStation] = useState<StationWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewsCount, setReviewsCount] = useState(0);
@@ -567,5 +567,3 @@ export function StationDetail({ params }: { params: { id: string } }) {
     </div>
   );
 }
-
-export default StationDetail;
