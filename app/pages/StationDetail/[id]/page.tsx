@@ -28,6 +28,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/app/components/ui/button";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
+type PaymentMethod = "CARTE_BANCAIRE" | "ESPECES" | "JETON";
+
 interface StationWithDetails extends Station {
   services: Service | null;
   parkingDetails: {
@@ -48,8 +50,6 @@ interface ServiceValue {
   value: boolean | string | number | string[] | Date | PaymentMethod[] | null;
   key: string;
 }
-
-type PaymentMethod = "CARTE_BANCAIRE" | "ESPECES" | "JETON";
 
 const serviceLabels: Record<string, string> = {
   highPressure: "Type de haute pression",
@@ -145,12 +145,58 @@ const renderServiceValue = (
   return value?.toString() || "Non spécifié";
 };
 
-const StationDetail = ({ params }: { params: { id: string } }) => {
+export function StationDetail({ params }: { params: { id: string } }) {
   const [station, setStation] = useState<StationWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewsCount, setReviewsCount] = useState(0);
+  const [newRating, setNewRating] = useState<number | null>(null);
+  const [newComment, setNewComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: session } = useSession();
   const supabase = createClientComponentClient();
+
+  const handleRatingChange = (rating: number) => {
+    setNewRating(rating);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!session?.user || !newRating || !newComment.trim()) return;
+
+    try {
+      setIsSubmitting(true);
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stationId: params.id,
+          rating: newRating,
+          content: newComment.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'envoi de l'avis");
+      }
+
+      // Réinitialiser le formulaire
+      setNewRating(null);
+      setNewComment("");
+
+      // Mettre à jour les avis
+      const updatedStation = await fetch(`/api/stations/${params.id}`).then(
+        (res) => res.json()
+      );
+      setStation(updatedStation);
+      setReviewsCount(updatedStation.reviews?.length || 0);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de l'avis:", error);
+      // Vous pouvez ajouter une notification d'erreur ici
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStation = async () => {
@@ -303,9 +349,36 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
           </div>
         </div>
 
-        {/* Services disponibles */}
+        {/* Services et Photos */}
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm">
+          {/* Photos - maintenant en premier pour le mobile */}
+          {station.images && station.images.length > 0 && (
+            <div className="bg-white rounded-xl p-6 shadow-sm md:order-2">
+              <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                Photos de la station
+              </h2>
+              <div className="space-y-4">
+                <Carousel className="w-full">
+                  {station.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className="relative aspect-video rounded-lg overflow-hidden"
+                    >
+                      <Image
+                        src={image}
+                        alt={`${station.name} ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
+            </div>
+          )}
+
+          {/* Services disponibles - maintenant en second pour le mobile */}
+          <div className="bg-white rounded-xl p-6 shadow-sm md:order-1">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
                 Services disponibles
@@ -378,68 +451,121 @@ const StationDetail = ({ params }: { params: { id: string } }) => {
               )}
             </div>
           </div>
-
-          {/* Photos */}
-          {station.images && station.images.length > 0 && (
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h2 className="text-xl font-semibold mb-4">Photos</h2>
-              <Carousel className="w-full">
-                {station.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className="relative aspect-video rounded-lg overflow-hidden"
-                  >
-                    <Image
-                      src={image}
-                      alt={`${station.name} ${index + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </Carousel>
-            </div>
-          )}
         </div>
 
-        {/* Avis */}
-        {station.reviews && station.reviews.length > 0 && (
-          <div className="bg-white rounded-xl p-6 shadow-sm mt-6">
-            <h2 className="text-xl font-semibold mb-4">
-              Avis des utilisateurs
+        {/* Avis et Commentaires */}
+        <div className="mt-8">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <h2 className="text-xl font-semibold mb-6 text-gray-800">
+              Avis et Commentaires
             </h2>
-            <div className="grid gap-4">
-              {station.reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex items-center gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <StarIcon
-                          key={star}
-                          className={cn("h-4 w-4", {
-                            "text-yellow-400 fill-yellow-400":
-                              star <= review.rating,
-                            "text-gray-300 fill-gray-300": star > review.rating,
-                          })}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <p className="text-gray-700">{review.content}</p>
+
+            {session?.user ? (
+              <div className="mb-8 p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-lg font-medium mb-4">Ajouter un avis</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => handleRatingChange(star)}
+                      className="focus:outline-none"
+                      disabled={isSubmitting}
+                    >
+                      <StarIcon
+                        className={cn("h-6 w-6", {
+                          "text-yellow-400 fill-yellow-400":
+                            star <= (newRating || 0),
+                          "text-gray-300": star > (newRating || 0),
+                          "opacity-50": isSubmitting,
+                        })}
+                      />
+                    </button>
+                  ))}
                 </div>
-              ))}
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Partagez votre expérience..."
+                  className={cn(
+                    "w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                    isSubmitting && "opacity-50 cursor-not-allowed"
+                  )}
+                  rows={4}
+                  disabled={isSubmitting}
+                />
+                <Button
+                  onClick={handleSubmitReview}
+                  disabled={!newRating || !newComment.trim() || isSubmitting}
+                  className={cn(
+                    "mt-4 bg-blue-600 hover:bg-blue-700",
+                    isSubmitting && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                      Publication en cours...
+                    </div>
+                  ) : (
+                    "Publier l'avis"
+                  )}
+                </Button>
+              </div>
+            ) : (
+              <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
+                <p className="text-gray-600 mb-4">
+                  Connectez-vous pour laisser un avis
+                </p>
+                <Button
+                  onClick={() => (window.location.href = "/signin")}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Se connecter
+                </Button>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              {station.reviews && station.reviews.length > 0 ? (
+                station.reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <StarIcon
+                              key={star}
+                              className={cn("h-4 w-4", {
+                                "text-yellow-400 fill-yellow-400":
+                                  star <= review.rating,
+                                "text-gray-300 fill-gray-300":
+                                  star > review.rating,
+                              })}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-500">
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-gray-700">{review.content}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">
+                  Aucun avis pour le moment
+                </p>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default StationDetail;

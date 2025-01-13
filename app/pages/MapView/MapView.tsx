@@ -2,28 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { MapViewComponent } from "./MapViewComponent";
+import { Map } from "leaflet";
+import { type Station as PrismaStation } from "@prisma/client";
 
-interface Station {
-  id: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  images: string[];
-  status: string;
-  validatedAt: Date | null;
-  validatedBy: string;
-  encryptedAddress: string | null;
-}
+type Station = PrismaStation & {
+  city: string | null;
+  postalCode: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string | null;
+};
 
 interface MapViewProps {
-  stations?: Station[];
+  stations: Station[];
+  onInit?: (map: Map) => void;
 }
 
 export default function MapView({
   stations: initialStations,
-}: MapViewProps = {}) {
-  const [stations, setStations] = useState<Station[]>(initialStations || []);
+  onInit,
+}: MapViewProps) {
+  const [stations, setStations] = useState<Station[]>([]);
   const [isLoading, setIsLoading] = useState(!initialStations);
 
   useEffect(() => {
@@ -38,6 +37,8 @@ export default function MapView({
           console.error("Erreur lors du chargement des stations:", error);
           setIsLoading(false);
         });
+    } else {
+      setStations(initialStations);
     }
   }, [initialStations]);
 
@@ -49,5 +50,5 @@ export default function MapView({
     );
   }
 
-  return <MapViewComponent stations={stations} />;
+  return <MapViewComponent stations={stations} onInit={onInit} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Station, Review, Service } from "@prisma/client";
 import {
   MapIcon,
@@ -20,6 +20,14 @@ import {
 } from "@/app/components/ui/select";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import StationCard from "@/app/components/StationCard/index";
+import { toast } from "@/hooks/use-toast";
+import type { Map } from "leaflet";
+import {
+  Icon,
+  Circle as LeafletCircle,
+  Marker as LeafletMarker,
+} from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 // Import dynamique de la carte pour éviter les problèmes de SSR
 const MapView = dynamic(() => import("@/app/pages/MapView/MapView"), {
@@ -56,9 +64,13 @@ const StationCardPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
   const [statusFilter, setStatusFilter] = useState<string>("active");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { data: sessionData } = useSession();
   const stationsPerPage = 6;
+  const [isLocating, setIsLocating] = useState(false);
+  const mapRef = useRef<Map | null>(null);
+  const userMarkerRef = useRef<L.Marker | null>(null);
 
   const hasFullAccess = useCallback(() => {
     return !!sessionData?.user;
@@ -89,6 +101,121 @@ const StationCardPage = () => {
     fetchStations();
   }, [stationsPerPage]);
 
+  const handleGeolocation = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) {
+      toast({
+        title: "Erreur",
+        description: "La carte n'est pas encore chargée",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLocating(true);
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+
+        if (mapRef.current && mapRef.current.getContainer()) {
+          try {
+            mapRef.current.invalidateSize();
+
+            setTimeout(() => {
+              if (mapRef.current) {
+                const zoomLevel =
+                  accuracy < 100 ? 16 : accuracy < 500 ? 14 : 13;
+                mapRef.current.setView([latitude, longitude], zoomLevel);
+
+                if (userMarkerRef.current) {
+                  userMarkerRef.current.remove();
+                }
+
+                const userIcon = new Icon({
+                  iconUrl: "/logo.png",
+                  iconSize: [40, 40],
+                  iconAnchor: [20, 20],
+                  className: "user-location-marker",
+                });
+
+                const newMarker = new LeafletMarker([latitude, longitude], {
+                  icon: userIcon,
+                  title: "Votre position",
+                  alt: "Votre position actuelle",
+                  zIndexOffset: 1000,
+                });
+
+                const precisionCircle = new LeafletCircle(
+                  [latitude, longitude],
+                  {
+                    radius: accuracy,
+                    weight: 1,
+                    color: "#3B82F6",
+                    fillColor: "#3B82F6",
+                    fillOpacity: 0.1,
+                  }
+                );
+
+                newMarker.addTo(mapRef.current);
+                precisionCircle.addTo(mapRef.current);
+                userMarkerRef.current = newMarker;
+
+                toast({
+                  title: "Succès",
+                  description: `Position trouvée avec une précision de ${Math.round(
+                    accuracy
+                  )}m`,
+                  variant: "default",
+                });
+              }
+            }, 100);
+          } catch (error) {
+            console.error("Erreur lors de la mise à jour de la carte:", error);
+            toast({
+              title: "Erreur",
+              description: "Erreur lors de la mise à jour de la carte",
+              variant: "destructive",
+            });
+          }
+        }
+        setIsLocating(false);
+      },
+      (error) => {
+        let message = "Une erreur est survenue lors de la géolocalisation";
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message =
+              "L'accès à votre position a été refusé. Veuillez vérifier les permissions de votre navigateur.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message =
+              "Impossible d'obtenir votre position. Vérifiez que votre GPS est activé et que vous êtes à l'extérieur.";
+            break;
+          case error.TIMEOUT:
+            message =
+              "La demande de localisation a expiré. Veuillez réessayer.";
+            break;
+        }
+
+        toast({
+          title: "Erreur de localisation",
+          description: message,
+          variant: "destructive",
+        });
+        setIsLocating(false);
+      },
+      options
+    );
+  }, []);
+
   if (loading) {
     return <LoadingScreen />;
   }
@@ -111,7 +238,10 @@ const StationCardPage = () => {
   }
 
   const filteredStations = stations.filter((station) => {
-    return statusFilter === "all" || station.status === statusFilter;
+    const statusMatch =
+      statusFilter === "all" || station.status === statusFilter;
+    const typeMatch = typeFilter === "all" || station.type === typeFilter;
+    return statusMatch && typeMatch;
   });
 
   const indexOfLastStation = currentPage * stationsPerPage;
@@ -123,6 +253,28 @@ const StationCardPage = () => {
 
   return (
     <div className="relative z-0 min-h-screen bg-[#1E2337]">
+      <style>
+        {`
+          .user-location-marker {
+            animation: pulse 2s infinite;
+          }
+          
+          @keyframes pulse {
+            0% {
+              transform: scale(0.95);
+              box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+              transform: scale(1);
+              box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+            100% {
+              transform: scale(0.95);
+              box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+          }
+        `}
+      </style>
       {!hasFullAccess() && (
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 mb-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -206,6 +358,32 @@ const StationCardPage = () => {
                 </SelectContent>
               </Select>
 
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-full bg-white dark:bg-gray-800/80 dark:text-gray-100 dark:border-gray-700">
+                  <SelectValue placeholder="Filtrer par type" />
+                </SelectTrigger>
+                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                  <SelectItem
+                    value="all"
+                    className="dark:text-gray-100 dark:focus:bg-gray-700"
+                  >
+                    Tous les types
+                  </SelectItem>
+                  <SelectItem
+                    value="STATION_LAVAGE"
+                    className="dark:text-gray-100 dark:focus:bg-gray-700"
+                  >
+                    Stations de lavage
+                  </SelectItem>
+                  <SelectItem
+                    value="PARKING"
+                    className="dark:text-gray-100 dark:focus:bg-gray-700"
+                  >
+                    Parkings
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
               <div className="flex flex-col gap-2">
                 <Button
                   onClick={() => setViewMode("cards")}
@@ -276,7 +454,7 @@ const StationCardPage = () => {
                             onClick={() => (window.location.href = "/signin")}
                             className="bg-blue-500 hover:bg-blue-600"
                           >
-                            Se connecter
+                            Se connecter gratuitement
                           </Button>
                         </div>
                       </div>
@@ -285,13 +463,68 @@ const StationCardPage = () => {
                 ))}
               </div>
             ) : hasFullAccess() ? (
-              <div className="h-[calc(100vh-180px)] rounded-lg overflow-hidden shadow-lg">
-                <MapView
-                  stations={stations.map((station) => ({
-                    ...station,
-                    validatedBy: station.validatedBy || "",
-                  }))}
-                />
+              <div className="relative h-[calc(100vh-180px)]">
+                <div className="absolute top-4 right-4 z-10">
+                  <Button
+                    onClick={handleGeolocation}
+                    disabled={isLocating}
+                    className="bg-white text-gray-800 hover:bg-gray-100 shadow-lg"
+                  >
+                    {isLocating ? (
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="h-5 w-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    )}
+                    {isLocating ? "Localisation..." : "Me localiser"}
+                  </Button>
+                </div>
+                <div className="h-full rounded-lg overflow-hidden shadow-lg">
+                  <MapView
+                    stations={stations.map((station) => ({
+                      ...station,
+                      validatedBy: station.validatedBy || "",
+                    }))}
+                    onInit={(map: Map) => {
+                      mapRef.current = map;
+                    }}
+                  />
+                </div>
               </div>
             ) : null}
 

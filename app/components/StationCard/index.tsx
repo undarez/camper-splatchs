@@ -5,9 +5,12 @@ import { useSession } from "next-auth/react";
 import { Card } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
+import { StarIcon } from "@heroicons/react/24/solid";
 
 interface StationWithDetails extends Station {
   services: Service | null;
+  images: string[];
   parkingDetails: {
     isPayant: boolean;
     tarif: number | null;
@@ -28,7 +31,7 @@ interface StationWithDetails extends Station {
 }
 
 interface StationCardProps {
-  station: Station | StationWithDetails;
+  station: StationWithDetails;
 }
 
 export default function StationCard({ station }: StationCardProps) {
@@ -36,8 +39,40 @@ export default function StationCard({ station }: StationCardProps) {
   const isGuest = !sessionData && localStorage.getItem("guestSessionId");
   const shouldBlur = !sessionData && isGuest;
 
+  const averageRating = station.reviews?.length
+    ? station.reviews.reduce((acc, review) => acc + review.rating, 0) /
+      station.reviews.length
+    : 0;
+
   return (
     <Card className="w-full bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className="relative h-48 w-full">
+        {station.images && station.images.length > 0 ? (
+          <Image
+            src={station.images[0]}
+            alt={station.name}
+            fill
+            style={{ objectFit: "cover" }}
+            className="transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <svg
+              className="w-12 h-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
       <div className={`p-6 ${shouldBlur ? "relative" : ""}`}>
         {shouldBlur && (
           <div className="absolute inset-0 bg-white/50 backdrop-blur-md z-10 flex flex-col items-center justify-center p-4 text-center">
@@ -52,9 +87,28 @@ export default function StationCard({ station }: StationCardProps) {
           </div>
         )}
         <div className={shouldBlur ? "blur-md" : ""}>
-          <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-            {station.name}
-          </h3>
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+              {station.name}
+            </h3>
+            <div className="flex items-center">
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <StarIcon
+                    key={star}
+                    className={`h-5 w-5 ${
+                      star <= Math.round(averageRating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="ml-2 text-sm text-gray-400">
+                ({station.reviews?.length || 0})
+              </span>
+            </div>
+          </div>
           <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
             {station.address}
           </p>
