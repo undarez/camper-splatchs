@@ -49,7 +49,12 @@ export default function AdressGeoapify({
 }: AddressProps) {
   const searchBarRef = useRef<HTMLDivElement>(null);
   const [searchBarVisible, setSearchBarVisible] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const defaultCenter: [number, number] = [46.603354, 1.888334]; // Centre de la France
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!persistSearchBar) return;
@@ -146,6 +151,10 @@ export default function AdressGeoapify({
 
     return servicesList;
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">

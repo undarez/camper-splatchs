@@ -12,6 +12,7 @@ import {
 import { Navigation, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface NavigationButtonProps {
   lat: number;
@@ -26,6 +27,16 @@ const NavigationButton = ({
   address,
   className,
 }: NavigationButtonProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
   const navigationApps = [
     {
       name: "Google Maps",
