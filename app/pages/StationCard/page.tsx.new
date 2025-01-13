@@ -1,120 +1,29 @@
-"use client";
-
-import { useState, useCallback, useRef, useEffect } from "react";
-import { Station, Review, Service } from "@prisma/client";
-import {
-  MapIcon,
-  ViewColumnsIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { useSession } from "next-auth/react";
-import { Button } from "@/app/components/ui/button";
+import { Suspense } from "react";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import dynamic from "next/dynamic";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
-import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
-import { toast } from "@/hooks/use-toast";
-import type { Map } from "leaflet";
-import {
-  Icon,
-  Circle as LeafletCircle,
-  Marker as LeafletMarker,
-} from "leaflet";
-import "leaflet/dist/leaflet.css";
 
-// Import dynamique des composants
-const StationCard = dynamic(() => import("@/app/components/StationCard/index"), {
-  ssr: false,
-});
-
-const MapView = dynamic(
-  () =>
-    import("@/app/pages/MapView/MapViewComponent").then(
-      (mod) => mod.MapViewComponent
-    ),
+const StationCardClient = dynamic(
+  () => import("./StationCardClient").then((mod) => mod.StationCardClient),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-[600px] w-full rounded-lg" />,
+    loading: () => (
+      <div className="min-h-screen bg-[#1E2337] p-4">
+        <Skeleton className="w-full h-[600px] rounded-xl" />
+      </div>
+    ),
   }
 );
 
-interface StationWithDetails extends Station {
-  services: Service | null;
-  parkingDetails: {
-    isPayant: boolean;
-    tarif: number | null;
-    taxeSejour: number | null;
-    hasElectricity: string;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-    waterPoint: boolean;
-    wasteWater: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-  } | null;
-  reviews: Review[];
-  averageRating?: number;
-}
-
-export default function StationCardPage() {
-  const [stations, setStations] = useState<StationWithDetails[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"cards" | "map">("cards");
-  const [statusFilter, setStatusFilter] = useState<string>("active");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const { data: sessionData } = useSession();
-  const stationsPerPage = 6;
-  const mapRef = useRef<Map | null>(null);
-  const userMarkerRef = useRef<LeafletMarker | null>(null);
-
-  const hasFullAccess = useCallback(() => {
-    return !!sessionData?.user;
-  }, [sessionData]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const fetchStations = async () => {
-      try {
-        const response = await fetch(
-          "/api/stations?include=parkingDetails,services,reviews"
-        );
-        if (!response.ok) {
-          throw new Error("Erreur lors du chargement des stations");
-        }
-        const data = await response.json();
-        setStations(data);
-        setTotalPages(Math.ceil(data.length / stationsPerPage));
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Une erreur est survenue"
-        );
-      } finally {
-        setLoading(false);
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#1E2337] p-4">
+          <Skeleton className="w-full h-[600px] rounded-xl" />
+        </div>
       }
-    };
-
-    if (isMounted) {
-      fetchStations();
-    }
-  }, [isMounted, stationsPerPage]);
-
-  // ... rest of the code ...
+    >
+      <StationCardClient />
+    </Suspense>
+  );
 } 

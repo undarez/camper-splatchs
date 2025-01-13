@@ -70,6 +70,7 @@ export function StationCardClient() {
   const [statusFilter, setStatusFilter] = useState<string>("active");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { data: sessionData } = useSession();
   const stationsPerPage = 6;
   const router = useRouter();
@@ -87,6 +88,12 @@ export function StationCardClient() {
   }, [router]);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     const fetchStations = async () => {
       try {
         const response = await fetch(
@@ -108,7 +115,11 @@ export function StationCardClient() {
     };
 
     fetchStations();
-  }, [stationsPerPage]);
+  }, [isMounted, stationsPerPage]);
+
+  if (!isMounted) {
+    return <LoadingScreen />;
+  }
 
   if (loading) {
     return <LoadingScreen />;
