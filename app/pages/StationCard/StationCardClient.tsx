@@ -68,7 +68,7 @@ interface StationWithDetails extends Station {
   averageRating?: number;
 }
 
-export const StationCardClient = function StationCardClient() {
+export function StationCardClient() {
   const [stations, setStations] = useState<StationWithDetails[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -667,4 +667,6 @@ export const StationCardClient = function StationCardClient() {
       </div>
     </div>
   );
-};
+}
+
+export default StationCardClient;
