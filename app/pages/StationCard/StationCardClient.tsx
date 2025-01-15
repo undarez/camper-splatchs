@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Station, Review, Service } from "@prisma/client";
 import {
   MapIcon,
   ViewColumnsIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { MapPin } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
 import { Skeleton } from "@/app/components/ui/skeleton";
@@ -20,6 +21,13 @@ import {
 } from "@/app/components/ui/select";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+import type { Map as LeafletMap } from "leaflet";
+import {
+  Icon,
+  Circle as LeafletCircle,
+  Marker as LeafletMarker,
+} from "leaflet";
 
 const StationCard = dynamic(
   () => import("@/app/components/StationCard/index"),
@@ -74,6 +82,10 @@ export const StationCardClient = function StationCardClient() {
   const { data: sessionData } = useSession();
   const stationsPerPage = 6;
   const router = useRouter();
+  const [isLocating, setIsLocating] = useState(false);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const userMarkerRef = useRef<LeafletMarker | null>(null);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   const hasFullAccess = useCallback(() => {
     return !!sessionData?.user;
@@ -86,6 +98,112 @@ export const StationCardClient = function StationCardClient() {
   const handleRetry = useCallback(() => {
     router.refresh();
   }, [router]);
+
+  const handleGeolocation = useCallback(() => {
+    if (!mapRef.current || !isMapReady) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez patienter pendant le chargement de la carte",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLocating(true);
+
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+
+        if (mapRef.current) {
+          try {
+            mapRef.current.invalidateSize();
+
+            const zoomLevel = accuracy < 100 ? 16 : accuracy < 500 ? 14 : 13;
+            mapRef.current.setView([latitude, longitude], zoomLevel);
+
+            if (userMarkerRef.current) {
+              userMarkerRef.current.remove();
+            }
+
+            const userIcon = new Icon({
+              iconUrl: "/images/logo.png",
+              iconSize: [40, 40],
+              iconAnchor: [20, 20],
+              className: "user-location-marker",
+            });
+
+            const newMarker = new LeafletMarker([latitude, longitude], {
+              icon: userIcon,
+              title: "Votre position",
+              alt: "Votre position actuelle",
+              zIndexOffset: 1000,
+            });
+
+            const precisionCircle = new LeafletCircle([latitude, longitude], {
+              radius: accuracy,
+              weight: 1,
+              color: "#3B82F6",
+              fillColor: "#3B82F6",
+              fillOpacity: 0.1,
+            });
+
+            newMarker.addTo(mapRef.current);
+            precisionCircle.addTo(mapRef.current);
+            userMarkerRef.current = newMarker;
+
+            toast({
+              title: "Succès",
+              description: `Position trouvée avec une précision de ${Math.round(
+                accuracy
+              )}m`,
+              variant: "default",
+            });
+          } catch (error) {
+            console.error("Erreur lors de la mise à jour de la carte:", error);
+            toast({
+              title: "Erreur",
+              description: "Erreur lors de la mise à jour de la carte",
+              variant: "destructive",
+            });
+          }
+        }
+        setIsLocating(false);
+      },
+      (error) => {
+        let message = "Une erreur est survenue lors de la géolocalisation";
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message =
+              "L'accès à votre position a été refusé. Veuillez vérifier les permissions de votre navigateur.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message =
+              "Impossible d'obtenir votre position. Vérifiez que votre GPS est activé et que vous êtes à l'extérieur.";
+            break;
+          case error.TIMEOUT:
+            message =
+              "La demande de localisation a expiré. Veuillez réessayer.";
+            break;
+        }
+
+        toast({
+          title: "Erreur de localisation",
+          description: message,
+          variant: "destructive",
+        });
+        setIsLocating(false);
+      },
+      options
+    );
+  }, [isMapReady]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -189,89 +307,191 @@ export const StationCardClient = function StationCardClient() {
       )}
 
       <div className="flex flex-col md:flex-row">
+        {/* Bouton pour ouvrir la sidebar en mobile */}
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-800 text-white md:hidden"
+          aria-label="Menu"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+
         {/* Sidebar */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1E2337] transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:relative md:translate-x-0 md:w-72 lg:w-80 shadow-lg`}
+          } md:relative md:translate-x-0 md:w-72 lg:w-80 shadow-lg border-r border-gray-700/50`}
         >
           <div className="p-4">
             <div className="flex items-center justify-between mb-6 md:hidden">
-              <h2 className="text-lg font-semibold dark:text-white">Filtres</h2>
+              <h2 className="text-lg font-semibold text-white">Options</h2>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsSidebarOpen(false)}
-                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="text-gray-400 hover:text-gray-200"
               >
                 <XMarkIcon className="h-5 w-5" />
               </Button>
             </div>
 
             <div className="space-y-4">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full bg-white dark:bg-gray-800/80 dark:text-gray-100 dark:border-gray-700">
-                  <SelectValue placeholder="Filtrer par statut" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="en_attente">En attente</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Filtres
+                </h3>
+                <div className="space-y-4">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full bg-gray-700/50 text-gray-200 border-gray-600">
+                      <SelectValue placeholder="Filtrer par statut" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="all" className="text-gray-200">
+                        Tous les statuts
+                      </SelectItem>
+                      <SelectItem value="active" className="text-gray-200">
+                        Active
+                      </SelectItem>
+                      <SelectItem value="en_attente" className="text-gray-200">
+                        En attente
+                      </SelectItem>
+                      <SelectItem value="inactive" className="text-gray-200">
+                        Inactive
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
 
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-full bg-white dark:bg-gray-800/80 dark:text-gray-100 dark:border-gray-700">
-                  <SelectValue placeholder="Filtrer par type" />
-                </SelectTrigger>
-                <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-                  <SelectItem value="all">Tous les types</SelectItem>
-                  <SelectItem value="STATION_LAVAGE">
-                    Stations de lavage
-                  </SelectItem>
-                  <SelectItem value="PARKING">Parkings</SelectItem>
-                </SelectContent>
-              </Select>
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="w-full bg-gray-700/50 text-gray-200 border-gray-600">
+                      <SelectValue placeholder="Filtrer par type" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      <SelectItem value="all" className="text-gray-200">
+                        Tous les types
+                      </SelectItem>
+                      <SelectItem
+                        value="STATION_LAVAGE"
+                        className="text-gray-200"
+                      >
+                        Stations de lavage
+                      </SelectItem>
+                      <SelectItem value="PARKING" className="text-gray-200">
+                        Parkings
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-              <div className="flex flex-col gap-2">
-                <Button
-                  onClick={() => setViewMode("cards")}
-                  variant={viewMode === "cards" ? "default" : "ghost"}
-                  className={`justify-start w-full ${
-                    viewMode === "cards"
-                      ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <ViewColumnsIcon className="h-4 w-4 mr-2" />
-                  <span className="flex-1">Vue Fiches Stations</span>
-                </Button>
-                {hasFullAccess() ? (
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Mode d'affichage
+                </h3>
+                <div className="flex flex-col gap-2">
                   <Button
-                    onClick={() => setViewMode("map")}
-                    variant={viewMode === "map" ? "default" : "ghost"}
+                    onClick={() => setViewMode("cards")}
+                    variant={viewMode === "cards" ? "default" : "ghost"}
                     className={`justify-start w-full ${
-                      viewMode === "map"
-                        ? "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      viewMode === "cards"
+                        ? "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                        : "text-gray-400 hover:text-gray-200 hover:bg-gray-700/50"
                     }`}
                   >
-                    <MapIcon className="h-4 w-4 mr-2" />
-                    <span className="flex-1">Vue Map interactive</span>
+                    <ViewColumnsIcon className="h-4 w-4 mr-2" />
+                    <span className="flex-1">Vue Fiches Stations</span>
                   </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    className="justify-start w-full text-gray-400 cursor-not-allowed"
-                    disabled
-                  >
-                    <MapIcon className="h-4 w-4 mr-2" />
-                    <span className="flex-1">
-                      Vue Map interactive (Connexion requise)
-                    </span>
-                  </Button>
-                )}
+
+                  {hasFullAccess() ? (
+                    <>
+                      <Button
+                        onClick={() => setViewMode("map")}
+                        variant={viewMode === "map" ? "default" : "ghost"}
+                        className={`justify-start w-full ${
+                          viewMode === "map"
+                            ? "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                            : "text-gray-400 hover:text-gray-200 hover:bg-gray-700/50"
+                        }`}
+                      >
+                        <MapIcon className="h-4 w-4 mr-2" />
+                        <span className="flex-1">Vue Map interactive</span>
+                      </Button>
+
+                      <Button
+                        onClick={handleGeolocation}
+                        disabled={isLocating}
+                        className="w-full bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                      >
+                        {isLocating ? (
+                          <svg
+                            className="animate-spin h-4 w-4 mr-2"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                        ) : (
+                          <MapPin className="h-4 w-4 mr-2" />
+                        )}
+                        {isLocating ? "Localisation..." : "Me localiser"}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      className="justify-start w-full text-gray-500 cursor-not-allowed"
+                      disabled
+                    >
+                      <MapIcon className="h-4 w-4 mr-2" />
+                      <span className="flex-1">
+                        Vue Map interactive (Connexion requise)
+                      </span>
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Légende des statuts
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span className="text-white">Validée</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <span className="text-white">En attente</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span className="text-white">Non validée</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -316,7 +536,13 @@ export const StationCardClient = function StationCardClient() {
               hasFullAccess() && (
                 <div className="relative h-[calc(100vh-180px)]">
                   <div className="h-full rounded-lg overflow-hidden shadow-lg">
-                    <MapView stations={stations} />
+                    <MapView
+                      stations={filteredStations}
+                      onInit={(map) => {
+                        mapRef.current = map;
+                      }}
+                      onMapReady={(ready) => setIsMapReady(ready)}
+                    />
                   </div>
                 </div>
               )
@@ -345,6 +571,99 @@ export const StationCardClient = function StationCardClient() {
               )}
           </div>
         </main>
+      </div>
+
+      {/* Barre de navigation mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1E2337] border-t border-gray-700/50 z-[1000]">
+        <div className="flex flex-col gap-2 p-4">
+          {/* Légendes en version mobile */}
+          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700/50 mb-2">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                <span className="text-white text-sm">Validée</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <span className="text-white text-sm">En attente</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <span className="text-white text-sm">Non validée</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Boutons de navigation */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={() => setViewMode("cards")}
+              variant={viewMode === "cards" ? "default" : "ghost"}
+              className={`${
+                viewMode === "cards"
+                  ? "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-700/50"
+              }`}
+            >
+              <ViewColumnsIcon className="h-4 w-4 mr-2" />
+              Fiches
+            </Button>
+
+            {hasFullAccess() ? (
+              <Button
+                onClick={() => setViewMode("map")}
+                variant={viewMode === "map" ? "default" : "ghost"}
+                className={`${
+                  viewMode === "map"
+                    ? "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                    : "text-gray-400 hover:text-gray-200 hover:bg-gray-700/50"
+                }`}
+              >
+                <MapIcon className="h-4 w-4 mr-2" />
+                Carte
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                className="text-gray-500 cursor-not-allowed"
+                disabled
+              >
+                <MapIcon className="h-4 w-4 mr-2" />
+                Carte
+              </Button>
+            )}
+          </div>
+
+          {viewMode === "map" && hasFullAccess() && (
+            <Button
+              onClick={handleGeolocation}
+              disabled={isLocating}
+              className="w-full bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+            >
+              {isLocating ? (
+                <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+              ) : (
+                <MapPin className="h-4 w-4 mr-2" />
+              )}
+              {isLocating ? "Localisation..." : "Me localiser"}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

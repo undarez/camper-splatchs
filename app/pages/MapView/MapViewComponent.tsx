@@ -16,9 +16,14 @@ import Image from "next/image";
 interface MapViewComponentProps {
   stations: Station[];
   onInit?: (map: Map) => void;
+  onMapReady?: (isReady: boolean) => void;
 }
 
-export function MapViewComponent({ stations, onInit }: MapViewComponentProps) {
+export function MapViewComponent({
+  stations,
+  onInit,
+  onMapReady,
+}: MapViewComponentProps) {
   const mapRef = useRef<Map | null>(null);
 
   const getMarkerIcon = useCallback((type: string) => {
@@ -85,7 +90,10 @@ export function MapViewComponent({ stations, onInit }: MapViewComponentProps) {
 
   useEffect(() => {
     if (!mapRef.current) {
-      const map = createMap("map").setView([46.603354, 1.888334], 6);
+      const map = createMap("map", {
+        zoomControl: true,
+        attributionControl: true,
+      }).setView([46.603354, 1.888334], 6);
 
       tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
@@ -94,14 +102,20 @@ export function MapViewComponent({ stations, onInit }: MapViewComponentProps) {
 
       mapRef.current = map;
 
-      if (onInit) {
-        onInit(map);
-      }
+      // Attendre que la carte soit complètement chargée
+      map.whenReady(() => {
+        if (onInit) {
+          onInit(map);
+        }
+        if (onMapReady) {
+          onMapReady(true);
+        }
+      });
     }
 
     // Mettre à jour les marqueurs avec les stations filtrées
     updateMarkers(stations);
-  }, [stations, onInit, updateMarkers]);
+  }, [stations, onInit, updateMarkers, onMapReady]);
 
   return (
     <>
@@ -134,11 +148,12 @@ export function MapViewComponent({ stations, onInit }: MapViewComponentProps) {
           position: absolute;
           bottom: 20px;
           right: 20px;
-          background: white;
+          background: rgba(30, 35, 55, 0.95);
           padding: 10px;
           border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
           z-index: 1000;
+          border: 1px solid rgba(75, 85, 99, 0.5);
         }
         .legend-item {
           display: flex;
@@ -177,7 +192,7 @@ export function MapViewComponent({ stations, onInit }: MapViewComponentProps) {
               }}
             />
           </div>
-          <span className="text-sm">Station de lavage</span>
+          <span className="text-sm text-white">Station de lavage</span>
         </div>
         <div className="legend-item">
           <div className="legend-color">
@@ -193,7 +208,7 @@ export function MapViewComponent({ stations, onInit }: MapViewComponentProps) {
               }}
             />
           </div>
-          <span className="text-sm">Parking</span>
+          <span className="text-sm text-white">Parking</span>
         </div>
       </div>
     </>
