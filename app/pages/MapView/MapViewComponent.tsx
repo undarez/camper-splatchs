@@ -59,12 +59,15 @@ export function MapViewComponent({
         marker([station.latitude, station.longitude], {
           icon: markerIcon,
         }).addTo(mapRef.current!).bindPopup(`
-        <div class="p-2">
-          <h3 class="font-bold">${station.name}</h3>
-          <p class="text-sm text-gray-600">${
-            station.type === "STATION_LAVAGE" ? "Station de lavage" : "Parking"
-          }</p>
-          <p class="text-sm mt-1">
+        <div class="p-4 min-w-[200px]">
+          <h3 class="font-bold text-lg mb-2">${station.name}</h3>
+          <p class="text-sm text-gray-600 mb-2">${station.address}</p>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-sm">${
+              station.type === "STATION_LAVAGE"
+                ? "Station de lavage"
+                : "Parking"
+            }</span>
             <span class="inline-block px-2 py-1 rounded-full text-xs ${
               station.status === "active"
                 ? "bg-green-100 text-green-800"
@@ -80,9 +83,43 @@ export function MapViewComponent({
                   : "Inactive"
               }
             </span>
-          </p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <button 
+              onclick="window.location.href='/pages/StationDetail/${
+                station.id
+              }'"
+              class="w-full px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-md text-sm font-medium transition-colors"
+            >
+              Voir les détails
+            </button>
+            <div id="navigation-${station.id}"></div>
+          </div>
         </div>
       `);
+
+        // Ajouter le bouton de navigation après que la popup est créée
+        setTimeout(() => {
+          const navigationContainer = document.getElementById(
+            `navigation-${station.id}`
+          );
+          if (navigationContainer) {
+            const navigationButton = document.createElement("div");
+            navigationButton.innerHTML = `
+              <button 
+                onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}', '_blank')"
+                class="w-full px-4 py-2 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Y aller
+              </button>
+            `;
+            navigationContainer.appendChild(navigationButton);
+          }
+        }, 0);
       });
     },
     [getMarkerIcon]
