@@ -152,12 +152,12 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-extrabold mb-8">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-extrabold mb-8">
             <span className="bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-600 text-transparent bg-clip-text animate-gradient">
               SplashCamper
             </span>
           </h1>
-          <p className="text-2xl md:text-3xl text-blue-100 mb-12 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl lg:text-3xl text-blue-100 mb-12 leading-relaxed max-w-3xl mx-auto">
             La plus grande base de données de stations de lavage pour
             camping-cars en France
           </p>

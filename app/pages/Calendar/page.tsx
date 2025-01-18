@@ -88,60 +88,99 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1E2337] py-12 px-4">
+    <div className="min-h-screen bg-[#1E2337] py-4 sm:py-12 px-2 sm:px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
           Mon Calendrier d'Entretien
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="p-6 bg-[#1a1f37] border-gray-700/50">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8">
+          <Card className="p-2 sm:p-6 bg-[#1a1f37] border-gray-700/50">
             <Calendar
               mode="single"
               selected={date}
               onSelect={(newDate) => newDate && setDate(newDate)}
-              className="text-white"
+              className="text-white mx-auto max-w-full"
               locale={fr}
+              classNames={{
+                month: "text-center text-sm sm:text-base",
+                caption: "flex justify-center pt-1 relative items-center",
+                caption_label: "text-sm font-medium",
+                nav: "space-x-1 flex items-center",
+                nav_button:
+                  "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                table: "w-full border-collapse space-y-1",
+                head_row: "flex",
+                head_cell:
+                  "text-slate-500 rounded-md w-8 sm:w-9 font-normal text-[0.8rem] sm:text-sm",
+                row: "flex w-full mt-2",
+                cell: "text-center text-sm sm:text-base p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 h-8 sm:h-9 w-8 sm:w-9",
+                day: "h-8 sm:h-9 w-8 sm:w-9 p-0 font-normal aria-selected:opacity-100",
+                day_selected:
+                  "bg-blue-500 text-white hover:bg-blue-600 focus:bg-blue-600 focus:text-white",
+                day_today: "bg-accent text-accent-foreground",
+                day_outside: "opacity-50",
+                day_disabled: "opacity-50",
+                day_range_middle:
+                  "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                day_hidden: "invisible",
+              }}
             />
           </Card>
 
-          <Card className="p-6 bg-[#1a1f37] border-gray-700/50">
+          <Card className="p-3 sm:p-6 bg-[#1a1f37] border-gray-700/50">
             <Tabs defaultValue="notes" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
-                <TabsTrigger value="notes">Notes du Jour</TabsTrigger>
-                <TabsTrigger value="add">Ajouter une Note</TabsTrigger>
+              <TabsList className="flex w-full gap-1 rounded-lg p-1 bg-[#1E2337]/50">
+                <TabsTrigger
+                  value="notes"
+                  className="flex-1 rounded-md px-2 py-1.5 text-xs font-medium text-white hover:bg-blue-600/50 data-[state=active]:bg-blue-600"
+                >
+                  Notes du Jour
+                </TabsTrigger>
+                <TabsTrigger
+                  value="add"
+                  className="flex-1 rounded-md px-2 py-1.5 text-xs font-medium text-white hover:bg-blue-600/50 data-[state=active]:bg-blue-600"
+                >
+                  Ajouter une Note
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="notes">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white">
+              <TabsContent value="notes" className="mt-2">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-white">
                     Notes pour le {format(date, "d MMMM yyyy", { locale: fr })}
                   </h3>
                   {notes.length > 0 ? (
-                    notes.map((note) => (
-                      <Card
-                        key={note.id}
-                        className="p-4 bg-[#1E2337] border-gray-700/50 relative group"
-                      >
-                        <p className="text-gray-300 pr-8">{note.content}</p>
-                        <button
-                          onClick={() => handleDeleteNote(note.id)}
-                          className="absolute top-4 right-4 text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Supprimer la note"
+                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                      {notes.map((note) => (
+                        <Card
+                          key={note.id}
+                          className="p-2 bg-[#1E2337] border-gray-700/50 relative group"
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </Card>
-                    ))
+                          <p className="text-gray-300 pr-6 text-xs">
+                            {note.content}
+                          </p>
+                          <button
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
+                            title="Supprimer la note"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </Card>
+                      ))}
+                    </div>
                   ) : (
-                    <p className="text-gray-400">Aucune note pour cette date</p>
+                    <p className="text-gray-400 text-xs py-2">
+                      Aucune note pour cette date
+                    </p>
                   )}
                 </div>
               </TabsContent>
 
-              <TabsContent value="add">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white">
+              <TabsContent value="add" className="mt-2">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-white">
                     Ajouter une note pour le{" "}
                     {format(date, "d MMMM yyyy", { locale: fr })}
                   </h3>
@@ -149,13 +188,13 @@ export default function CalendarPage() {
                     value={currentNote}
                     onChange={(e) => setCurrentNote(e.target.value)}
                     placeholder="Écrivez votre note ici..."
-                    className="min-h-[200px] bg-[#1E2337] border-gray-700/50 text-white"
+                    className="min-h-[100px] bg-[#1E2337] border-gray-700/50 text-white text-xs p-2"
                     disabled={isLoading}
                   />
                   <button
                     onClick={handleSaveNote}
                     disabled={isLoading}
-                    className="w-full py-2 px-4 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-1.5 px-2 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                   >
                     {isLoading ? "Enregistrement..." : "Enregistrer la note"}
                   </button>

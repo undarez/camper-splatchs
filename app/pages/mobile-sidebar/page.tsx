@@ -1,252 +1,148 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import Image from "next/image";
-import {
-  Home,
-  MapPin,
-  Map,
-  Mail,
-  Info,
-  Settings,
-  Users,
-  LogOut,
-  Star,
-  User,
-  LogIn,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/app/components/ui/sheet";
 import { Button } from "@/app/components/ui/button";
-import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
+import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-const menuItems = [
-  { href: "/", label: "Accueil", icon: Home },
-  {
-    href: "/pages/StationCard",
-    label: "Stations vérifiées",
-    icon: MapPin,
-    highlight: true,
-  },
-  {
-    href: "/localisationStation2",
-    label: "Ajouter un emplacement",
-    icon: Map,
-    highlight: true,
-  },
-  { href: "/pages/Contact", label: "Contact", icon: Mail },
-  { href: "/pages/About", label: "À propos", icon: Info },
-  { href: "/pages/profil", label: "Profil", icon: User },
-];
-
-const adminItems = [
-  {
-    href: "/pages/AdminStation",
-    label: "Gestion des stations",
-    icon: Settings,
-  },
-  {
-    href: "/pages/AdminUsers",
-    label: "Gestion des utilisateurs",
-    icon: Users,
-  },
-  {
-    href: "/pages/AdminStation/AdminPage",
-    label: "Statistiques Admin",
-    icon: Star,
-  },
-];
-
-const MobileSidebarComponent = ({
-  isSidebarOpen = false,
-}: {
-  isSidebarOpen?: boolean;
-}) => {
+export default function MobileSidebar() {
+  const [open, setOpen] = useState(false);
   const { data: session } = useSession();
-  const pathname = usePathname();
   const router = useRouter();
-  const [open, setOpen] = useState(isSidebarOpen);
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    setOpen(isSidebarOpen);
-  }, [isSidebarOpen]);
-
-  const handleSignOut = async () => {
-    setIsLoading(true);
-    try {
-      await signOut({ callbackUrl: "/signin" });
-    } catch (error) {
-      console.error("Erreur lors de la déconnexion:", error);
-    }
-    setIsLoading(false);
-  };
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  const isAdmin = session?.user?.email === "fortuna77320@gmail.com";
 
   return (
-    <>
-      <style>{`
-        .sidebar-bg {
-          background: #0a0f1c;
-          border-radius: 16px;
-          margin: 8px;
-          height: calc(100vh - 16px);
-          width: 250px;
-        }
-
-        .highlight-green {
-          background: linear-gradient(90deg, rgba(34, 197, 94, 0.2), transparent);
-          border-left: 3px solid rgb(34, 197, 94);
-        }
-
-        .highlight-blue {
-          background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), transparent);
-          border-left: 3px solid rgb(59, 130, 246);
-        }
-
-        .menu-item {
-          display: flex;
-          align-items: center;
-          padding: 12px 16px;
-          color: #94a3b8;
-          transition: all 0.2s;
-          border-radius: 8px;
-          margin: 4px 0;
-        }
-
-        .menu-item:hover {
-          color: #f8fafc;
-          background: rgba(59, 130, 246, 0.1);
-        }
-
-        .menu-item.active {
-          color: #3b82f6;
-          background: rgba(59, 130, 246, 0.1);
-        }
-
-        .menu-item span {
-          margin-left: 12px;
-          font-size: 14px;
-          font-weight: 500;
-        }
-      `}</style>
-
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-800 text-white md:hidden"
-        aria-label="Toggle menu"
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" className="text-gray-400 hover:text-gray-200">
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </Button>
+      </SheetTrigger>
+      <SheetContent
+        side="left"
+        className="w-72 bg-[#1E2337] border-r border-gray-700/50 p-0"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-      </button>
-
-      <div
-        role="navigation"
-        aria-label="Menu principal"
-        className={cn(
-          "fixed inset-y-0 left-0 z-[40] transform transition-all duration-300 ease-in-out sidebar-bg",
-          open ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0"
-        )}
-      >
-        <div className="relative flex h-full flex-col">
-          <div className="flex items-center p-4">
-            <Link href="/" className="flex items-center space-x-3">
-              <Image
-                src="/images/logo.png"
-                alt="Logo"
-                width={35}
-                height={35}
-                className="rounded-full"
-              />
-              <span className="text-white text-lg font-medium">CamperWash</span>
-            </Link>
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b border-gray-700/50">
+            <h2 className="text-lg font-semibold text-white mb-2">Menu</h2>
           </div>
-
-          <nav className="flex-1 px-4 py-2">
-            {menuItems.map((item) => (
+          <nav className="flex-1 overflow-y-auto">
+            <div className="px-2 py-4 space-y-2">
               <Link
-                key={item.href}
-                href={item.href}
+                href="/localisationStation2"
+                className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
                 onClick={() => setOpen(false)}
-                className={cn(
-                  "menu-item",
-                  pathname === item.href && "active",
-                  item.highlight && "highlight-blue"
-                )}
               >
-                <item.icon className="h-5 w-5" />
-                <span>{item.label}</span>
+                Ajouter une station
               </Link>
-            ))}
+              <Link
+                href="/pages/StationCard"
+                className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Stations vérifiées
+              </Link>
+              <Link
+                href="/pages/About"
+                className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                À propos
+              </Link>
+              <Link
+                href="/pages/Guide"
+                className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                Guides
+              </Link>
 
-            {session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
-              <>
-                <div className="my-4 border-t border-white/5" />
-                {adminItems.map((item) => (
+              {session && (
+                <>
                   <Link
-                    key={item.href}
-                    href={item.href}
+                    href="/pages/profil"
+                    className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
                     onClick={() => setOpen(false)}
-                    className={cn(
-                      "menu-item",
-                      pathname === item.href && "active"
-                    )}
                   >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.label}</span>
+                    Profil
                   </Link>
-                ))}
-              </>
-            )}
-          </nav>
+                  <Link
+                    href="/pages/Calendar"
+                    className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                    onClick={() => setOpen(false)}
+                  >
+                    Mon Calendrier
+                  </Link>
+                </>
+              )}
 
-          <div className="p-4 mt-auto">
-            <div className="flex space-x-4 justify-center">
-              {!session ? (
-                <Button
-                  onClick={() => router.push("/signin")}
-                  className="text-blue-500 hover:bg-blue-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
-                >
-                  <LogIn className="h-5 w-5 text-blue-500 hover:text-green-500" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSignOut}
-                  disabled={isLoading}
-                  className="font-sans text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
-                >
-                  {isLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-red-600" />
-                  ) : (
-                    <LogOut className="h-5 w-5" />
-                  )}
-                </Button>
+              {isAdmin && (
+                <>
+                  <div className="my-2 border-t border-gray-700/50"></div>
+                  <Link
+                    href="/pages/AdminStation"
+                    className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                    onClick={() => setOpen(false)}
+                  >
+                    Gestion des stations
+                  </Link>
+                  <Link
+                    href="/pages/AdminStation/AdminPage"
+                    className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                    onClick={() => setOpen(false)}
+                  >
+                    Tableau de bord
+                  </Link>
+                  <Link
+                    href="/pages/AdminUsers"
+                    className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                    onClick={() => setOpen(false)}
+                  >
+                    Gestion des utilisateurs
+                  </Link>
+                </>
               )}
             </div>
+          </nav>
+          <div className="p-4 border-t border-gray-700/50">
+            {session ? (
+              <Button
+                onClick={() => {
+                  signOut({ callbackUrl: "/signin" });
+                  setOpen(false);
+                }}
+                className="w-full bg-red-600 hover:bg-red-700 text-white"
+              >
+                Se déconnecter
+              </Button>
+            ) : (
+              <Button
+                onClick={() => {
+                  router.push("/signin");
+                  setOpen(false);
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Se connecter
+              </Button>
+            )}
           </div>
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   );
-};
-
-export default function Page() {
-  return <MobileSidebarComponent />;
 }

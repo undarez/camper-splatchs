@@ -85,8 +85,41 @@ const guides: Guide[] = [
       "Apprenez à optimiser votre consommation d'eau de manière responsable tout en préservant le confort de votre voyage.",
     content: [
       {
-        subtitle: "Techniques d'économie",
-        text: "Utilisez un nettoyeur haute pression, récupérez l'eau de pluie...",
+        subtitle: "Introduction à l'économie d'eau",
+        text: "Voyager en camping-car offre liberté et aventure, mais cela nécessite une gestion réfléchie de l'eau. Voici des méthodes pratiques pour économiser cette ressource précieuse, tout en respectant l'environnement.",
+      },
+      {
+        subtitle: "Optimisation des équipements",
+        text: "Installez des dispositifs économiseurs d'eau comme des pommeaux de douche basse consommation ou des embouts de robinet à débit réduit. Ces équipements maintiennent une pression optimale tout en réduisant le gaspillage.",
+      },
+      {
+        subtitle: "Réutilisation de l'eau grise",
+        text: "L'eau utilisée pour rincer les légumes ou se laver les mains peut être récupérée pour nettoyer le sol ou les toilettes. Investissez dans un système de filtration si vous souhaitez maximiser cette réutilisation.",
+      },
+      {
+        subtitle: "Lavage de vaisselle économe",
+        text: "Adoptez ces bonnes pratiques pour économiser l'eau lors de la vaisselle :",
+        items: [
+          "Limitez l'eau en utilisant une bassine pour laver et rincer la vaisselle",
+          "Essuyez les restes avec un chiffon avant de laver",
+          "Utilisez un savon biodégradable pour minimiser l'impact environnemental",
+        ],
+      },
+      {
+        subtitle: "Collecte d'eau de pluie",
+        text: "Équipez votre camping-car d'un récupérateur d'eau de pluie pour les tâches ménagères comme le nettoyage extérieur ou le lavage des vêtements.",
+      },
+      {
+        subtitle: "Utilisation des stations adaptées",
+        text: "Utilisez des stations de lavage conçues pour les camping-cars. Elles permettent une gestion efficace de l'eau, souvent avec un recyclage intégré.",
+      },
+      {
+        subtitle: "Entretien des réservoirs",
+        text: "Vérifiez régulièrement vos réservoirs pour détecter les fuites. Les micro-fuites peuvent entraîner des pertes importantes sur la durée.",
+      },
+      {
+        subtitle: "Conclusion",
+        text: "En adoptant ces pratiques, vous alliez confort, économie et protection de l'environnement, tout en prolongeant vos ressources lors de vos séjours prolongés.",
       },
     ],
   },
@@ -99,8 +132,45 @@ const guides: Guide[] = [
       "Protégez votre camping-car pendant l'hiver avec nos conseils d'experts.",
     content: [
       {
-        subtitle: "Préparation hivernale",
-        text: "Vidangez les circuits d'eau, protégez les joints...",
+        subtitle: "L'importance de l'entretien hivernal",
+        text: "L'hiver peut mettre votre camping-car à rude épreuve. Pour éviter les mauvaises surprises et prolonger sa durée de vie, voici un guide complet pour un entretien hivernal efficace.",
+      },
+      {
+        subtitle: "Vidanger les circuits d'eau",
+        text: "Avant les températures négatives, videz complètement les réservoirs d'eau propre, les eaux usées et les canalisations pour éviter qu'ils ne gèlent et n'endommagent les systèmes.",
+      },
+      {
+        subtitle: "Entretien de la batterie",
+        text: "Rechargez la batterie à fond et, si possible, débranchez-la si vous n'utilisez pas le camping-car pendant une longue période. Stockez-la dans un endroit sec et tempéré.",
+      },
+      {
+        subtitle: "Vérification des joints et ouvertures",
+        text: "Inspectez les joints de portes, fenêtres et trappes pour détecter toute fissure ou usure. Une bonne étanchéité est essentielle pour éviter les infiltrations d'eau et l'humidité.",
+      },
+      {
+        subtitle: "Protection des pneus",
+        text: "Surélevez légèrement le véhicule pour éviter que les pneus ne se déforment avec le temps. Pensez aussi à vérifier leur pression.",
+      },
+      {
+        subtitle: "Nettoyage et protection de la carrosserie",
+        text: "Lavez soigneusement la carrosserie pour enlever les saletés et appliquez une couche de cire protectrice pour protéger la peinture contre l'humidité et le gel.",
+      },
+      {
+        subtitle: "Protection extérieure",
+        text: "Utilisez une housse de protection respirante pour protéger votre camping-car des intempéries tout en évitant la condensation à l'intérieur.",
+      },
+      {
+        subtitle: "Stockage intérieur",
+        text: "Voici les étapes essentielles pour un bon stockage intérieur :",
+        items: [
+          "Nettoyez et videz entièrement le réfrigérateur pour éviter les moisissures",
+          "Débranchez les appareils électriques",
+          "Laissez les placards légèrement ouverts pour éviter les odeurs renfermées",
+        ],
+      },
+      {
+        subtitle: "Chauffage occasionnel",
+        text: "Si possible, mettez en marche le chauffage de votre camping-car de temps en temps pour éviter l'humidité et vérifier qu'il fonctionne correctement.",
       },
     ],
   },
@@ -110,22 +180,22 @@ export default function GuidePage() {
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
 
   return (
-    <div className="min-h-screen bg-[#1E2337] py-12 px-4">
+    <div className="min-h-screen bg-[#1E2337] py-8 sm:py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
           Guide du camping-cariste
         </h1>
 
         {selectedGuide ? (
-          <div className="bg-[#1a1f37] rounded-lg p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold text-white">
+          <div className="bg-[#1a1f37] rounded-lg p-4 sm:p-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 {selectedGuide.title}
               </h2>
               <Button
                 onClick={() => setSelectedGuide(null)}
                 variant="outline"
-                className="border-gray-700 text-gray-400 hover:text-white"
+                className="border-gray-700 text-gray-400 hover:text-white w-full sm:w-auto"
               >
                 Retour aux guides
               </Button>
