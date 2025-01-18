@@ -123,6 +123,24 @@ const Header = () => {
                 </MenubarContent>
               </MenubarMenu>
 
+              <MenubarMenu>
+                <MenubarTrigger asChild>
+                  <Button className={menuButtonClass} variant="outline">
+                    Guide
+                    <span className="ml-1 transform group-hover:rotate-180 transition-transform duration-200">
+                      ▼
+                    </span>
+                  </Button>
+                </MenubarTrigger>
+                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
+                  <MenubarItem className={menuItemClass}>
+                    <Link href="/pages/Guide" className="w-full">
+                      Guides
+                    </Link>
+                  </MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+
               {session ? (
                 <MenubarMenu>
                   <MenubarTrigger asChild>
@@ -137,6 +155,11 @@ const Header = () => {
                     <MenubarItem className={menuItemClass}>
                       <Link href="/pages/profil" className="w-full">
                         Profil
+                      </Link>
+                    </MenubarItem>
+                    <MenubarItem className={menuItemClass}>
+                      <Link href="/pages/Calendar" className="w-full">
+                        Mon Calendrier
                       </Link>
                     </MenubarItem>
                     {isAdmin && (

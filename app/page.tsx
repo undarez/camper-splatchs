@@ -104,6 +104,36 @@ export default function Home() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
+      {!hasFullAccess() && (
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 mb-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-full">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="text-white font-medium">Mode Invité</p>
+                <p className="text-sm text-white/80">
+                  Connectez-vous pour accéder à toutes les fonctionnalités
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <PrivacyPolicyModal />
 
       {/* Hero Section */}
@@ -174,24 +204,28 @@ export default function Home() {
         </div>
       </section>
 
-      <style jsx global>{`
-        .animate-gradient {
-          background-size: 200% auto;
-          animation: gradient 3s linear infinite;
-        }
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          .animate-gradient {
+            background-size: 200% auto;
+            animation: gradient 3s linear infinite;
+          }
 
-        @keyframes gradient {
-          0% {
-            background-position: 0% 50%;
+          @keyframes gradient {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
           }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-      `}</style>
+        `,
+        }}
+      />
     </div>
   );
 }
