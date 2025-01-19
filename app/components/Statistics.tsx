@@ -2,36 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { Users, Star, MapPin } from "lucide-react";
-import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 
 export default function Statistics() {
   const [stats, setStats] = useState({
-    stations: 17,
-    users: 3,
+    stations: 0,
+    users: 0,
     reviews: 0,
   });
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const { data, error } = await supabase.rpc("get_public_stats");
+        const response = await fetch("/api/statistics");
+        const data = await response.json();
 
-        if (error) {
-          console.error("Erreur RPC:", error);
-          return;
-        }
-
-        if (data) {
+        if (data.statistics) {
           setStats({
-            stations: data.stations_count || 17,
-            users: data.users_count || 3,
-            reviews: data.reviews_count || 0,
+            stations: data.statistics.stations || 0,
+            users: data.statistics.users || 0,
+            reviews: data.statistics.reviews || 0,
           });
         }
       } catch (error) {
@@ -43,7 +33,7 @@ export default function Statistics() {
     }
 
     fetchStats();
-  }, [supabase]);
+  }, []);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl mx-auto px-4 py-12">

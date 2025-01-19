@@ -2,9 +2,20 @@ import { createClient } from "@supabase/supabase-js";
 import { Note } from "../types/notes";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "Les variables d'environnement Supabase ne sont pas définies"
+  );
+}
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+  },
+});
 
 export const notesService = {
   async getNotesByDate(userId: string, date: string): Promise<Note[]> {
@@ -15,7 +26,10 @@ export const notesService = {
       .eq("date", date)
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erreur lors de la récupération des notes:", error);
+      throw error;
+    }
     return data || [];
   },
 
@@ -36,7 +50,10 @@ export const notesService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erreur lors de la création de la note:", error);
+      throw error;
+    }
     return data;
   },
 
@@ -48,13 +65,19 @@ export const notesService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erreur lors de la mise à jour de la note:", error);
+      throw error;
+    }
     return data;
   },
 
   async deleteNote(noteId: string): Promise<void> {
     const { error } = await supabase.from("notes").delete().eq("id", noteId);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Erreur lors de la suppression de la note:", error);
+      throw error;
+    }
   },
 };

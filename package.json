@@ -14,7 +14,8 @@
     "build:android": "next build && npx cap add android && npx cap sync && npx cap open android",
     "sync:android": "npx cap sync",
     "generate:android-resources": "node scripts/generate-android-resources.mjs",
-    "prepare:android": "npm run build && npm run generate:android-resources && npm run build:android"
+    "prepare:android": "npm run build && npm run generate:android-resources && npm run build:android",
+    "import-stations": "node scripts/importStations.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.3",
@@ -103,8 +104,9 @@
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
     "autoprefixer": "^10.4.20",
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.7",
     "eslint": "^8.0.0",
     "eslint-config-next": "^15.0.4",

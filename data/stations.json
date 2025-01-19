@@ -1,0 +1,185 @@
+{
+  "stations": [
+    {
+      "id": "1",
+      "name": "Station Camping-Car Park Millau",
+      "address": "Rue des Erables, 12100 Millau",
+      "latitude": 44.0978,
+      "longitude": 3.0825,
+      "type": "STATION_LAVAGE",
+      "status": "active",
+      "description": "Station de lavage spécialisée pour camping-cars avec aire de service complète",
+      "equipments": [
+        "Lavage haute pression",
+        "Vidange eaux grises",
+        "Vidange eaux noires",
+        "Remplissage eau propre",
+        "Électricité"
+      ],
+      "openingHours": {
+        "monday": { "open": "00:00", "close": "23:59" },
+        "tuesday": { "open": "00:00", "close": "23:59" },
+        "wednesday": { "open": "00:00", "close": "23:59" },
+        "thursday": { "open": "00:00", "close": "23:59" },
+        "friday": { "open": "00:00", "close": "23:59" },
+        "saturday": { "open": "00:00", "close": "23:59" },
+        "sunday": { "open": "00:00", "close": "23:59" }
+      },
+      "pricing": {
+        "washing": "5€/15min",
+        "greyWaterDisposal": "2€",
+        "blackWaterDisposal": "2€",
+        "freshWater": "2€/100L"
+      },
+      "images": [],
+      "averageRating": 4.5,
+      "reviews": []
+    },
+    {
+      "id": "2",
+      "name": "Aire de Service Cap d'Agde",
+      "address": "Avenue des Sergents, 34300 Cap d'Agde",
+      "latitude": 43.2796,
+      "longitude": 3.5046,
+      "type": "STATION_LAVAGE",
+      "status": "active",
+      "description": "Station de lavage et aire de service pour camping-cars en bord de mer",
+      "equipments": [
+        "Lavage haute pression",
+        "Vidange eaux grises",
+        "Vidange eaux noires",
+        "Remplissage eau propre",
+        "Électricité",
+        "WiFi"
+      ],
+      "openingHours": {
+        "monday": { "open": "00:00", "close": "23:59" },
+        "tuesday": { "open": "00:00", "close": "23:59" },
+        "wednesday": { "open": "00:00", "close": "23:59" },
+        "thursday": { "open": "00:00", "close": "23:59" },
+        "friday": { "open": "00:00", "close": "23:59" },
+        "saturday": { "open": "00:00", "close": "23:59" },
+        "sunday": { "open": "00:00", "close": "23:59" }
+      },
+      "pricing": {
+        "washing": "6€/15min",
+        "greyWaterDisposal": "3€",
+        "blackWaterDisposal": "3€",
+        "freshWater": "3€/100L"
+      },
+      "images": [],
+      "averageRating": 4.2,
+      "reviews": []
+    },
+    {
+      "id": "3",
+      "name": "Station Camping-Car Carcassonne",
+      "address": "Avenue du Général Leclerc, 11000 Carcassonne",
+      "latitude": 43.2130,
+      "longitude": 2.3491,
+      "type": "STATION_LAVAGE",
+      "status": "active",
+      "description": "Station de lavage moderne avec tous les services nécessaires",
+      "equipments": [
+        "Lavage haute pression",
+        "Vidange eaux grises",
+        "Vidange eaux noires",
+        "Remplissage eau propre",
+        "Électricité",
+        "Aspirateur",
+        "Gonflage pneus"
+      ],
+      "openingHours": {
+        "monday": { "open": "07:00", "close": "21:00" },
+        "tuesday": { "open": "07:00", "close": "21:00" },
+        "wednesday": { "open": "07:00", "close": "21:00" },
+        "thursday": { "open": "07:00", "close": "21:00" },
+        "friday": { "open": "07:00", "close": "21:00" },
+        "saturday": { "open": "08:00", "close": "20:00" },
+        "sunday": { "open": "08:00", "close": "20:00" }
+      },
+      "pricing": {
+        "washing": "5€/15min",
+        "greyWaterDisposal": "2€",
+        "blackWaterDisposal": "2€",
+        "freshWater": "2€/100L"
+      },
+      "images": [],
+      "averageRating": 4.7,
+      "reviews": []
+    },
+    {
+      "id": "4",
+      "name": "Aire de Service Toulouse",
+      "address": "Route de Narbonne, 31000 Toulouse",
+      "latitude": 43.6047,
+      "longitude": 1.4442,
+      "type": "STATION_LAVAGE",
+      "status": "active",
+      "description": "Station de lavage et aire de service complète proche du centre-ville",
+      "equipments": [
+        "Lavage haute pression",
+        "Vidange eaux grises",
+        "Vidange eaux noires",
+        "Remplissage eau propre",
+        "Électricité",
+        "WiFi",
+        "Aire de pique-nique"
+      ],
+      "openingHours": {
+        "monday": { "open": "06:00", "close": "22:00" },
+        "tuesday": { "open": "06:00", "close": "22:00" },
+        "wednesday": { "open": "06:00", "close": "22:00" },
+        "thursday": { "open": "06:00", "close": "22:00" },
+        "friday": { "open": "06:00", "close": "22:00" },
+        "saturday": { "open": "07:00", "close": "21:00" },
+        "sunday": { "open": "07:00", "close": "21:00" }
+      },
+      "pricing": {
+        "washing": "6€/15min",
+        "greyWaterDisposal": "3€",
+        "blackWaterDisposal": "3€",
+        "freshWater": "2.5€/100L"
+      },
+      "images": [],
+      "averageRating": 4.3,
+      "reviews": []
+    },
+    {
+      "id": "5",
+      "name": "Station Camping-Car Montpellier",
+      "address": "Avenue de la Mer, 34000 Montpellier",
+      "latitude": 43.6108,
+      "longitude": 3.8767,
+      "type": "STATION_LAVAGE",
+      "status": "active",
+      "description": "Station moderne avec borne de paiement automatique",
+      "equipments": [
+        "Lavage haute pression",
+        "Vidange eaux grises",
+        "Vidange eaux noires",
+        "Remplissage eau propre",
+        "Électricité",
+        "Borne de paiement CB 24/7"
+      ],
+      "openingHours": {
+        "monday": { "open": "00:00", "close": "23:59" },
+        "tuesday": { "open": "00:00", "close": "23:59" },
+        "wednesday": { "open": "00:00", "close": "23:59" },
+        "thursday": { "open": "00:00", "close": "23:59" },
+        "friday": { "open": "00:00", "close": "23:59" },
+        "saturday": { "open": "00:00", "close": "23:59" },
+        "sunday": { "open": "00:00", "close": "23:59" }
+      },
+      "pricing": {
+        "washing": "5€/15min",
+        "greyWaterDisposal": "2€",
+        "blackWaterDisposal": "2€",
+        "freshWater": "2€/100L"
+      },
+      "images": [],
+      "averageRating": 4.6,
+      "reviews": []
+    }
+  ]
+} 

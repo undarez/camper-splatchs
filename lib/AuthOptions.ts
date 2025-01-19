@@ -50,7 +50,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Mot de passe incorrect");
         }
 
-        return user;
+        return {
+          ...user,
+          provider: "credentials",
+        };
       },
     }),
   ],
@@ -114,6 +117,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id,
+          provider: token.provider,
           role: token.role || "USER",
           department: token.department,
           age: token.age,
@@ -123,7 +127,7 @@ export const authOptions: NextAuthOptions = {
       };
     },
 
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger, session, account }) {
       if (trigger === "update" && session) {
         return { ...token, ...session.user };
       }
@@ -132,6 +136,7 @@ export const authOptions: NextAuthOptions = {
         return {
           ...token,
           id: user.id,
+          provider: account?.provider || user.provider || "credentials",
           role: user.role || "USER",
           department: user.department,
           age: user.age,

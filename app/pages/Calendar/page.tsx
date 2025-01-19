@@ -17,6 +17,16 @@ import { notesService } from "@/app/services/notes";
 import { Note } from "@/app/types/notes";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { createClient, User } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+  },
+});
 
 export default function CalendarPage() {
   const { data: session } = useSession();
@@ -24,12 +34,63 @@ export default function CalendarPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [currentNote, setCurrentNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
+
+  // Synchroniser l'authentification avec Supabase
+  useEffect(() => {
+    const syncSupabaseAuth = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        // Récupérer la session Supabase existante
+        const {
+          data: { session: supaSession },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        // Si pas de session Supabase, créer un nouvel utilisateur
+        if (!supaSession) {
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: session.user.email,
+            password: crypto.randomUUID(), // Utiliser un mot de passe aléatoire sécurisé
+            options: {
+              data: {
+                name: session.user.name,
+                provider: session.user.provider || "credentials",
+              },
+            },
+          });
+
+          if (
+            signUpError &&
+            !signUpError.message.includes("User already registered")
+          ) {
+            throw signUpError;
+          }
+        }
+
+        // Mettre à jour l'utilisateur Supabase
+        if (supaSession?.user) {
+          setSupabaseUser(supaSession.user);
+        }
+      } catch (error) {
+        console.error("Erreur d'authentification:", error);
+        toast.error("Erreur de synchronisation de l'authentification");
+      }
+    };
+
+    syncSupabaseAuth();
+  }, [session]);
 
   const fetchNotes = useCallback(async () => {
-    if (!session?.user?.email) return;
+    if (!supabaseUser?.id) return;
     try {
       const fetchedNotes = await notesService.getNotesByDate(
-        session.user.email,
+        supabaseUser.id,
         format(date, "yyyy-MM-dd")
       );
       setNotes(fetchedNotes);
@@ -37,19 +98,19 @@ export default function CalendarPage() {
       console.error("Erreur lors de la récupération des notes:", error);
       toast.error("Impossible de charger les notes");
     }
-  }, [session?.user?.email, date]);
+  }, [supabaseUser?.id, date]);
 
   useEffect(() => {
     fetchNotes();
   }, [fetchNotes]);
 
   const handleSaveNote = async () => {
-    if (!currentNote.trim() || !session?.user?.email) return;
+    if (!currentNote.trim() || !supabaseUser?.id) return;
 
     setIsLoading(true);
     try {
       await notesService.createNote(
-        session.user.email,
+        supabaseUser.id,
         format(date, "yyyy-MM-dd"),
         currentNote.trim()
       );
