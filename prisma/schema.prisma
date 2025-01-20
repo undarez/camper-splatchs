@@ -58,6 +58,7 @@ model User {
   visits         Visit[]
   Station        Station[]
   notes          Note[]
+  Review         Review[]
 }
 
 enum StationStatus {
@@ -130,14 +131,20 @@ model ParkingDetails {
 
 model Review {
   id               String   @id @default(cuid())
-  content          String   @db.Text
+  content          String
+  encryptedContent String
   rating           Int
   createdAt        DateTime @default(now())
-  station          Station  @relation("StationReviews", fields: [stationId], references: [id])
-  stationId        String
+  updatedAt        DateTime @updatedAt
   author           User     @relation("ReviewAuthor", fields: [authorId], references: [id])
   authorId         String
-  encryptedContent String?  @db.Text
+  station          Station  @relation("StationReviews", fields: [stationId], references: [id])
+  stationId        String
+  User             User?    @relation(fields: [userId], references: [id])
+  userId           String?
+
+  @@index([authorId])
+  @@index([stationId])
 }
 
 model Service {

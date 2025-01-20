@@ -1,36 +1,40 @@
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET() {
   try {
-    const [totalStations, totalUsers, totalReviews, totalVisits] =
-      await Promise.all([
-        prisma.station.count(),
-        prisma.user.count(),
-        prisma.review.count(),
-        prisma.visit.count(),
-      ]);
+    // Récupérer le nombre de stations
+    const { count: stationsCount } = await supabase
+      .from("stations")
+      .select("*", { count: "exact", head: true });
 
-    const stats = {
-      totalStations,
-      totalUsers,
-      totalReviews,
-      totalVisits,
-      totalParkings: await prisma.station.count({
-        where: {
-          hasParking: true,
-        },
-      }),
-    };
+    // Récupérer le nombre d'utilisateurs
+    const { count: usersCount } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true });
 
-    return NextResponse.json(stats);
+    // Récupérer le nombre de parkings
+    const { count: parkingsCount } = await supabase
+      .from("stations")
+      .select("*", { count: "exact", head: true })
+      .eq("type", "PARKING");
+
+    return NextResponse.json({
+      totalStations: stationsCount || 0,
+      totalUsers: usersCount || 0,
+      totalParkings: parkingsCount || 0,
+    });
   } catch (error) {
     console.error("Erreur lors de la récupération des statistiques:", error);
-    return NextResponse.json(
-      {
-        error: "Erreur lors de la récupération des statistiques",
-      },
-      { status: 500 }
-    );
+    // Retourner des valeurs par défaut en cas d'erreur
+    return NextResponse.json({
+      totalStations: 0,
+      totalUsers: 0,
+      totalParkings: 0,
+    });
   }
 }

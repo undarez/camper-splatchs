@@ -1,87 +1,197 @@
-const Terms = () => {
+"use client";
+
+import { CheckCircle2, XCircle, AlertCircle, Info } from "lucide-react";
+
+export default function ConditionUtilisation() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-white">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-          <div className="border-b border-blue-100 pb-8 mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] bg-clip-text text-transparent">
-              Conditions Générales d&apos;Utilisation
-            </h1>
-            <p className="mt-4 text-gray-600">
-              Dernière mise à jour : {new Date().toLocaleDateString("fr-FR")}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-[#1a1f37] rounded-lg p-8 shadow-lg border border-gray-700/50">
+          <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
+            Conditions Générales d'Utilisation
+          </h1>
+          <p className="text-gray-400 text-sm mb-8 text-center">
+            Dernière mise à jour : 20/01/2025
+          </p>
+
+          {/* Section 1 */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <Info className="w-6 h-6 mr-2 text-blue-500" />
+              1. Acceptation des conditions
+            </h2>
+            <p className="text-gray-300">
+              En accédant et en utilisant l'application SplashCamper, vous
+              acceptez sans réserve les présentes Conditions Générales
+              d'Utilisation (CGU). Si vous n'acceptez pas ces conditions,
+              veuillez cesser immédiatement d'utiliser l'application.
             </p>
-          </div>
+          </section>
 
-          <div className="space-y-8">
-            <section className="bg-gradient-to-r from-blue-50 to-transparent p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                1. Acceptation des conditions
+          {/* Section 2 */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <Info className="w-6 h-6 mr-2 text-blue-500" />
+              2. Description du service
+            </h2>
+            <p className="text-gray-300 mb-4">
+              SplashCamper est une plateforme collaborative destinée aux
+              camping-caristes. Elle permet :
+            </p>
+            <ul className="space-y-3 text-gray-300">
+              <li className="flex items-start">
+                <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                De localiser et de partager des informations sur des stations de
+                lavage adaptées aux camping-cars et des parkings.
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                De consulter les services proposés sur chaque emplacement.
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                D'utiliser des fonctionnalités telles qu'une carte interactive,
+                un calendrier d'entretien personnel et des outils de navigation
+                GPS.
+              </li>
+              <li className="flex items-start">
+                <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                De soumettre de nouvelles stations ou parkings (vérifiés par
+                notre équipe).
+              </li>
+            </ul>
+          </section>
+
+          {/* Section 3 */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <Info className="w-6 h-6 mr-2 text-blue-500" />
+              3. Inscription et compte utilisateur
+            </h2>
+            <div className="space-y-4">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3">
+                  Bonnes pratiques
+                </h3>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                    Inscription avec une adresse e-mail valide ou compte Google
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                    Informations exactes et mises à jour
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                    Être majeur
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3">
+                  À éviter
+                </h3>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <XCircle className="w-5 h-5 mr-2 text-red-500 mt-1 flex-shrink-0" />
+                    Informations frauduleuses
+                  </li>
+                  <li className="flex items-start">
+                    <XCircle className="w-5 h-5 mr-2 text-red-500 mt-1 flex-shrink-0" />
+                    Utilisation abusive du compte
+                  </li>
+                  <li className="flex items-start">
+                    <XCircle className="w-5 h-5 mr-2 text-red-500 mt-1 flex-shrink-0" />
+                    Partage des identifiants
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 4 */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <Info className="w-6 h-6 mr-2 text-blue-500" />
+              4. Utilisation responsable
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3">
+                  Ce qu'il faut faire
+                </h3>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                    Publier des informations vérifiées
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle2 className="w-5 h-5 mr-2 text-green-500 mt-1 flex-shrink-0" />
+                    Respecter les autres utilisateurs
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3">
+                  Ce qu'il ne faut pas faire
+                </h3>
+                <ul className="space-y-2">
+                  <li className="flex items-start">
+                    <XCircle className="w-5 h-5 mr-2 text-red-500 mt-1 flex-shrink-0" />
+                    Publier des informations fausses
+                  </li>
+                  <li className="flex items-start">
+                    <XCircle className="w-5 h-5 mr-2 text-red-500 mt-1 flex-shrink-0" />
+                    Harceler ou spammer
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* Sections 5-7 */}
+          <section className="space-y-8">
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <AlertCircle className="w-6 h-6 mr-2 text-yellow-500" />
+                5. Limitation de responsabilité
               </h2>
-              <p className="text-gray-700 leading-relaxed">
-                En accédant et en utilisant l&apos;application CamperWash, vous
-                acceptez d&apos;être lié par ces Conditions Générales
-                d&apos;Utilisation. Si vous n&apos;acceptez pas ces conditions,
-                veuillez ne pas utiliser l&apos;application.
+              <p className="text-gray-300">
+                Bien que SplashCamper s'efforce de fournir des informations
+                fiables et à jour, nous ne pouvons garantir que les informations
+                publiées seront toujours exactes ou exemptes d'erreurs.
               </p>
-            </section>
+            </div>
 
-            <section className="p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                2. Description du service
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <Info className="w-6 h-6 mr-2 text-blue-500" />
+                6. Résiliation
               </h2>
-              <p className="text-gray-700 leading-relaxed">
-                CamperWash est une plateforme collaborative permettant aux
-                utilisateurs de localiser et de partager des informations sur
-                les stations de lavage adaptées aux camping-cars.
+              <p className="text-gray-300">
+                Vous pouvez résilier votre compte à tout moment en contactant
+                notre support. SplashCamper se réserve également le droit de
+                suspendre ou de supprimer un compte en cas de non-respect des
+                CGU.
               </p>
-            </section>
+            </div>
 
-            <section className="bg-gradient-to-r from-blue-50 to-transparent p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                3. Inscription et compte utilisateur
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <Info className="w-6 h-6 mr-2 text-blue-500" />
+                7. Modifications des CGU
               </h2>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3"></div>
-                  L&apos;inscription est gratuite
-                </li>
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3"></div>
-                  Les informations fournies doivent être exactes et à jour
-                </li>
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3"></div>
-                  Vous êtes responsable de la confidentialité de vos
-                  identifiants
-                </li>
-                <li className="flex items-center">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3"></div>
-                  Un compte ne peut être créé que par une personne physique
-                  majeure
-                </li>
-              </ul>
-            </section>
-
-            <section className="bg-gradient-to-r from-[#2ABED9]/10 to-[#1B4B82]/10 p-6 rounded-xl mt-12">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                Des questions ?
-              </h2>
-              <p className="text-gray-700 mb-4">
-                Notre équipe est là pour vous aider et répondre à toutes vos
-                questions.
+              <p className="text-gray-300">
+                Les présentes CGU peuvent être modifiées à tout moment. Vous
+                serez informé des modifications importantes, et votre
+                utilisation continue de l'application vaudra acceptation des CGU
+                mises à jour.
               </p>
-              <a
-                href="/pages/Contact"
-                className="inline-block bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
-              >
-                Nous contacter
-              </a>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
   );
-};
-
-export default Terms;
+}

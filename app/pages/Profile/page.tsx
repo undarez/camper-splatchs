@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/app/components/ui/card";
 import Image from "next/image";
+import ExportDonnees from "@/app/components/ExportDonnees";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -37,37 +38,47 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Mon Profil</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center space-y-4">
-            {session.user?.image && (
-              <div className="relative w-24 h-24 rounded-full overflow-hidden">
-                <Image
-                  src={session.user.image}
-                  alt="Photo de profil"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
-            <h2 className="text-xl font-semibold">{session.user?.name}</h2>
-            <p className="text-gray-600">{session.user?.email}</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Mon Profil</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center space-y-4">
+              {session.user?.image && (
+                <div className="relative w-24 h-24 rounded-full overflow-hidden">
+                  <Image
+                    src={session.user.image}
+                    alt="Photo de profil"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <h2 className="text-xl font-semibold">{session.user?.name}</h2>
+              <p className="text-gray-600">{session.user?.email}</p>
 
-            <div className="w-full space-y-4 mt-8">
-              <Button variant="outline" className="w-full">
-                Modifier mon profil
-              </Button>
-              <Button variant="destructive" className="w-full">
-                Supprimer mon compte
-              </Button>
+              <div className="w-full space-y-4 mt-8">
+                <Button variant="outline" className="w-full">
+                  Modifier mon profil
+                </Button>
+                <Button variant="destructive" className="w-full">
+                  Supprimer mon compte
+                </Button>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Section Export des données */}
+        <section>
+          <h2 className="text-xl font-semibold text-white mb-6">
+            Mes données personnelles
+          </h2>
+          <ExportDonnees />
+        </section>
+      </div>
     </div>
   );
 }

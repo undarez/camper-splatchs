@@ -1,151 +1,197 @@
-const Privacy = () => {
+"use client";
+
+import {
+  Shield,
+  Database,
+  Settings,
+  Lock,
+  UserCog,
+  RefreshCw,
+  Mail,
+  User,
+  Activity,
+  Server,
+  Key,
+  FileText,
+  Edit3,
+  Trash2,
+} from "lucide-react";
+import { Button } from "@/app/components/ui/button";
+import Link from "next/link";
+
+export default function RegleConfidentialite() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-white">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-          {/* En-tête */}
-          <div className="border-b border-blue-100 pb-8 mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] bg-clip-text text-transparent">
-              Règles de Confidentialité
-            </h1>
-            <p className="mt-4 text-gray-600">
-              Dernière mise à jour : {new Date().toLocaleDateString("fr-FR")}
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-[#1a1f37] rounded-lg p-8 shadow-lg border border-gray-700/50">
+          <h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
+            Règles de Confidentialité
+          </h1>
+          <p className="text-gray-400 text-sm mb-8 text-center">
+            Dernière mise à jour : 20/01/2025
+          </p>
 
-          {/* Introduction */}
-          <div className="mb-8 p-6 bg-gradient-to-r from-[#2ABED9]/5 to-transparent rounded-xl">
-            <p className="text-gray-700 leading-relaxed">
-              Chez SplashCamper, nous accordons une grande importance à la
-              protection de vos données personnelles. Cette politique détaille
-              comment nous collectons, utilisons et protégeons vos informations.
-            </p>
-          </div>
-
-          {/* Sections principales */}
-          <div className="space-y-8">
-            {/* Collecte des données */}
-            <section className="bg-gradient-to-r from-blue-50 to-transparent p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                1. Collecte des données
-              </h2>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3 mt-2"></div>
-                  <span>
-                    <strong className="text-[#1B4B82]">
-                      Informations de compte :
-                    </strong>{" "}
-                    email, nom d&apos;utilisateur
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-[#2ABED9] rounded-full mr-3 mt-2"></div>
-                  <span>
-                    <strong className="text-[#1B4B82]">
-                      Données de profil :
-                    </strong>{" "}
-                    type de véhicule, département pas obligatoire
-                  </span>
-                </li>
-              </ul>
-            </section>
-
-            {/* Utilisation des données */}
-            <section className="p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                2. Utilisation des données
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white p-4 rounded-lg border border-blue-100">
-                  <h3 className="font-medium text-[#2ABED9] mb-2">
-                    Services essentiels
-                  </h3>
-                  <p className="text-gray-700">
-                    Fournir et améliorer nos services de localisation de
-                    stations
-                  </p>
-                </div>
-                <div className="bg-white p-4 rounded-lg border border-blue-100">
-                  <h3 className="font-medium text-[#2ABED9] mb-2">
-                    Personnalisation
-                  </h3>
-                  <p className="text-gray-700">
-                    Adapter votre expérience selon vos préférences
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Protection des données */}
-            <section className="bg-gradient-to-r from-blue-50 to-transparent p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                3. Protection des données
-              </h2>
-              <p className="text-gray-700 leading-relaxed">
-                Conformément au RGPD, nous mettons en œuvre des mesures de
-                sécurité strictes pour protéger vos données personnelles contre
-                tout accès non autorisé, modification ou destruction.
+          <div className="text-gray-300 mb-8">
+            <div className="flex items-start gap-3">
+              <Shield className="w-6 h-6 text-blue-500 flex-shrink-0 mt-1" />
+              <p>
+                Chez SplashCamper, la protection de vos données personnelles est
+                une priorité. Cette politique explique en détail comment nous
+                collectons, utilisons, stockons et protégeons vos informations
+                personnelles, conformément aux réglementations applicables, y
+                compris le RGPD.
               </p>
-            </section>
+            </div>
+          </div>
 
-            {/* Vos droits */}
-            <section className="p-6 rounded-xl">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
-                4. Vos droits
-              </h2>
-              <div className="grid gap-4">
-                {[
-                  "Accès",
-                  "Rectification",
-                  "Suppression",
-                  "Opposition",
-                  "Portabilité",
-                ].map((droit) => (
-                  <div
-                    key={droit}
-                    className="flex items-center space-x-3 text-gray-700"
-                  >
-                    <svg
-                      className="w-5 h-5 text-[#2ABED9]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Droit de {droit.toLowerCase()}</span>
-                  </div>
-                ))}
+          {/* Section 1: Collecte des données */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+              <Database className="w-6 h-6 mr-2 text-blue-500" />
+              1. Collecte des données
+            </h2>
+            <p className="text-gray-300 mb-4">
+              Nous collectons uniquement les données nécessaires à
+              l'amélioration de votre expérience utilisateur et au bon
+              fonctionnement de l'application.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <User className="w-5 h-5 mr-2 text-teal-500" />
+                  Informations de compte
+                </h3>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li>• Adresse e-mail</li>
+                  <li>• Nom d'utilisateur</li>
+                  <li>• Mode de connexion (Google)</li>
+                </ul>
               </div>
-            </section>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <Activity className="w-5 h-5 mr-2 text-teal-500" />
+                  Données d'utilisation
+                </h3>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li>• Interactions avec l'application</li>
+                  <li>• Emplacements recherchés</li>
+                  <li>• Stations consultées</li>
+                </ul>
+              </div>
+            </div>
+          </section>
 
-            {/* Contact */}
-            <section className="bg-gradient-to-r from-[#2ABED9]/10 to-[#1B4B82]/10 p-6 rounded-xl mt-12">
-              <h2 className="text-2xl font-semibold text-[#1B4B82] mb-4">
+          {/* Section 2: Utilisation des données */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+              <Settings className="w-6 h-6 mr-2 text-blue-500" />
+              2. Utilisation des données
+            </h2>
+            <div className="space-y-4">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <Server className="w-5 h-5 mr-2 text-teal-500" />
+                  Services essentiels
+                </h3>
+                <ul className="space-y-2 text-gray-300 text-sm">
+                  <li>• Fonctionnalités principales de l'application</li>
+                  <li>• Vérification des informations soumises</li>
+                  <li>• Validation des contenus</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 3: Protection des données */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+              <Lock className="w-6 h-6 mr-2 text-blue-500" />
+              3. Protection des données
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <Key className="w-5 h-5 mr-2 text-teal-500" />
+                  Chiffrement
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Données sensibles chiffrées
+                </p>
+              </div>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <RefreshCw className="w-5 h-5 mr-2 text-teal-500" />
+                  Sauvegardes
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Sauvegardes régulières et sécurisées
+                </p>
+              </div>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <Shield className="w-5 h-5 mr-2 text-teal-500" />
+                  Contrôle
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Accès strictement contrôlés
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 4: Vos droits */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
+              <UserCog className="w-6 h-6 mr-2 text-blue-500" />
+              4. Vos droits
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <FileText className="w-5 h-5 mr-2 text-teal-500" />
+                  Droit d'accès
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Demander une copie de vos données
+                </p>
+              </div>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <Edit3 className="w-5 h-5 mr-2 text-teal-500" />
+                  Droit de rectification
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  Corriger vos informations
+                </p>
+              </div>
+              <div className="bg-gray-800/50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium text-white mb-3 flex items-center">
+                  <Trash2 className="w-5 h-5 mr-2 text-teal-500" />
+                  Droit de suppression
+                </h3>
+                <p className="text-gray-300 text-sm">Demander la suppression</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Contact */}
+          <div className="bg-blue-600/20 p-6 rounded-lg mt-12">
+            <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <Mail className="w-6 h-6 mr-2 text-blue-400" />
+              Nous contacter
+            </h2>
+            <p className="text-gray-300 mb-4">
+              Pour exercer vos droits ou pour toute question concernant vos
+              données personnelles :
+            </p>
+            <Link href="/pages/Contact">
+              <Button className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800">
                 Contactez-nous
-              </h2>
-              <p className="text-gray-700 mb-4">
-                Pour toute question concernant vos données personnelles ou pour
-                exercer vos droits :
-              </p>
-              <a
-                href="/pages/Contact"
-                className="inline-block bg-gradient-to-r from-[#2ABED9] to-[#1B4B82] text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
-              >
-                Nous contacter
-              </a>
-            </section>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Privacy;
+}
