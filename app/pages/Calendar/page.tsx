@@ -17,24 +17,18 @@ import { notesService } from "@/app/services/notes";
 import { Note } from "@/app/types/notes";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createClient, User } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-  },
-});
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function CalendarPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [date, setDate] = useState<Date>(new Date());
   const [notes, setNotes] = useState<Note[]>([]);
   const [currentNote, setCurrentNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
 
   // Synchroniser l'authentification avec Supabase
   useEffect(() => {
@@ -42,55 +36,69 @@ export default function CalendarPage() {
       if (!session?.user?.email) return;
 
       try {
-        // Récupérer la session Supabase existante
+        // Vérifier si l'utilisateur est déjà connecté à Supabase
         const {
           data: { session: supaSession },
-          error: sessionError,
         } = await supabase.auth.getSession();
 
-        if (sessionError) {
-          throw sessionError;
-        }
-
-        // Si pas de session Supabase, créer un nouvel utilisateur
-        if (!supaSession) {
-          const { error: signUpError } = await supabase.auth.signUp({
-            email: session.user.email,
-            password: crypto.randomUUID(), // Utiliser un mot de passe aléatoire sécurisé
-            options: {
-              data: {
-                name: session.user.name,
-                provider: session.user.provider || "credentials",
-              },
-            },
-          });
-
-          if (
-            signUpError &&
-            !signUpError.message.includes("User already registered")
-          ) {
-            throw signUpError;
-          }
-        }
-
-        // Mettre à jour l'utilisateur Supabase
         if (supaSession?.user) {
-          setSupabaseUser(supaSession.user);
+          await notesService.getNotesByDate(
+            session.user.email,
+            format(new Date(), "yyyy-MM-dd")
+          );
+          return;
+        }
+
+        // Créer une session Supabase avec Google
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent",
+            },
+          },
+        });
+
+        if (error) {
+          console.error("Erreur d'authentification:", error);
+          toast.error("Erreur de synchronisation avec la base de données");
+          return;
+        }
+
+        // Rediriger vers l'URL de Google si disponible
+        if (data?.url) {
+          window.location.href = data.url;
+          return;
+        }
+
+        // Si pas de redirection, attendre la session
+        const {
+          data: { session: newSession },
+        } = await supabase.auth.getSession();
+
+        if (newSession?.user) {
+          await notesService.getNotesByDate(
+            session.user.email,
+            format(new Date(), "yyyy-MM-dd")
+          );
         }
       } catch (error) {
-        console.error("Erreur d'authentification:", error);
-        toast.error("Erreur de synchronisation de l'authentification");
+        console.error("Erreur de synchronisation:", error);
+        toast.error("Erreur de synchronisation avec la base de données");
       }
     };
 
-    syncSupabaseAuth();
-  }, [session]);
+    if (status === "authenticated") {
+      syncSupabaseAuth();
+    }
+  }, [session, status]);
 
   const fetchNotes = useCallback(async () => {
-    if (!supabaseUser?.id) return;
+    if (!session?.user?.email) return;
     try {
       const fetchedNotes = await notesService.getNotesByDate(
-        supabaseUser.id,
+        session.user.email,
         format(date, "yyyy-MM-dd")
       );
       setNotes(fetchedNotes);
@@ -98,24 +106,29 @@ export default function CalendarPage() {
       console.error("Erreur lors de la récupération des notes:", error);
       toast.error("Impossible de charger les notes");
     }
-  }, [supabaseUser?.id, date]);
+  }, [session?.user?.email, date]);
 
   useEffect(() => {
-    fetchNotes();
-  }, [fetchNotes]);
+    if (status === "authenticated") {
+      fetchNotes();
+    }
+  }, [fetchNotes, status]);
 
   const handleSaveNote = async () => {
-    if (!currentNote.trim() || !supabaseUser?.id) return;
+    if (!currentNote.trim() || !session?.user?.email) {
+      toast.error("Veuillez d'abord écrire une note");
+      return;
+    }
 
     setIsLoading(true);
     try {
       await notesService.createNote(
-        supabaseUser.id,
+        session.user.email,
         format(date, "yyyy-MM-dd"),
         currentNote.trim()
       );
       setCurrentNote("");
-      fetchNotes();
+      await fetchNotes();
       toast.success("Note enregistrée avec succès");
     } catch (error) {
       console.error("Erreur lors de la sauvegarde de la note:", error);
@@ -128,7 +141,7 @@ export default function CalendarPage() {
   const handleDeleteNote = async (noteId: string) => {
     try {
       await notesService.deleteNote(noteId);
-      fetchNotes();
+      await fetchNotes();
       toast.success("Note supprimée avec succès");
     } catch (error) {
       console.error("Erreur lors de la suppression de la note:", error);
@@ -254,7 +267,7 @@ export default function CalendarPage() {
                   />
                   <button
                     onClick={handleSaveNote}
-                    disabled={isLoading}
+                    disabled={isLoading || !currentNote.trim()}
                     className="w-full py-1.5 px-2 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs"
                   >
                     {isLoading ? "Enregistrement..." : "Enregistrer la note"}
