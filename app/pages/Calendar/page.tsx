@@ -27,7 +27,9 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const redirectUrl =
   typeof window !== "undefined"
     ? `${window.location.protocol}//${window.location.host}`
-    : process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000";
+    : process.env.NODE_ENV === "production"
+    ? "https://www.splashcamper.fr"
+    : "http://localhost:3000";
 
 export default function CalendarPage() {
   const { data: session, status } = useSession();
