@@ -61,7 +61,7 @@ export default function CalendarPage() {
               access_type: "offline",
               prompt: "consent",
             },
-            redirectTo: `${redirectUrl}/auth/callback`,
+            redirectTo: `${redirectUrl}/auth/callback?next=/pages/Calendar`,
           },
         });
 
