@@ -23,6 +23,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Déterminer l'URL de redirection en fonction de l'environnement
+const redirectUrl =
+  typeof window !== "undefined"
+    ? `${window.location.protocol}//${window.location.host}`
+    : process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000";
+
 export default function CalendarPage() {
   const { data: session, status } = useSession();
   const [date, setDate] = useState<Date>(new Date());
@@ -36,7 +42,6 @@ export default function CalendarPage() {
       if (!session?.user?.email) return;
 
       try {
-        // Vérifier si l'utilisateur est déjà connecté à Supabase
         const {
           data: { session: supaSession },
         } = await supabase.auth.getSession();
@@ -49,7 +54,6 @@ export default function CalendarPage() {
           return;
         }
 
-        // Créer une session Supabase avec Google
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
@@ -57,6 +61,7 @@ export default function CalendarPage() {
               access_type: "offline",
               prompt: "consent",
             },
+            redirectTo: `${redirectUrl}/auth/callback`,
           },
         });
 
