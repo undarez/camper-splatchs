@@ -5,6 +5,7 @@ import { Button } from "@/app/components/ui/button";
 import { Card } from "@/app/components/ui/card";
 import Image from "next/image";
 import { Check } from "lucide-react";
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 interface Guide {
   id: number;
@@ -22,6 +23,67 @@ interface Guide {
 const guides: Guide[] = [
   {
     id: 1,
+    title: "Pourquoi le lavage d'un camping-car est-il important ?",
+    category: "Entretien",
+    image: "/images/lavage-camping-car.png",
+    description:
+      "Découvrez les meilleures pratiques pour l'entretien de votre camping-car et préservez sa valeur à long terme.",
+    content: [
+      {
+        subtitle: "L'importance du lavage régulier",
+        text: "Le lavage régulier d'un camping-car est une étape essentielle, autant pour préserver son esthétique que pour assurer son bon fonctionnement à long terme. Selon CosmétiCar, un entretien régulier contribue à maintenir la valeur de votre véhicule tout en évitant les dommages liés à la saleté ou aux résidus accumulés.\n\nEn effet, chaque tache, chaque trace de saleté ou de poussière agit comme un élément corrosif pouvant endommager la carrosserie, les vitres, le toit ou les pare-chocs. En nettoyant régulièrement ces parties, vous protégez votre camping-car contre la corrosion, les rayures et la détérioration prématurée, tout en prolongeant sa durée de vie.",
+      },
+      {
+        subtitle:
+          "Conseils pour laver efficacement l'extérieur de votre camping-car",
+        text: "Lorsque vous procédez au nettoyage extérieur de votre camping-car, voici quelques étapes à suivre pour un résultat optimal, tout en préservant les surfaces délicates de votre véhicule :",
+      },
+      {
+        subtitle: "Préparer le lavage",
+        text: "Étapes essentielles pour préparer le lavage :",
+        items: [
+          "Commencez par rincer l'ensemble du camping-car avec de l'eau pour retirer les poussières et les saletés de surface. Cela évite les rayures lorsque vous commencez à frotter.",
+          "Assurez-vous que votre matériel (brosse, produits) est adapté aux surfaces de véhicules récréatifs.",
+        ],
+      },
+      {
+        subtitle: "Utiliser les bons outils et produits",
+        text: "Pour un lavage efficace et sécurisé :",
+        items: [
+          "Optez pour un lavage à pression modérée. Une pression trop forte pourrait endommager certaines parties sensibles comme les joints ou les panneaux solaires.",
+          "Utilisez des produits de nettoyage spécialement conçus pour les camping-cars ou les véhicules récréatifs. Ces produits préservent la brillance de la carrosserie tout en éliminant efficacement les traces sur le toit, les pare-chocs ou les vitres.",
+          "Munissez-vous d'une brosse télescopique pour accéder aux zones difficiles d'accès, comme le toit ou le haut des vitres.",
+        ],
+      },
+      {
+        subtitle: "Nettoyer le toit et les accessoires spécifiques",
+        text: "Points importants pour le nettoyage des parties hautes :",
+        items: [
+          "Le toit, souvent négligé, doit être nettoyé avec soin. Des débris ou résidus accumulés peuvent affecter les panneaux solaires ou provoquer des fuites à long terme.",
+          "Rincez abondamment pour éliminer les restes de produit nettoyant, en particulier sur les accessoires comme les antennes ou climatiseurs de toit.",
+        ],
+      },
+      {
+        subtitle: "Sécher et inspecter",
+        text: "Étapes finales importantes :",
+        items: [
+          "Utilisez un chiffon microfibre doux pour sécher la surface et éviter les traces d'eau.",
+          "Profitez de cette étape pour inspecter la carrosserie et détecter d'éventuels dommages, comme des fissures ou des rayures.",
+        ],
+      },
+      {
+        subtitle:
+          "Une alternative pratique : utiliser une station référencée sur SplashCamper",
+        text: "Si vous préférez un lavage rapide et efficace sans matériel ou si vous êtes en déplacement, vous pouvez utiliser l'une des stations de lavage référencées dans l'application SplashCamper. Ces stations sont adaptées pour les véhicules volumineux comme les camping-cars, avec des équipements conçus pour répondre à leurs besoins spécifiques.",
+      },
+      {
+        subtitle: "Contribuez à la communauté SplashCamper !",
+        text: "Si vous découvrez une station de lavage qui n'est pas encore référencée dans l'application, vous pouvez contribuer en l'ajoutant directement via la plateforme. Votre contribution permettra à d'autres utilisateurs de profiter d'options supplémentaires pour entretenir leurs véhicules.",
+      },
+    ],
+  },
+  {
+    id: 2,
     title: "Nettoyage Écologique du Camping-Car",
     category: "Écologie",
     image: "/images/netoyage.jpg",
@@ -77,7 +139,7 @@ const guides: Guide[] = [
     ],
   },
   {
-    id: 2,
+    id: 3,
     title: "Économiser l'eau",
     category: "Écologie",
     image: "/images/economie.jpg",
@@ -124,7 +186,7 @@ const guides: Guide[] = [
     ],
   },
   {
-    id: 3,
+    id: 4,
     title: "Entretien hivernal",
     category: "Saisonnier",
     image: "/images/entretienhiver.jpg",
@@ -178,12 +240,27 @@ const guides: Guide[] = [
 
 export default function GuidePage() {
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleGuideClick = async (guide: Guide) => {
+    setIsLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulation de chargement
+      setSelectedGuide(guide);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-[#1E2337] py-8 sm:py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
-          Guide du camping-cariste
+          Conseils & Astuces
         </h1>
 
         {selectedGuide ? (
@@ -201,13 +278,37 @@ export default function GuidePage() {
               </Button>
             </div>
 
+            {selectedGuide.id === 1 && (
+              <div className="mb-8 flex flex-col items-center">
+                <p className="text-xl font-semibold text-cyan-400 mb-4">
+                  Source de l'article
+                </p>
+                <a
+                  href="https://www.cosmeticar.fr/lavage-camping-car"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block"
+                >
+                  <Image
+                    src="/images/version_2000_logo-cosmeticar.png"
+                    alt="CosmétiCar Logo"
+                    width={250}
+                    height={125}
+                    className="mb-4 hover:opacity-80 transition-opacity"
+                  />
+                </a>
+              </div>
+            )}
+
             <div className="prose prose-invert max-w-none">
               {selectedGuide.content.map((section, index) => (
                 <div key={index} className="mb-8">
                   <h3 className="text-xl font-semibold text-cyan-400 mb-4">
                     {section.subtitle}
                   </h3>
-                  <p className="text-gray-300 mb-4">{section.text}</p>
+                  <p className="text-gray-300 mb-4 whitespace-pre-line">
+                    {section.text}
+                  </p>
                   {section.items && (
                     <ul className="space-y-2">
                       {section.items.map((item, itemIndex) => (
@@ -224,6 +325,28 @@ export default function GuidePage() {
                 </div>
               ))}
             </div>
+
+            {selectedGuide.id === 1 && (
+              <div className="mt-8 border-t border-gray-700 pt-8 flex flex-col items-center text-center">
+                <p className="text-lg text-gray-300 mb-4">
+                  Article inspiré du contenu de{" "}
+                  <span className="text-cyan-400 font-semibold">
+                    CosmétiCar
+                  </span>
+                </p>
+                <Button
+                  className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 px-8"
+                  onClick={() =>
+                    window.open(
+                      "https://www.cosmeticar.fr/lavage-camping-car",
+                      "_blank"
+                    )
+                  }
+                >
+                  Lire l'article original
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -252,10 +375,37 @@ export default function GuidePage() {
                   </h3>
                   <p className="text-gray-400 mb-4">{guide.description}</p>
                   <Button
-                    onClick={() => setSelectedGuide(guide)}
+                    onClick={() => handleGuideClick(guide)}
+                    disabled={isLoading}
                     className="w-full bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800"
                   >
-                    Lire le guide
+                    {isLoading ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Chargement...
+                      </>
+                    ) : (
+                      "Lire le guide"
+                    )}
                   </Button>
                 </div>
               </Card>
@@ -273,20 +423,103 @@ export default function GuidePage() {
               <div className="grid gap-6">
                 <div className="border-b border-gray-700/50 pb-4">
                   <h3 className="text-xl font-semibold text-cyan-400 mb-2">
-                    Quelle est la meilleure période pour laver son camping-car ?
+                    Quels produits sont suggérés pour le nettoyage d'un
+                    camping-car ?
                   </h3>
                   <p className="text-gray-300">
-                    Il est recommandé de laver son camping-car tôt le matin ou
-                    en fin de journée pour éviter...
+                    Pour nettoyer un camping-car, utilisez des produits
+                    spécifiques adaptés aux véhicules de loisirs :
+                  </p>
+                  <ul className="mt-2 space-y-2">
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>
+                        Shampoing pour camping-car : nettoyants doux préservant
+                        la peinture
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>
+                        Dégraissants doux pour les zones avec traces d'huile
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>Nettoyants pour vitres sans ammoniaque</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>Cire protectrice spéciale camping-car</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="border-b border-gray-700/50 pb-4">
+                  <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+                    Quel produit appliquer avant de nettoyer en station de
+                    lavage ?
+                  </h3>
+                  <p className="text-gray-300">
+                    Appliquez un dégraissant doux ou un pré-nettoyant sur les
+                    zones les plus sales comme les pare-chocs, les roues, les
+                    bas de caisse et le toit. Laissez agir quelques minutes
+                    avant de rincer.
                   </p>
                 </div>
                 <div className="border-b border-gray-700/50 pb-4">
                   <h3 className="text-xl font-semibold text-cyan-400 mb-2">
-                    Comment protéger la carrosserie ?
+                    Est-il possible de nettoyer les panneaux solaires du
+                    camping-car ?
                   </h3>
                   <p className="text-gray-300">
-                    Utilisez des produits spécifiques pour camping-cars, évitez
-                    les brosses trop dures...
+                    Oui, utilisez une éponge douce ou une brosse télescopique
+                    avec des fibres souples, de l'eau tiède et un détergent
+                    doux. Évitez les produits abrasifs et rincez abondamment.
+                  </p>
+                </div>
+                <div className="border-b border-gray-700/50 pb-4">
+                  <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+                    Puis-je utiliser un nettoyeur haute pression sur un
+                    camping-car ?
+                  </h3>
+                  <p className="text-gray-300">
+                    Oui, mais avec précaution : réglez une pression moyenne,
+                    gardez une distance de 30 cm minimum et évitez les joints et
+                    bouches d'aération.
+                  </p>
+                </div>
+                <div className="border-b border-gray-700/50 pb-4">
+                  <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+                    Quels équipements sont indispensables pour laver un
+                    camping-car ?
+                  </h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>Une brosse télescopique pour le toit</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>Un seau avec des produits adaptés</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>Un chiffon microfibre pour le séchage</span>
+                    </li>
+                    <li className="flex items-start gap-3 text-gray-300">
+                      <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+                      <span>Un nettoyeur haute pression réglable</span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="border-b border-gray-700/50 pb-4">
+                  <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+                    Peut-on laver un camping-car en hiver ?
+                  </h3>
+                  <p className="text-gray-300">
+                    Oui, mais lavez au-dessus de 0°C, utilisez de l'eau tiède et
+                    des produits adaptés aux basses températures. Séchez
+                    soigneusement les joints pour éviter le gel.
                   </p>
                 </div>
               </div>
@@ -320,7 +553,7 @@ export default function GuidePage() {
                     </h3>
                     <p className="text-gray-300">
                       Faites le tour de votre véhicule régulièrement pour
-                      détecter...
+                      détecter les problèmes potentiels.
                     </p>
                   </div>
                 </div>
@@ -344,10 +577,17 @@ export default function GuidePage() {
                     <h3 className="text-xl font-semibold text-white mb-2">
                       Planification
                     </h3>
-                    <p className="text-gray-300">
+                    <p className="text-gray-300 mb-4">
                       Établissez un calendrier d'entretien pour votre
-                      camping-car...
+                      camping-car. Utilisez notre calendrier personnel pour
+                      planifier et suivre vos entretiens.
                     </p>
+                    <Button
+                      onClick={() => (window.location.href = "/pages/Calendar")}
+                      className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800"
+                    >
+                      Accéder à mon calendrier
+                    </Button>
                   </div>
                 </div>
               </div>

@@ -1,22 +1,39 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const latestStations = await prisma.station.findMany({
-      take: 3,
-      orderBy: {
-        createdAt: "desc",
+      where: {
+        status: "active",
       },
       include: {
         services: true,
         parkingDetails: true,
-        reviews: true,
+        reviews: {
+          select: {
+            rating: true,
+            content: true,
+            createdAt: true,
+            author: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
-      where: {
-        status: "active",
+      orderBy: {
+        createdAt: "desc",
       },
+      take: 3,
     });
+
+    if (!latestStations || latestStations.length === 0) {
+      return NextResponse.json([]);
+    }
 
     const stationsWithDetails = latestStations.map((station) => {
       const averageRating = station.reviews.length
@@ -25,9 +42,21 @@ export async function GET() {
         : 0;
 
       return {
-        ...station,
-        images: station.images || [],
-        averageRating,
+        id: station.id,
+        name: station.name,
+        address: station.address,
+        city: station.city,
+        postalCode: station.postalCode,
+        latitude: station.latitude,
+        longitude: station.longitude,
+        status: station.status,
+        type: station.type,
+        createdAt: station.createdAt,
+        images: Array.isArray(station.images) ? station.images : [],
+        services: station.services,
+        parkingDetails: station.parkingDetails,
+        reviews: station.reviews,
+        averageRating: Number(averageRating.toFixed(1)),
       };
     });
 

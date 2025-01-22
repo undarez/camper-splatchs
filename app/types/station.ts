@@ -1,4 +1,10 @@
-import { Service as PrismaService } from "@prisma/client";
+import {
+  Service as PrismaService,
+  Station,
+  Service,
+  Review,
+  ElectricityType,
+} from "@prisma/client";
 import { ServiceType, StationStatus } from "./index";
 
 export type StationWithPrismaServices = {
@@ -19,3 +25,27 @@ export type CreateStationInput = {
   description?: string;
   services: Omit<ServiceType, "id" | "stationId">;
 };
+
+export interface StationWithDetails extends Station {
+  services: Service | null;
+  images: string[];
+  parkingDetails: {
+    id: string;
+    isPayant: boolean;
+    tarif: number | null;
+    taxeSejour: number | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    createdAt: Date;
+  } | null;
+  reviews: Review[];
+  averageRating: number;
+}

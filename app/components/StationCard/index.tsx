@@ -1,6 +1,5 @@
 "use client";
 
-import { Station, Service, Review } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { Card } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
@@ -9,28 +8,7 @@ import Image from "next/image";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/navigation";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButton";
-
-interface StationWithDetails extends Station {
-  services: Service | null;
-  images: string[];
-  parkingDetails: {
-    isPayant: boolean;
-    tarif: number | null;
-    taxeSejour: number | null;
-    hasElectricity: string;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-    waterPoint: boolean;
-    wasteWater: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-  } | null;
-  reviews: Review[];
-  averageRating?: number;
-}
+import { StationWithDetails } from "@/app/types/station";
 
 interface StationCardProps {
   station: StationWithDetails;

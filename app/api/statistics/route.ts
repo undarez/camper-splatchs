@@ -5,28 +5,46 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // Nombre total de stations
-    const totalStations = await prisma.station.count();
+    // Nombre total de stations actives
+    const stations = await prisma.station.count({
+      where: {
+        status: "active",
+      },
+    });
 
     // Nombre total d'utilisateurs
-    const totalUsers = await prisma.user.count();
+    const users = await prisma.user.count();
 
-    // Nombre total d'avis
-    const totalReviews = await prisma.review.count();
+    // Nombre total d'avis sur les stations actives
+    const reviews = await prisma.review.count({
+      where: {
+        station: {
+          status: "active",
+        },
+      },
+    });
 
     // Derniers avis
     const recentReviews = await prisma.review.findMany({
-      take: 2,
-      orderBy: {
-        createdAt: "desc",
+      where: {
+        station: {
+          status: "active",
+        },
       },
-      include: {
+      select: {
+        content: true,
+        rating: true,
+        createdAt: true,
         author: {
           select: {
             name: true,
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 2,
     });
 
     const formattedReviews = recentReviews.map((review) => ({
@@ -38,9 +56,9 @@ export async function GET() {
 
     return NextResponse.json({
       statistics: {
-        stations: totalStations,
-        users: totalUsers,
-        reviews: totalReviews,
+        stations,
+        users,
+        reviews,
       },
       recentReviews: formattedReviews,
     });

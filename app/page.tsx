@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import Statistics from "@/app/components/Statistics";
 import Image from "next/image";
@@ -9,34 +9,20 @@ import PrivacyPolicyModal from "@/app/components/PrivacyPolicyModal";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
-import { Station, Service, Review } from "@prisma/client";
-import StationCard from "@/app/components/StationCard";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/app/components/ui/skeleton";
+import { StationWithDetails } from "@/app/types/station";
 import { useRouter } from "next/navigation";
 
-interface StationWithDetails extends Station {
-  services: Service | null;
-  images: string[];
-  parkingDetails: {
-    isPayant: boolean;
-    tarif: number | null;
-    taxeSejour: number | null;
-    hasElectricity: string;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-    waterPoint: boolean;
-    wasteWater: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-  } | null;
-  reviews: Review[];
-  averageRating?: number;
-}
+const StationCard = dynamic(() => import("@/app/components/StationCard"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[400px] w-full rounded-lg" />,
+});
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [latestStations, setLatestStations] = useState<StationWithDetails[]>(
     []
   );
@@ -51,10 +37,21 @@ export default function Home() {
     // Charger les dernières stations
     const fetchLatestStations = async () => {
       try {
-        const response = await fetch("/api/stations/latest");
+        const response = await fetch("/api/stations/latest", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
         if (response.ok) {
           const data = await response.json();
+          console.log("Stations chargées:", data); // Pour le débogage
           setLatestStations(data);
+        } else {
+          console.error(
+            "Erreur lors du chargement des stations:",
+            response.status
+          );
         }
       } catch (error) {
         console.error("Erreur lors du chargement des stations:", error);
@@ -69,11 +66,17 @@ export default function Home() {
     return !!sessionData?.user;
   };
 
-  const handleLogin = () => {
-    router.push("/signin");
+  const handleLogin = async () => {
+    setIsLoggingIn(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulation de chargement
+      await router.push("/signin");
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
-  if (loading) {
+  if (loading || isLoggingIn) {
     return <LoadingScreen />;
   }
 
@@ -180,26 +183,105 @@ export default function Home() {
             Dernières stations ajoutées
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {latestStations.map((station) => (
-              <div key={station.id} className="relative group">
-                <StationCard station={station} />
-                {!hasFullAccess() && (
-                  <div className="absolute inset-0 bg-[#1E2337]/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="text-center p-4">
-                      <p className="text-white text-lg mb-4">
-                        Connectez-vous pour voir les détails
-                      </p>
-                      <Button
-                        onClick={handleLogin}
-                        className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
-                      >
-                        Se connecter gratuitement
-                      </Button>
-                    </div>
+            <Suspense fallback={<div>Chargement...</div>}>
+              {latestStations.map((station) => (
+                <div key={station.id} className="relative group">
+                  <div className={!hasFullAccess() ? "blur-sm" : ""}>
+                    <StationCard station={station} />
                   </div>
-                )}
+                  {!hasFullAccess() && (
+                    <div className="absolute inset-0 bg-[#1E2337]/80 backdrop-blur-sm flex items-center justify-center opacity-100">
+                      <div className="text-center p-4">
+                        <p className="text-white text-lg mb-4">
+                          Connectez-vous pour voir les détails
+                        </p>
+                        <Button
+                          onClick={handleLogin}
+                          disabled={isLoggingIn}
+                          className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                        >
+                          {isLoggingIn ? (
+                            <>
+                              <svg
+                                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                              Redirection...
+                            </>
+                          ) : (
+                            "Se connecter gratuitement"
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </Suspense>
+          </div>
+          <div className="flex justify-center mt-8">
+            <div className="relative group">
+              <div className={!hasFullAccess() ? "blur-sm" : ""}>
+                <Link href="/pages/StationCard">
+                  <Button className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    Voir toutes les stations
+                  </Button>
+                </Link>
               </div>
-            ))}
+              {!hasFullAccess() && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Button
+                    onClick={handleLogin}
+                    disabled={isLoggingIn}
+                    className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                  >
+                    {isLoggingIn ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Redirection...
+                      </>
+                    ) : (
+                      "Se connecter pour accéder"
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
