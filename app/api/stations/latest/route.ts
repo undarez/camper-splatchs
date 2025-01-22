@@ -11,7 +11,25 @@ export async function GET() {
       },
       include: {
         services: true,
-        parkingDetails: true,
+        parkingDetails: {
+          select: {
+            id: true,
+            isPayant: true,
+            tarif: true,
+            taxeSejour: true,
+            hasElectricity: true,
+            commercesProches: true,
+            handicapAccess: true,
+            totalPlaces: true,
+            hasWifi: true,
+            hasChargingPoint: true,
+            waterPoint: true,
+            wasteWater: true,
+            wasteWaterDisposal: true,
+            blackWaterDisposal: true,
+            createdAt: true,
+          },
+        },
         reviews: {
           select: {
             rating: true,
@@ -42,16 +60,7 @@ export async function GET() {
         : 0;
 
       return {
-        id: station.id,
-        name: station.name,
-        address: station.address,
-        city: station.city,
-        postalCode: station.postalCode,
-        latitude: station.latitude,
-        longitude: station.longitude,
-        status: station.status,
-        type: station.type,
-        createdAt: station.createdAt,
+        ...station,
         images: Array.isArray(station.images) ? station.images : [],
         services: station.services,
         parkingDetails: station.parkingDetails,
