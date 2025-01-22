@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Station, Review, Service } from "@prisma/client";
 import {
   MapIcon,
   ViewColumnsIcon,
@@ -28,11 +27,13 @@ import {
   Circle as LeafletCircle,
   Marker as LeafletMarker,
 } from "leaflet";
+import { StationWithDetails } from "@/app/types/station";
 
 const StationCard = dynamic(
-  () => import("@/app/components/StationCard/index"),
+  () => import("@/app/components/StationCard").then((mod) => mod.default),
   {
     ssr: false,
+    loading: () => <Skeleton className="h-[400px] w-full rounded-lg" />,
   }
 );
 
@@ -46,27 +47,6 @@ const MapView = dynamic(
     loading: () => <Skeleton className="h-[600px] w-full rounded-lg" />,
   }
 );
-
-interface StationWithDetails extends Station {
-  services: Service | null;
-  parkingDetails: {
-    isPayant: boolean;
-    tarif: number | null;
-    taxeSejour: number | null;
-    hasElectricity: string;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-    waterPoint: boolean;
-    wasteWater: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-  } | null;
-  reviews: Review[];
-  averageRating?: number;
-}
 
 export function StationCardClient() {
   const [stations, setStations] = useState<StationWithDetails[]>([]);
@@ -510,10 +490,12 @@ export function StationCardClient() {
         <main className="flex-1 min-h-screen">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
             {viewMode === "cards" ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {currentStations.map((station) => (
                   <div key={station.id} className="relative group">
-                    <StationCard station={station} />
+                    <div className={!hasFullAccess() ? "blur-sm" : ""}>
+                      <StationCard station={station} showActions={false} />
+                    </div>
                     {!hasFullAccess() && (
                       <div className="absolute inset-0 bg-[#1E2337]/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <div className="text-center p-4">

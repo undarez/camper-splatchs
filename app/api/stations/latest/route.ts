@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { ElectricityType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -11,27 +12,10 @@ export async function GET() {
       },
       include: {
         services: true,
-        parkingDetails: {
-          select: {
-            id: true,
-            isPayant: true,
-            tarif: true,
-            taxeSejour: true,
-            hasElectricity: true,
-            commercesProches: true,
-            handicapAccess: true,
-            totalPlaces: true,
-            hasWifi: true,
-            hasChargingPoint: true,
-            waterPoint: true,
-            wasteWater: true,
-            wasteWaterDisposal: true,
-            blackWaterDisposal: true,
-            createdAt: true,
-          },
-        },
+        parkingDetails: true,
         reviews: {
           select: {
+            id: true,
             rating: true,
             content: true,
             createdAt: true,
@@ -59,12 +43,37 @@ export async function GET() {
           station.reviews.length
         : 0;
 
+      // S'assurer que parkingDetails a toutes les propriétés requises
+      const formattedParkingDetails = station.parkingDetails
+        ? {
+            id: station.parkingDetails.id,
+            isPayant: station.parkingDetails.isPayant,
+            tarif: station.parkingDetails.tarif,
+            taxeSejour: station.parkingDetails.taxeSejour,
+            hasElectricity: station.parkingDetails
+              .hasElectricity as ElectricityType,
+            commercesProches: station.parkingDetails.commercesProches,
+            handicapAccess: station.parkingDetails.handicapAccess,
+            totalPlaces: station.parkingDetails.totalPlaces,
+            hasWifi: station.parkingDetails.hasWifi,
+            hasChargingPoint: station.parkingDetails.hasChargingPoint,
+            waterPoint: station.parkingDetails.waterPoint,
+            wasteWater: station.parkingDetails.wasteWater,
+            wasteWaterDisposal: station.parkingDetails.wasteWaterDisposal,
+            blackWaterDisposal: station.parkingDetails.blackWaterDisposal,
+            createdAt: station.parkingDetails.createdAt,
+          }
+        : null;
+
       return {
         ...station,
         images: Array.isArray(station.images) ? station.images : [],
         services: station.services,
-        parkingDetails: station.parkingDetails,
-        reviews: station.reviews,
+        parkingDetails: formattedParkingDetails,
+        reviews: station.reviews.map((review) => ({
+          ...review,
+          author: review.author,
+        })),
         averageRating: Number(averageRating.toFixed(1)),
       };
     });

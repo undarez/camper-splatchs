@@ -12,9 +12,13 @@ import { StationWithDetails } from "@/app/types/station";
 
 interface StationCardProps {
   station: StationWithDetails;
+  showActions?: boolean;
 }
 
-export default function StationCard({ station }: StationCardProps) {
+export default function StationCard({
+  station,
+  showActions = true,
+}: StationCardProps) {
   const { data: sessionData } = useSession();
   const isGuest = !sessionData && localStorage.getItem("guestSessionId");
   const shouldBlur = !sessionData && isGuest;
@@ -207,18 +211,24 @@ export default function StationCard({ station }: StationCardProps) {
             )}
 
           <div className="mt-4 flex gap-2">
-            <Button
-              onClick={() => router.push(`/pages/StationDetail/${station.id}`)}
-              className="flex-1 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
-            >
-              Voir les détails
-            </Button>
-            <NavigationButton
-              lat={station.latitude}
-              lng={station.longitude}
-              address={station.address}
-              className="flex-none"
-            />
+            {showActions && (
+              <>
+                <Button
+                  onClick={() =>
+                    router.push(`/pages/StationDetail/${station.id}`)
+                  }
+                  className="flex-1 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                >
+                  Voir les détails
+                </Button>
+                <NavigationButton
+                  lat={station.latitude}
+                  lng={station.longitude}
+                  address={station.address}
+                  className="flex-none"
+                />
+              </>
+            )}
           </div>
         </div>
       </div>
