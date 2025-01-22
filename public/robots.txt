@@ -1,5 +1,37 @@
+# https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://splashcamper.fr/sitemap.xml 
+Sitemap: https://splashcamper.fr/sitemap.xml
+
+# Interdire l'accès aux pages d'administration et aux API
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Autoriser l'accès aux ressources statiques
+Allow: /images/
+Allow: /static/
+Allow: /favicon.ico
+Allow: /manifest.json
+
+# Règles spécifiques pour Googlebot
+User-agent: Googlebot
+Allow: /
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.gif$
+Allow: /*.svg$
+
+# Règles spécifiques pour Bingbot
+User-agent: Bingbot
+Allow: /
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.gif$
+Allow: /*.svg$ 

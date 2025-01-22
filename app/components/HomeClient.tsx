@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+
+import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import Statistics from "@/app/components/Statistics";
 import Services from "@/app/components/Services";
 import PrivacyPolicyModal from "@/app/components/PrivacyPolicyModal";
@@ -12,14 +14,13 @@ import { Button } from "@/app/components/ui/button";
 import { StationWithDetails } from "@/app/types/station";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/app/components/ui/skeleton";
-import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 
 const StationCard = dynamic(() => import("@/app/components/StationCard"), {
   ssr: false,
   loading: () => <Skeleton className="h-[400px] w-full rounded-lg" />,
 });
 
-export default function HomePage() {
+export default function HomeClient() {
   const [loading, setLoading] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [latestStations, setLatestStations] = useState<StationWithDetails[]>(
@@ -44,7 +45,8 @@ export default function HomePage() {
         });
         if (response.ok) {
           const data = await response.json();
-          setLatestStations(data.slice(0, 3)); // Limiter aux 3 dernières stations
+          console.log("Stations chargées:", data);
+          setLatestStations(data);
         } else {
           console.error(
             "Erreur lors du chargement des stations:",
@@ -112,7 +114,7 @@ export default function HomePage() {
 
       <PrivacyPolicyModal />
 
-      {/* Hero Section avec image de fond */}
+      {/* Hero Section */}
       <div className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
@@ -133,113 +135,21 @@ export default function HomePage() {
               SplashCamper
             </span>
           </h1>
-          <div className="space-y-6">
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto">
-              Trouvez facilement les meilleures stations adaptées à votre
-              véhicule, avec tous les services dont vous avez besoin
-            </p>
-          </div>
+          <p className="text-xl md:text-2xl lg:text-3xl text-blue-100 mb-12 leading-relaxed max-w-3xl mx-auto">
+            La plus grande base de données de stations de lavage pour
+            camping-cars en France
+          </p>
           <Button
             onClick={() => router.push("/pages/StationCard")}
-            className="mt-8 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white font-bold py-6 px-8 rounded-lg text-xl transform hover:scale-105 transition-all duration-300 shadow-lg"
+            className="bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white font-bold py-6 px-8 rounded-lg text-xl transform hover:scale-105 transition-all duration-300 shadow-lg"
           >
             Découvrir les stations
           </Button>
         </div>
       </div>
 
-      {/* Section Statistiques */}
-      <div className="relative z-10 -mt-20">
-        <Statistics />
-      </div>
-
-      {/* Section Services */}
-      <div className="py-16">
-        <Services />
-      </div>
-
-      {/* Section SEO stylisée */}
-      <div className="relative z-10 py-20 bg-gradient-to-b from-[#1E2337] to-[#1a1f37]">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
-            Station de lavage camping-car en France
-          </h2>
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="bg-[#252b43] p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300">
-              <h3 className="text-2xl font-semibold mb-6 text-cyan-400">
-                Trouvez la station idéale
-              </h3>
-              <p className="text-gray-300 mb-6 leading-relaxed">
-                SplashCamper vous aide à localiser les meilleures stations de
-                lavage adaptées aux camping-cars. Notre plateforme recense les
-                installations spécialement conçues pour les grands gabarits,
-                vous permettant de laver votre camping-car en toute sérénité.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  "Stations de lavage camping-car autour de vous",
-                  "Points d'eau et aires de service",
-                  "Équipements adaptés aux grands véhicules",
-                  "Informations détaillées et mises à jour",
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center text-gray-300">
-                    <svg
-                      className="w-5 h-5 mr-3 text-cyan-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-[#252b43] p-8 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300">
-              <h3 className="text-2xl font-semibold mb-6 text-cyan-400">
-                Services disponibles
-              </h3>
-              <p className="text-gray-300 mb-6 leading-relaxed">
-                Notre application vous permet de trouver facilement tous les
-                services nécessaires pour l'entretien de votre camping-car.
-                Découvrez une sélection complète d'installations adaptées à vos
-                besoins.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  "Portiques de lavage grand gabarit",
-                  "Aires de service complètes",
-                  "Points de vidange eaux usées",
-                  "Stations haute pression adaptées",
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center text-gray-300">
-                    <svg
-                      className="w-5 h-5 mr-3 text-cyan-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Statistics />
+      <Services />
 
       {/* Section des dernières stations */}
       <section className="py-16 px-4 bg-[#1E2337]">

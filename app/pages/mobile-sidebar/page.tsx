@@ -70,6 +70,13 @@ export default function MobileSidebar() {
               >
                 Guides
               </Link>
+              <Link
+                href="/pages/FAQ"
+                className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}
+              >
+                FAQ
+              </Link>
 
               {session && (
                 <>

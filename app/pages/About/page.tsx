@@ -5,12 +5,44 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import { Button } from "@/app/components/ui/button";
+import { Metadata } from "next";
 
 interface Stats {
   totalStations: number;
   totalUsers: number;
   totalParkings: number;
 }
+
+export const metadata: Metadata = {
+  title:
+    "À propos de SplashCamper | L'application de référence pour les camping-caristes",
+  description:
+    "Découvrez l'histoire de SplashCamper, créée par Florian Billard pour faciliter la vie des camping-caristes. Une application innovante née d'une passion pour le camping-car et le développement web.",
+  keywords: [
+    "SplashCamper histoire",
+    "Florian Billard développeur",
+    "application camping-car",
+    "projet camping-car",
+    "innovation camping-car",
+    "communauté camping-car",
+    "développement application",
+    "services camping-caristes",
+    "application mobile camping-car",
+  ],
+  openGraph: {
+    title: "À propos de SplashCamper - Notre histoire et notre mission",
+    description:
+      "Découvrez comment SplashCamper révolutionne le quotidien des camping-caristes avec une application intuitive et complète.",
+    images: [
+      {
+        url: "/images/imageperso.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Équipe SplashCamper",
+      },
+    ],
+  },
+};
 
 export default function About() {
   const [stats, setStats] = useState<Stats>({

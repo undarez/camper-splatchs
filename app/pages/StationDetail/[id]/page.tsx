@@ -154,6 +154,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: session } = useSession();
   const supabase = createClientComponentClient();
+  const [error, setError] = useState<string | null>(null);
 
   const handleRatingChange = (rating: number) => {
     setNewRating(rating);
@@ -202,8 +203,49 @@ export default function Page({ params }: { params: { id: string } }) {
     const fetchStation = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/stations/${params.id}`);
+        console.log("Début de fetchStation - ID de la station:", params.id);
+
+        const response = await fetch(`/api/stations/${params.id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+          },
+        });
+
+        console.log("Réponse reçue:", {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error("Erreur détaillée:", errorData);
+          throw new Error(
+            `Erreur HTTP: ${response.status}. ${errorData.error || ""}`
+          );
+        }
+
         const data = await response.json();
+        console.log(
+          "Données complètes de la station:",
+          JSON.stringify(data, null, 2)
+        );
+
+        if (!data || !data.id) {
+          console.error("Données invalides reçues:", data);
+          throw new Error(
+            "Les données de la station sont invalides ou incomplètes"
+          );
+        }
+
+        console.log("Station trouvée avec succès:", {
+          id: data.id,
+          name: data.name,
+          nbReviews: data.reviews?.length,
+        });
+
         setStation(data);
         setReviewsCount(data.reviews?.length || 0);
 
@@ -218,13 +260,25 @@ export default function Page({ params }: { params: { id: string } }) {
           });
         }
       } catch (error) {
-        console.error("Erreur lors de la récupération de la station:", error);
+        console.error(
+          "Erreur détaillée lors de la récupération de la station:",
+          error
+        );
+        setError(
+          error instanceof Error ? error.message : "Une erreur est survenue"
+        );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStation();
+    if (params.id) {
+      fetchStation();
+    } else {
+      console.error("Pas d'ID de station fourni");
+      setError("ID de station manquant");
+      setLoading(false);
+    }
 
     // Mettre à jour la subscription Supabase pour les avis
     const reviewsSubscription = supabase
@@ -275,11 +329,46 @@ export default function Page({ params }: { params: { id: string } }) {
     return <LoadingScreen />;
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#1E2337] flex items-center justify-center p-4">
+        <div className="bg-red-50 text-red-600 p-6 rounded-lg shadow-lg max-w-md w-full">
+          <h3 className="text-lg font-semibold mb-2">Erreur</h3>
+          <p className="mb-4">{error}</p>
+          <div className="flex justify-between">
+            <Button
+              onClick={() => window.history.back()}
+              className="bg-red-600 text-white hover:bg-red-700 transition-colors"
+            >
+              Retour
+            </Button>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-red-600 text-white hover:bg-red-700 transition-colors"
+            >
+              Réessayer
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!station) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-lg text-gray-600 mb-4">Station non trouvée</p>
-        <Button onClick={() => window.history.back()}>Retour</Button>
+      <div className="min-h-screen bg-[#1E2337] flex items-center justify-center p-4">
+        <div className="bg-yellow-50 text-yellow-600 p-6 rounded-lg shadow-lg max-w-md w-full">
+          <h3 className="text-lg font-semibold mb-2">Station non trouvée</h3>
+          <p className="mb-4">
+            La station que vous recherchez n'existe pas ou a été supprimée.
+          </p>
+          <Button
+            onClick={() => window.history.back()}
+            className="bg-yellow-600 text-white hover:bg-yellow-700 transition-colors"
+          >
+            Retour aux stations
+          </Button>
+        </div>
       </div>
     );
   }

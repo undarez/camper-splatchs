@@ -6,6 +6,7 @@ import { Card } from "@/app/components/ui/card";
 import Image from "next/image";
 import { Check } from "lucide-react";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
+import { Metadata } from "next";
 
 interface Guide {
   id: number;
@@ -237,6 +238,36 @@ const guides: Guide[] = [
     ],
   },
 ];
+
+export const metadata: Metadata = {
+  title: "Guide d'entretien et conseils pour camping-cars | SplashCamper",
+  description:
+    "Découvrez nos guides complets sur l'entretien de votre camping-car : conseils de nettoyage, astuces écologiques, maintenance hivernale et bonnes pratiques.",
+  keywords: [
+    "guide entretien camping-car",
+    "nettoyage camping-car",
+    "conseils camping-car",
+    "maintenance camping-car",
+    "lavage écologique",
+    "hivernage camping-car",
+    "entretien véhicule loisirs",
+    "astuces camping-car",
+    "guide pratique camping-car",
+  ],
+  openGraph: {
+    title: "Guide complet d'entretien pour camping-cars - SplashCamper",
+    description:
+      "Tous nos conseils experts pour l'entretien de votre camping-car : nettoyage, maintenance, astuces écologiques et préparation hivernale.",
+    images: [
+      {
+        url: "/images/lavage-camping-car.png",
+        width: 1200,
+        height: 630,
+        alt: "Guide d'entretien camping-car SplashCamper",
+      },
+    ],
+  },
+};
 
 export default function GuidePage() {
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);

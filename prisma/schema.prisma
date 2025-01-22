@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Account {
@@ -135,7 +136,6 @@ model Review {
   encryptedContent String
   rating           Int
   createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
   author           User     @relation("ReviewAuthor", fields: [authorId], references: [id])
   authorId         String
   station          Station  @relation("StationReviews", fields: [stationId], references: [id])

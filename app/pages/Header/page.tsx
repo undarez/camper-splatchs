@@ -138,6 +138,12 @@ const Header = () => {
                       Guides
                     </Link>
                   </MenubarItem>
+                  <MenubarSeparator className="my-1" />
+                  <MenubarItem className={menuItemClass}>
+                    <Link href="/pages/FAQ" className="w-full">
+                      FAQ
+                    </Link>
+                  </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
 

@@ -494,7 +494,7 @@ export function StationCardClient() {
                 {currentStations.map((station) => (
                   <div key={station.id} className="relative group">
                     <div className={!hasFullAccess() ? "blur-sm" : ""}>
-                      <StationCard station={station} showActions={false} />
+                      <StationCard station={station} showActions={true} />
                     </div>
                     {!hasFullAccess() && (
                       <div className="absolute inset-0 bg-[#1E2337]/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
