@@ -194,19 +194,68 @@ export default function About() {
         {/* À propos de moi */}
         <div className="bg-gray-800 p-8 rounded-lg mb-20">
           <h2 className="text-2xl font-semibold text-white mb-6">
-            À propos de moi : Florian Billard
+            Présentation de l'équipe
           </h2>
+          <h3 className="text-xl font-semibold text-blue-400 mb-4">
+            Florian Billard – Créateur et Gestionnaire de Contenu de
+            l'Application
+          </h3>
+          <div className="text-gray-300 space-y-6">
+            <p>
+              Je m'appelle Florian Billard et je suis passionné par les
+              technologies web et le développement d'applications. À l'âge de 30
+              ans, j'ai découvert les langages informatiques tels que
+              JavaScript, React, et bien d'autres, ce qui a marqué un tournant
+              dans ma carrière.
+            </p>
+            <div className="flex items-center gap-6">
+              <div className="flex-1">
+                <p>
+                  Pour approfondir mes connaissances, j'ai suivi une formation
+                  de niveau Bac+2 Intégrateur d'Applications Web sur
+                  OpenClassrooms. Cette formation m'a permis d'acquérir des
+                  compétences solides, notamment :
+                </p>
+              </div>
+              <div className="relative w-32 h-32 flex-shrink-0">
+                <Image
+                  src="/images/blog_logo.jpg"
+                  alt="Logo OpenClassrooms"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  className="rounded-lg"
+                />
+              </div>
+            </div>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>L'apprentissage des bases : HTML, CSS, et Sass.</li>
+              <li>
+                La mise en œuvre des bonnes pratiques de SEO pour optimiser le
+                référencement d'une maquette.
+              </li>
+              <li>Le développement avancé avec JavaScript et React.</li>
+            </ul>
+            <p>
+              Depuis la fin de cette formation, je continue à me perfectionner
+              en autodidacte, en explorant des technologies modernes telles que
+              Next.js et TypeScript pour repousser les limites des applications
+              web.
+            </p>
+            <p>
+              Ma mission est de rendre l'application SplashCamper intuitive,
+              pratique et enrichissante pour tous les utilisateurs, en
+              m'assurant que le contenu reste clair, pertinent et à jour.
+            </p>
+          </div>
+
+          <h3 className="text-xl font-semibold text-blue-400 mt-8 mb-4">
+            Notre Engagement
+          </h3>
           <p className="text-gray-300 mb-6">
-            Je m'appelle Florian Billard, j'ai 35 ans et je suis né le 29
-            janvier 1989. Depuis mon enfance, j'ai toujours été curieux et
-            fasciné par le monde qui m'entoure. C'est à l'âge de 30 ans que ma
-            vie a réellement changé : j'ai découvert les langages informatiques
-            comme JavaScript, React, et bien d'autres.
-            <br />
-            <br />
-            Depuis, je n'ai cessé de me former et de me perfectionner en
-            autodidacte, explorant les innombrables possibilités offertes par la
-            création d'applications web.
+            Nous nous efforçons de proposer une expérience utilisateur optimale
+            en combinant innovation, collaboration, et écoute des retours des
+            utilisateurs. Si vous souhaitez en savoir plus ou avez des
+            questions, n'hésitez pas à nous contacter.
           </p>
           <div className="flex justify-center">
             <Link href="/pages/Contact">
