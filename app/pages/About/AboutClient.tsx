@@ -167,6 +167,175 @@ export default function AboutClient() {
             </button>
           </Link>
         </div>
+
+        {/* Emplacement Google AdSense 1 */}
+        <div className="my-8 text-center">
+          <div
+            id="splashcamper-about-ad-1"
+            className="min-h-[250px] bg-gray-800 rounded-lg overflow-hidden mx-auto"
+            style={{ maxWidth: "728px" }}
+          >
+            <script
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-VOTRE_ID_CLIENT"
+            ></script>
+            <ins
+              className="adsbygoogle"
+              style={{ display: "block" }}
+              data-ad-client="ca-pub-VOTRE_ID_CLIENT"
+              data-ad-slot="VOTRE_ID_EMPLACEMENT_1"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </div>
+        </div>
+
+        {/* Fonctionnalités à venir */}
+        <div className="mt-20 mb-16">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-12">
+            Fonctionnalités à venir
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-pink-500 mb-4 text-center">
+                Système de récompenses
+              </h3>
+              <p className="text-gray-300 text-center">
+                Gagnez des points en contribuant à la communauté : ajout de
+                stations, avis, photos. Échangez vos points contre des
+                récompenses exclusives.
+              </p>
+            </div>
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-orange-500 mb-4 text-center">
+                Réservation en ligne
+              </h3>
+              <p className="text-gray-300 text-center">
+                Réservez votre créneau de lavage à l'avance dans les stations
+                partenaires pour éviter l'attente et optimiser votre temps.
+              </p>
+            </div>
+            <div className="bg-gray-800 p-6 rounded-lg">
+              <h3 className="text-xl font-semibold text-teal-500 mb-4 text-center">
+                Guide d'entretien personnalisé
+              </h3>
+              <p className="text-gray-300 text-center">
+                Recevez des conseils d'entretien adaptés à votre véhicule et des
+                rappels personnalisés pour maintenir votre camping-car en
+                parfait état.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Emplacement Google AdSense 2 */}
+        <div className="my-8 text-center">
+          <div
+            id="splashcamper-about-ad-2"
+            className="min-h-[250px] bg-gray-800 rounded-lg overflow-hidden mx-auto"
+            style={{ maxWidth: "728px" }}
+          >
+            <script
+              async
+              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-VOTRE_ID_CLIENT"
+            ></script>
+            <ins
+              className="adsbygoogle"
+              style={{ display: "block" }}
+              data-ad-client="ca-pub-VOTRE_ID_CLIENT"
+              data-ad-slot="VOTRE_ID_EMPLACEMENT_2"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            ></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          </div>
+        </div>
+
+        {/* Notre vision */}
+        <div className="bg-gray-800 p-8 rounded-lg mb-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">
+            Notre Vision
+          </h2>
+          <p className="text-gray-300 text-lg text-center max-w-4xl mx-auto">
+            Notre ambition est de faire de SplashCamper la référence
+            incontournable pour tous les camping-caristes en France. Nous
+            travaillons constamment à l'amélioration de nos services, à l'ajout
+            de nouvelles fonctionnalités et à l'expansion de notre réseau de
+            stations partenaires. Notre objectif est de créer une communauté
+            active et engagée, où chaque membre contribue à enrichir
+            l'expérience de tous.
+          </p>
+        </div>
+
+        {/* Présentation de l'équipe */}
+        <div className="bg-gray-800 p-8 rounded-lg mb-20">
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-8">
+            Présentation de l'équipe
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            <div className="space-y-6">
+              <h3 className="text-xl font-bold text-cyan-400">
+                Florian Billard – Créateur et Gestionnaire de Contenu de
+                l'Application
+              </h3>
+              <p className="text-gray-300">
+                Je m'appelle Florian Billard et je suis passionné par les
+                technologies web et le développement d'applications. À l'âge de
+                30 ans, j'ai découvert les langages informatiques tels que
+                JavaScript, React, et bien d'autres, ce qui a marqué un tournant
+                dans ma carrière.
+              </p>
+              <p className="text-gray-300">
+                Pour approfondir mes connaissances, j'ai suivi une formation de
+                niveau Bac+2 Intégrateur d'Applications Web sur OpenClassrooms.
+                Cette formation m'a permis d'acquérir des compétences solides,
+                notamment :
+              </p>
+              <ul className="list-disc list-inside text-gray-300 space-y-2 ml-4">
+                <li>L'apprentissage des bases : HTML, CSS, et Sass.</li>
+                <li>
+                  La mise en œuvre des bonnes pratiques de SEO pour optimiser le
+                  référencement d'une maquette.
+                </li>
+                <li>Le développement avancé avec JavaScript et React.</li>
+              </ul>
+              <p className="text-gray-300">
+                Depuis la fin de cette formation, je continue à me perfectionner
+                en autodidacte, en explorant des technologies modernes telles
+                que Next.js et TypeScript pour repousser les limites des
+                applications web.
+              </p>
+              <p className="text-gray-300">
+                Ma mission est de rendre l'application SplashCamper intuitive,
+                pratique et enrichissante pour tous les utilisateurs, en
+                m'assurant que le contenu reste clair, pertinent et à jour.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-8">
+              <div className="relative w-full h-[200px]">
+                <Image
+                  src="/images/Blog_logo.jpg"
+                  alt="Logo OpenClassrooms"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  className="rounded-lg"
+                />
+              </div>
+              <div className="bg-gray-700 p-6 rounded-lg w-full">
+                <h3 className="text-xl font-bold text-white mb-4 text-center">
+                  Notre Engagement
+                </h3>
+                <p className="text-gray-300 text-center">
+                  Nous nous efforçons de proposer une expérience utilisateur
+                  optimale en combinant innovation, collaboration, et écoute des
+                  retours des utilisateurs. Si vous souhaitez en savoir plus ou
+                  avez des questions, n'hésitez pas à nous contacter.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

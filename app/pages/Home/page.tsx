@@ -161,6 +161,17 @@ export default function HomePage() {
       {/* Section SEO stylisée */}
       <div className="relative z-10 py-20 bg-gradient-to-b from-[#1E2337] to-[#1a1f37]">
         <div className="max-w-7xl mx-auto px-4">
+          {/* Section Google AdSense 1 */}
+          <div
+            id="google-ads-1"
+            className="w-full h-[250px] bg-[#252b43] mb-12 flex items-center justify-center rounded-lg"
+          >
+            <div className="text-center">
+              <p className="text-gray-400">Espace publicitaire</p>
+              <p className="text-xs text-gray-500">Advertisement</p>
+            </div>
+          </div>
+
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
             Station de lavage camping-car en France
           </h2>
@@ -244,6 +255,17 @@ export default function HomePage() {
       {/* Section des dernières stations */}
       <section className="py-16 px-4 bg-[#1E2337]">
         <div className="max-w-7xl mx-auto">
+          {/* Section Google AdSense 2 */}
+          <div
+            id="google-ads-2"
+            className="w-full h-[250px] bg-[#252b43] mb-12 flex items-center justify-center rounded-lg"
+          >
+            <div className="text-center">
+              <p className="text-gray-400">Espace publicitaire</p>
+              <p className="text-xs text-gray-500">Advertisement</p>
+            </div>
+          </div>
+
           <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
             Dernières stations ajoutées
           </h2>
@@ -346,6 +368,17 @@ export default function HomePage() {
                   </Button>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Section Google AdSense 3 */}
+          <div
+            id="google-ads-3"
+            className="w-full h-[250px] bg-[#252b43] mt-12 flex items-center justify-center rounded-lg"
+          >
+            <div className="text-center">
+              <p className="text-gray-400">Espace publicitaire</p>
+              <p className="text-xs text-gray-500">Advertisement</p>
             </div>
           </div>
         </div>
