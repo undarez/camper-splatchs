@@ -252,6 +252,130 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Section éco-lavage */}
+      <section className="py-16 bg-gradient-to-b from-[#1E2337] to-[#252b43]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
+                Lavez écologique, gagnez des récompenses !
+              </h2>
+              <p className="text-lg text-gray-300">
+                Découvrez notre nouveau système d'éco-lavage qui vous permet de
+                suivre et réduire votre impact environnemental.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-center space-x-3 text-gray-300">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#2A3147]">
+                    💧
+                  </span>
+                  <span>Suivre votre consommation d'eau en temps réel</span>
+                </li>
+                <li className="flex items-center space-x-3 text-gray-300">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#2A3147]">
+                    🌱
+                  </span>
+                  <span>Réduire votre impact environnemental</span>
+                </li>
+                <li className="flex items-center space-x-3 text-gray-300">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#2A3147]">
+                    🏆
+                  </span>
+                  <span>Gagner des badges écologiques</span>
+                </li>
+                <li className="flex items-center space-x-3 text-gray-300">
+                  <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#2A3147]">
+                    📊
+                  </span>
+                  <span>Visualiser vos économies d'eau</span>
+                </li>
+              </ul>
+
+              {/* Explication du calcul */}
+              <div className="mt-6 p-4 bg-[#2A3147] rounded-lg border border-cyan-800/30">
+                <h3 className="text-lg font-semibold text-cyan-400 mb-2">
+                  Comment ça marche ?
+                </h3>
+                <p className="text-gray-300 text-sm mb-3">
+                  Notre système calcule vos économies d'eau en comparant votre
+                  consommation à celle d'un lavage traditionnel :
+                </p>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li className="flex items-start space-x-2">
+                    <svg
+                      className="w-5 h-5 text-cyan-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                    <span>Lavage traditionnel : environ 200L d'eau</span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <svg
+                      className="w-5 h-5 text-cyan-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                    <span>
+                      Calcul basé sur : type de lavage, taille du véhicule et
+                      durée
+                    </span>
+                  </li>
+                  <li className="flex items-start space-x-2">
+                    <svg
+                      className="w-5 h-5 text-cyan-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                    <span>1 point éco = 10L d'eau économisés</span>
+                  </li>
+                </ul>
+              </div>
+
+              <Link
+                href="/pages/eco-wash"
+                className="inline-block bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-cyan-900/20"
+              >
+                Commencer à économiser
+              </Link>
+            </div>
+            <div className="relative h-96 rounded-lg overflow-hidden shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1E2337]/80 to-transparent z-10" />
+              <Image
+                src="/images/eco-wash-hero.webp"
+                alt="Éco-lavage de camping-car"
+                fill
+                style={{ objectFit: "cover" }}
+                className="rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section des dernières stations */}
       <section className="py-16 px-4 bg-[#1E2337]">
         <div className="max-w-7xl mx-auto">

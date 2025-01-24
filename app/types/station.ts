@@ -1,6 +1,6 @@
 import {
   Service as PrismaService,
-  Station,
+  Station as PrismaStation,
   Service,
   Review,
   ElectricityType,
@@ -26,7 +26,7 @@ export type CreateStationInput = {
   services: Omit<ServiceType, "id" | "stationId">;
 };
 
-export interface StationWithDetails extends Station {
+export interface StationWithDetails extends PrismaStation {
   services: Service | null;
   images: string[];
   parkingDetails: {
@@ -48,4 +48,24 @@ export interface StationWithDetails extends Station {
   } | null;
   reviews: Review[];
   averageRating: number;
+}
+
+export interface Station {
+  id: string;
+  name: string;
+  address: string;
+  city?: string;
+  postalCode?: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: "active" | "en_attente" | "inactive";
+  type: "STATION_LAVAGE" | "PARKING";
+  validatedAt?: Date;
+  validatedBy?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  authorId: string;
+  userId?: string;
+  hasParking?: boolean;
 }

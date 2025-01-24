@@ -52,6 +52,16 @@ const Header = () => {
     "group"
   );
 
+  const stationsLinks = [
+    { name: "Toutes les stations", href: "/pages/stations" },
+    { name: "Ajouter une station", href: "/pages/stations/add" },
+    {
+      name: "Éco-Lavage",
+      href: "/pages/eco-wash",
+      description: "Suivez votre impact écologique",
+    },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full bg-[#1E2337]/95 backdrop-blur-md border-b border-gray-700/50 shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,17 +101,13 @@ const Header = () => {
                   </Button>
                 </MenubarTrigger>
                 <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
-                  <MenubarItem className={menuItemClass}>
-                    <Link href="/localisationStation2" className="w-full">
-                      Ajouter une station
-                    </Link>
-                  </MenubarItem>
-                  <MenubarSeparator className="my-1" />
-                  <MenubarItem className={menuItemClass}>
-                    <Link href="/pages/StationCard" className="w-full">
-                      Stations vérifiées
-                    </Link>
-                  </MenubarItem>
+                  {stationsLinks.map((link) => (
+                    <MenubarItem key={link.name} className={menuItemClass}>
+                      <Link href={link.href} className="w-full">
+                        {link.name}
+                      </Link>
+                    </MenubarItem>
+                  ))}
                 </MenubarContent>
               </MenubarMenu>
 
