@@ -39,6 +39,7 @@ import {
 } from "@/app/utils/guestSession";
 import Image from "next/image";
 import { ExtendedStation, StationWithMarker } from "@/app/types/station";
+import { StationData } from "./types";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic(
@@ -68,37 +69,6 @@ interface GeoapifyProperties {
 
 interface GeoapifyResult {
   properties: GeoapifyProperties;
-}
-
-interface StationData {
-  name: string;
-  address: string;
-  city: string;
-  postalCode: string;
-  lat: number | null;
-  lng: number | null;
-  type: StationType;
-  highPressure: HighPressureType;
-  tirePressure: boolean;
-  vacuum: boolean;
-  handicapAccess: boolean;
-  wasteWater: boolean;
-  waterPoint: boolean;
-  wasteWaterDisposal: boolean;
-  blackWaterDisposal: boolean;
-  electricity: ElectricityType;
-  hasElectricity: ElectricityType;
-  maxVehicleLength: string;
-  paymentMethods: string[];
-  isPayant: boolean;
-  tarif: string;
-  commercesProches: string[];
-  taxeSejour: string;
-  totalPlaces: number;
-  hasWifi: boolean;
-  hasChargingPoint: boolean;
-  phoneNumber?: string;
-  description?: string;
 }
 
 const defaultFormData: StationData = {
