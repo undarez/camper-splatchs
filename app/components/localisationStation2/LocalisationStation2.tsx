@@ -94,6 +94,8 @@ interface StationData {
   totalPlaces: number;
   hasWifi: boolean;
   hasChargingPoint: boolean;
+  phoneNumber?: string;
+  description?: string;
 }
 
 interface Station {
@@ -136,13 +138,13 @@ interface Station {
 }
 
 // Déplacer defaultFormData avant son utilisation
-const defaultFormData = {
+const defaultFormData: StationData = {
   name: "",
   address: "",
   city: "",
   postalCode: "",
-  lat: null as number | null,
-  lng: null as number | null,
+  lat: null,
+  lng: null,
   type: StationType.STATION_LAVAGE,
   highPressure: HighPressureType.NONE,
   tirePressure: false,
@@ -155,14 +157,16 @@ const defaultFormData = {
   electricity: ElectricityType.NONE,
   hasElectricity: ElectricityType.NONE,
   maxVehicleLength: "",
-  paymentMethods: [] as string[],
+  paymentMethods: [],
   isPayant: false,
   tarif: "",
-  commercesProches: [] as string[],
+  commercesProches: [],
   taxeSejour: "",
   totalPlaces: 0,
   hasWifi: false,
   hasChargingPoint: false,
+  phoneNumber: "",
+  description: "",
 };
 
 // Correction pour les icônes Leaflet

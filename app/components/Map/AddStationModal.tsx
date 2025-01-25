@@ -79,6 +79,8 @@ interface FormDataType {
     blackWaterDisposal: boolean;
   };
   isLavaTrans?: boolean;
+  phoneNumber?: string;
+  description?: string;
 }
 
 const modalStyles = `
@@ -279,6 +281,8 @@ export default function AddPointModal({
         lng: formData.lng,
         latitude: Number(formData.lat) || 0,
         longitude: Number(formData.lng) || 0,
+        phoneNumber: formData.phoneNumber || "",
+        description: formData.description || "",
         services:
           formData.type === "STATION_LAVAGE"
             ? {
@@ -478,6 +482,39 @@ export default function AddPointModal({
                     : "du parking"
                 }`}
                 required
+              />
+            </div>
+
+            {/* Numéro de téléphone */}
+            <div className="space-y-2">
+              <label htmlFor="phoneNumber" className="text-gray-300">
+                Numéro de téléphone (optionnel)
+              </label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                className="w-full bg-[#252B43] border border-gray-700/50 text-white rounded-lg p-2"
+                value={formData.phoneNumber || ""}
+                onChange={(e) =>
+                  onFormDataChange({ phoneNumber: e.target.value })
+                }
+                placeholder="Ex: 06 12 34 56 78"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <label htmlFor="description" className="text-gray-300">
+                Description (optionnel)
+              </label>
+              <textarea
+                id="description"
+                className="w-full bg-[#252B43] border border-gray-700/50 text-white rounded-lg p-2 min-h-[100px]"
+                value={formData.description || ""}
+                onChange={(e) =>
+                  onFormDataChange({ description: e.target.value })
+                }
+                placeholder="Ajoutez des informations complémentaires sur cet établissement..."
               />
             </div>
 
