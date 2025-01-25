@@ -6,7 +6,6 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { EcoCalculator } from "@/app/components/EcoCalculator";
 import { EcoHistory } from "@/app/components/EcoHistory";
 import { WashHistory } from "@/app/types/ecoConsumption";
-import { Station } from "@/app/types/station";
 
 interface ExtendedUser {
   id: string;

@@ -2,6 +2,8 @@ import {
   ElectricityType,
   HighPressureType,
   type Station as PrismaBaseStation,
+  Service,
+  Review,
 } from "@prisma/client";
 import { Icon } from "leaflet";
 
@@ -43,4 +45,11 @@ export interface ExtendedStation extends PrismaBaseStation {
 // Interface pour les stations avec la fonction getMarkerIcon
 export interface StationWithMarker extends ExtendedStation {
   getMarkerIcon: () => Icon;
+}
+
+export interface StationWithDetails extends ExtendedStation {
+  services: Service | null;
+  images: string[];
+  reviews: Review[];
+  averageRating: number;
 }
