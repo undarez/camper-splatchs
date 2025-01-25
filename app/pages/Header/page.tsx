@@ -53,8 +53,8 @@ const Header = () => {
   );
 
   const stationsLinks = [
-    { name: "Toutes les stations", href: "/pages/stations" },
-    { name: "Ajouter une station", href: "/pages/stations/add" },
+    { name: "Toutes les stations", href: "/pages/StationCard" },
+    { name: "Ajouter une station", href: "/localisationStation2" },
     {
       name: "Éco-Lavage",
       href: "/pages/eco-wash",
