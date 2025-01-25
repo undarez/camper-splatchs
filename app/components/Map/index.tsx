@@ -2,93 +2,62 @@
 
 import { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { divIcon, icon, marker, Map as LeafletMap } from "leaflet";
+import { divIcon, marker, Map as LeafletMap, Icon } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useGeolocation } from "@/app/hooks/useGeolocation";
+import { Button } from "@/app/components/ui/button";
 import {
-  ElectricityType,
-  HighPressureType,
-  PaymentMethod,
+  Station as PrismaStation,
   StationStatus,
   StationType,
 } from "@prisma/client";
-import { useGeolocation } from "@/app/hooks/useGeolocation";
-import { Button } from "@/app/components/ui/button";
 
-export interface StationWithOptionalFields {
-  id: string;
-  name: string;
-  address: string;
-  city: string | null;
-  postalCode: string | null;
-  latitude: number;
-  longitude: number;
-  status: StationStatus;
-  type: StationType;
-  services: {
-    id: string;
-    highPressure: HighPressureType;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    waterPoint: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    maxVehicleLength: number | null;
-    paymentMethods: PaymentMethod[];
-  } | null;
-  parkingDetails: {
-    id: string;
-    isPayant: boolean;
-    tarif: number | null;
-    hasElectricity: ElectricityType;
-    commercesProches: string[];
-    handicapAccess: boolean;
-  } | null;
+// Étendre l'interface Station pour inclure isLavaTrans
+interface Station extends PrismaStation {
+  isLavaTrans?: boolean;
 }
 
 export interface MapComponentProps {
-  stations: StationWithOptionalFields[];
-  getMarkerIcon: (status: StationStatus, type: StationType) => string;
+  stations: Station[];
+  getMarkerIcon: (
+    status: StationStatus,
+    type: StationType,
+    isLavaTrans?: boolean
+  ) => Icon;
   center: [number, number];
   zoom: number;
   onMapReady?: (map: LeafletMap) => void;
-  createPopupContent: (station: StationWithOptionalFields) => string;
 }
 
 function MapEvents({ onMapReady }: { onMapReady?: (map: LeafletMap) => void }) {
   const map = useMap();
 
   useEffect(() => {
-    onMapReady?.(map);
+    if (map && onMapReady) {
+      onMapReady(map);
+    }
   }, [map, onMapReady]);
 
   return null;
 }
 
-const Map = ({
+const MapComponent: React.FC<MapComponentProps> = ({
   stations,
   getMarkerIcon,
   center,
   zoom,
   onMapReady,
-  createPopupContent,
-}: MapComponentProps) => {
+}) => {
   const mapRef = useRef<LeafletMap | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const { latitude, longitude, getLocation, loading } = useGeolocation();
+  const markers = useRef<L.Marker[]>([]);
 
   useEffect(() => {
     if (latitude && longitude && mapRef.current) {
-      console.log("Mise à jour de la position sur la carte:", {
-        latitude,
-        longitude,
-      });
       const userPosition: L.LatLngExpression = [latitude, longitude];
 
       if (userMarkerRef.current) {
-        console.log("Suppression de l'ancien marqueur");
         userMarkerRef.current.remove();
       }
 
@@ -98,15 +67,36 @@ const Map = ({
         iconSize: [20, 20],
       });
 
-      console.log("Ajout du nouveau marqueur");
       userMarkerRef.current = marker(userPosition, { icon: userIcon }).addTo(
         mapRef.current
       );
 
-      console.log("Centrage de la carte");
       mapRef.current.setView(userPosition, 13);
     }
   }, [latitude, longitude]);
+
+  useEffect(() => {
+    stations.forEach((station) => {
+      const markerIcon = getMarkerIcon(
+        station.status,
+        station.type,
+        station.isLavaTrans
+      );
+      const newMarker = marker([station.latitude, station.longitude], {
+        icon: markerIcon,
+      });
+
+      if (mapRef.current) {
+        newMarker.addTo(mapRef.current);
+        markers.current.push(newMarker);
+      }
+    });
+
+    return () => {
+      markers.current.forEach((marker) => marker.remove());
+      markers.current = [];
+    };
+  }, [stations, getMarkerIcon]);
 
   return (
     <div className="relative h-full w-full">
@@ -125,27 +115,24 @@ const Map = ({
           <Marker
             key={station.id}
             position={[station.latitude, station.longitude]}
-            icon={icon({
-              iconUrl: getMarkerIcon(station.status, station.type),
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-            })}
+            icon={getMarkerIcon(
+              station.status,
+              station.type,
+              station.isLavaTrans
+            )}
           >
             <Popup>
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: createPopupContent(station),
-                }}
-              />
+              <div>
+                <h3 className="font-bold">{station.name}</h3>
+                <p>{station.address}</p>
+                {station.city && <p>{station.city}</p>}
+              </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
       <Button
-        onClick={() => {
-          console.log("Clic sur le bouton Me localiser");
-          getLocation();
-        }}
+        onClick={getLocation}
         disabled={loading}
         className="absolute top-4 right-4 z-[1000] bg-white text-black hover:bg-gray-100"
         size="sm"
@@ -156,4 +143,4 @@ const Map = ({
   );
 };
 
-export default Map;
+export default MapComponent;

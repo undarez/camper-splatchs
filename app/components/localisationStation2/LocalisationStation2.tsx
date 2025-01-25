@@ -8,7 +8,7 @@ import {
   HighPressureType,
   ElectricityType,
   StationStatus,
-  PaymentMethod,
+  type Station as PrismaBaseStation,
 } from "@prisma/client";
 import AddStationModal from "@/app/components/Map/AddStationModal";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,6 @@ import {
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
 import type { MapComponentProps } from "@/app/components/Map/index";
-import { StationWithOptionalFields } from "@/app/components/Map/index";
 import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
@@ -42,8 +41,12 @@ import {
 import Image from "next/image";
 
 // Import dynamique de la carte complète
-const MapComponent = dynamic<MapComponentProps>(
-  () => import("@/app/components/Map").then((mod) => mod.default),
+const MapComponent = dynamic(
+  () =>
+    import("@/app/components/Map").then((mod) => {
+      const Component = mod.default;
+      return Component as unknown as React.ComponentType<MapComponentProps>;
+    }),
   {
     ssr: false,
     loading: () => (
@@ -98,16 +101,9 @@ interface StationData {
   description?: string;
 }
 
-interface Station {
-  id: string;
-  name: string;
-  address: string;
-  city: string | null;
-  postalCode: string | null;
-  latitude: number;
-  longitude: number;
-  status: StationStatus;
-  type: StationType;
+// Étendre l'interface PrismaStation pour inclure services et parkingDetails
+interface PrismaStation extends PrismaBaseStation {
+  isLavaTrans?: boolean;
   services: {
     id: string;
     highPressure: HighPressureType;
@@ -133,7 +129,10 @@ interface Station {
     totalPlaces: number;
     hasWifi: boolean;
     hasChargingPoint: boolean;
-    createdAt: Date;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
   } | null;
 }
 
@@ -270,13 +269,18 @@ const handleMapClick = (
   }
 };
 
+// Définir l'interface StationWithOptionalFields qui étend PrismaStation
+interface StationWithOptionalFields extends PrismaStation {
+  getMarkerIcon: () => Icon;
+}
+
 export default function LocalisationStation2() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationData>(defaultFormData);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const mapCenter: [number, number] = [46.603354, 1.888334];
-  const [stations, setStations] = useState<Station[]>([]);
+  const [stations, setStations] = useState<PrismaStation[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { data: sessionData, status } = useSession();
   const mapRef = useRef<Map | null>(null);
@@ -371,13 +375,7 @@ export default function LocalisationStation2() {
         const response = await fetch("/api/stations");
         if (response.ok) {
           const data = await response.json();
-          setStations(
-            data.map((station: Station) => ({
-              ...station,
-              services: station.services || null,
-              parkingDetails: station.parkingDetails || null,
-            }))
-          );
+          setStations(data);
         }
       } catch (error) {
         console.error("Erreur lors de la récupération des stations:", error);
@@ -516,55 +514,6 @@ export default function LocalisationStation2() {
     );
   }, [toast]);
 
-  // Fonction pour créer le contenu du popup
-  const createPopupContent = (station: StationWithOptionalFields) => {
-    if (!hasFullAccess()) {
-      return `
-        <div class="p-4 max-w-xs">
-          <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
-          <p class="text-sm text-gray-600">Connectez-vous pour voir les détails de la station</p>
-          <button onclick="window.location.href='/signin'" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
-            Se connecter
-          </button>
-        </div>
-      `;
-    }
-
-    return `
-      <div class="p-4 max-w-xs">
-        <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
-        <p class="text-sm text-gray-600 mb-2">${station.address}</p>
-        <p class="text-sm mb-2">Coordonnées : ${station.latitude.toFixed(
-          6
-        )}, ${station.longitude.toFixed(6)}</p>
-        ${
-          station.services
-            ? `
-          <div class="mt-2">
-            <p class="text-sm font-semibold mb-1">Services :</p>
-            <ul class="text-sm text-gray-600">
-              ${
-                station.services.highPressure !== "NONE"
-                  ? `<li>• Haute pression (${station.services.highPressure})</li>`
-                  : ""
-              }
-              ${
-                station.services.tirePressure
-                  ? "<li>• Gonflage des pneus</li>"
-                  : ""
-              }
-              ${station.services.vacuum ? "<li>• Aspirateur</li>" : ""}
-              ${station.services.waterPoint ? "<li>• Point d'eau</li>" : ""}
-              ${station.services.wasteWater ? "<li>• Eaux usées</li>" : ""}
-            </ul>
-          </div>
-        `
-            : ""
-        }
-      </div>
-    `;
-  };
-
   if (loading) {
     return <LoadingScreen />;
   }
@@ -585,59 +534,68 @@ export default function LocalisationStation2() {
     status: StationStatus,
     type: StationType,
     isLavaTrans?: boolean
-  ): string => {
-    let baseIcon = "/images/logo.png";
-    if (type === StationType.PARKING) {
-      baseIcon = "/images/logo.png";
-    } else if (isLavaTrans) {
-      baseIcon = "/images/lavatranssplas.png";
-    }
-    return baseIcon;
+  ): Icon => {
+    const iconUrl = isLavaTrans
+      ? "/images/lavatranssplas.png"
+      : "/images/logo.png";
+
+    return new Icon({
+      iconUrl,
+      iconRetinaUrl: iconUrl,
+      shadowUrl: "/images/marker-shadow.png",
+      iconSize: [25, 25],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+      className: `station-marker ${status} ${
+        type === StationType.PARKING ? "parking" : "station-lavage"
+      }`,
+    });
   };
 
   // Convertir les stations au type StationWithOptionalFields
-  const convertedStations: StationWithOptionalFields[] = stations
-    .filter((station) => filters.length === 0 || filters.includes(station.type))
-    .map((station) => ({
-      id: station.id,
-      name: station.name,
-      address: station.address,
-      city: station.city,
-      postalCode: station.postalCode,
-      latitude: station.latitude,
-      longitude: station.longitude,
-      status: station.status as StationStatus,
-      type: station.type as StationType,
-      services: station.services
-        ? {
-            id: station.services.id,
-            highPressure: station.services.highPressure as HighPressureType,
-            tirePressure: station.services.tirePressure,
-            vacuum: station.services.vacuum,
-            handicapAccess: station.services.handicapAccess,
-            wasteWater: station.services.wasteWater,
-            waterPoint: station.services.waterPoint,
-            wasteWaterDisposal: station.services.wasteWaterDisposal,
-            blackWaterDisposal: station.services.blackWaterDisposal,
-            electricity: station.services.electricity as ElectricityType,
-            maxVehicleLength: station.services.maxVehicleLength,
-            paymentMethods: station.services.paymentMethods.map(
-              (method) => method as PaymentMethod
-            ),
-          }
-        : null,
-      parkingDetails: station.parkingDetails
-        ? {
-            id: station.parkingDetails.id,
-            isPayant: station.parkingDetails.isPayant,
-            tarif: station.parkingDetails.tarif,
-            hasElectricity: station.parkingDetails
-              .hasElectricity as ElectricityType,
-            commercesProches: station.parkingDetails.commercesProches,
-            handicapAccess: station.parkingDetails.handicapAccess,
-          }
-        : null,
-    }));
+  const convertedStations = stations.map(
+    (station): StationWithOptionalFields => {
+      // Créer un objet de base avec les propriétés communes
+      const baseStation: StationWithOptionalFields = {
+        ...station,
+        services: station.services || {
+          id: "",
+          highPressure: HighPressureType.NONE,
+          tirePressure: false,
+          vacuum: false,
+          handicapAccess: false,
+          wasteWater: false,
+          waterPoint: false,
+          wasteWaterDisposal: false,
+          blackWaterDisposal: false,
+          electricity: ElectricityType.NONE,
+          maxVehicleLength: null,
+          paymentMethods: [],
+        },
+        parkingDetails: station.parkingDetails || {
+          id: "",
+          isPayant: false,
+          tarif: null,
+          taxeSejour: null,
+          hasElectricity: ElectricityType.NONE,
+          commercesProches: [],
+          handicapAccess: false,
+          totalPlaces: 0,
+          hasWifi: false,
+          hasChargingPoint: false,
+          waterPoint: false,
+          wasteWater: false,
+          wasteWaterDisposal: false,
+          blackWaterDisposal: false,
+        },
+        getMarkerIcon: () =>
+          getMarkerIcon(station.status, station.type, station.isLavaTrans),
+      };
+
+      return baseStation;
+    }
+  );
 
   return (
     <div className="min-h-screen bg-[#1E2337]">
@@ -699,31 +657,34 @@ export default function LocalisationStation2() {
           .station-marker {
             filter: drop-shadow(0 0 4px var(--glow-color));
             transition: all 0.3s ease;
-            padding: 8px;
-            background-color: var(--bg-color);
-            border-radius: 8px;
           }
-          .station-marker:hover {
-            transform: scale(1.1);
-            filter: drop-shadow(0 0 8px var(--glow-color));
+          .station-marker img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
           }
           .station-marker.active {
             --glow-color: #10B981;
+            filter: drop-shadow(0 0 8px var(--glow-color));
           }
           .station-marker.en_attente {
             --glow-color: #F59E0B;
+            filter: drop-shadow(0 0 8px var(--glow-color));
           }
           .station-marker.inactive {
             --glow-color: #EF4444;
+            filter: drop-shadow(0 0 8px var(--glow-color));
             opacity: 0.7;
           }
-          .station-marker[data-type="STATION_LAVAGE"] {
-            --bg-color: rgba(64, 224, 208, 0.2);
+          .station-marker.parking {
+            --glow-color: #8B00FF;
+          }
+          .station-marker.station-lavage {
             --glow-color: #40E0D0;
           }
-          .station-marker[data-type="PARKING"] {
-            --bg-color: rgba(139, 0, 255, 0.2);
-            --glow-color: #8B00FF;
+          .station-marker:hover {
+            transform: scale(1.1);
+            z-index: 1000 !important;
           }
         `}
       </style>
@@ -1043,7 +1004,6 @@ export default function LocalisationStation2() {
                   mapRef.current = map;
                   setIsMapReady(true);
                 }}
-                createPopupContent={createPopupContent}
               />
               {!hasFullAccess() && (
                 <div className="map-blur-overlay">
