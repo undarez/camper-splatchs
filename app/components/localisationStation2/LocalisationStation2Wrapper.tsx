@@ -8,7 +8,7 @@ const LocalisationStation2 = dynamic(
     ssr: false,
     loading: () => (
       <div className="h-full w-full flex items-center justify-center">
-        <p>Chargement de la carte...</p>
+        <p>Chargements de la carte...</p>
       </div>
     ),
   }
