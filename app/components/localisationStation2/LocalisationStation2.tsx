@@ -39,6 +39,7 @@ import {
   checkGuestSession,
   createGuestSession,
 } from "@/app/utils/guestSession";
+import Image from "next/image";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic<MapComponentProps>(
@@ -280,6 +281,7 @@ export default function LocalisationStation2() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isValidGuest, setIsValidGuest] = useState(false);
+  const [filters, setFilters] = useState<StationType[]>([]);
 
   // Déplacement de la fonction hasFullAccess ici
   const hasFullAccess = () => {
@@ -575,26 +577,24 @@ export default function LocalisationStation2() {
     return <AuthDialog />;
   }
 
-  const getMarkerIcon = (status: StationStatus, type: StationType) => {
+  const getMarkerIcon = (
+    status: StationStatus,
+    type: StationType,
+    isLavaTrans?: boolean
+  ): string => {
+    let baseIcon = "/images/logo.png";
     if (type === StationType.PARKING) {
-      return "/markers/parking.svg";
+      baseIcon = "/images/logo.png";
+    } else if (isLavaTrans) {
+      baseIcon = "/images/lavatranssplas.png";
     }
-
-    switch (status) {
-      case "active":
-        return "/markers/station-active.svg";
-      case "en_attente":
-        return "/markers/station-waiting.svg";
-      case "inactive":
-        return "/markers/station-inactive.svg";
-      default:
-        return "/markers/station-active.svg";
-    }
+    return baseIcon;
   };
 
   // Convertir les stations au type StationWithOptionalFields
-  const convertedStations: StationWithOptionalFields[] = stations.map(
-    (station) => ({
+  const convertedStations: StationWithOptionalFields[] = stations
+    .filter((station) => filters.length === 0 || filters.includes(station.type))
+    .map((station) => ({
       id: station.id,
       name: station.name,
       address: station.address,
@@ -633,8 +633,7 @@ export default function LocalisationStation2() {
             handicapAccess: station.parkingDetails.handicapAccess,
           }
         : null,
-    })
-  );
+    }));
 
   return (
     <div className="min-h-screen bg-[#1E2337]">
@@ -692,6 +691,36 @@ export default function LocalisationStation2() {
           .leaflet-control-zoom {
             cursor: pointer;
           }
+
+          .station-marker {
+            filter: drop-shadow(0 0 4px var(--glow-color));
+            transition: all 0.3s ease;
+            padding: 8px;
+            background-color: var(--bg-color);
+            border-radius: 8px;
+          }
+          .station-marker:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 8px var(--glow-color));
+          }
+          .station-marker.active {
+            --glow-color: #10B981;
+          }
+          .station-marker.en_attente {
+            --glow-color: #F59E0B;
+          }
+          .station-marker.inactive {
+            --glow-color: #EF4444;
+            opacity: 0.7;
+          }
+          .station-marker[data-type="STATION_LAVAGE"] {
+            --bg-color: rgba(64, 224, 208, 0.2);
+            --glow-color: #40E0D0;
+          }
+          .station-marker[data-type="PARKING"] {
+            --bg-color: rgba(139, 0, 255, 0.2);
+            --glow-color: #8B00FF;
+          }
         `}
       </style>
 
@@ -699,6 +728,112 @@ export default function LocalisationStation2() {
         {/* Sidebar pour desktop */}
         <div className="hidden md:block w-80 bg-[#1E2337] border-r border-gray-700/50 p-4 h-screen fixed left-0 z-50">
           <div className="space-y-4">
+            {/* Logo et titre */}
+            <div className="flex items-center gap-2 mb-6">
+              <Image
+                src="/images/lavatranssplas.png"
+                alt="Logo"
+                width={40}
+                height={40}
+                className="rounded-lg"
+              />
+              <h1 className="text-xl font-bold text-white">
+                Stations & Parkings
+              </h1>
+            </div>
+
+            {/* Filtres de type */}
+            <div className="bg-[#252B43] rounded-lg p-4 shadow-lg">
+              <h3 className="text-white font-semibold mb-3">Type</h3>
+              <select
+                className="w-full p-2 bg-[#2A3147] text-gray-200 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                value={
+                  filters.length === 1 ? filters[0] : StationType.STATION_LAVAGE
+                }
+                onChange={(e) => {
+                  const value = e.target.value as StationType;
+                  if (value === StationType.STATION_LAVAGE) {
+                    setFilters([StationType.STATION_LAVAGE]);
+                  } else if (value === StationType.PARKING) {
+                    setFilters([StationType.PARKING]);
+                  } else {
+                    setFilters([]);
+                  }
+                }}
+              >
+                <option value={StationType.STATION_LAVAGE}>
+                  Stations de lavage
+                </option>
+                <option value={StationType.PARKING}>Parkings</option>
+              </select>
+            </div>
+
+            {/* Légende */}
+            <div className="bg-[#252B43] rounded-lg p-4 shadow-lg">
+              <h3 className="text-white font-semibold mb-3">Légende</h3>
+              <div className="space-y-3">
+                {/* Types de stations */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                      <Image
+                        src="/images/lavatranssplas.png"
+                        alt="Station LavaTrans"
+                        width={35}
+                        height={35}
+                        className="filter drop-shadow-[0_0_4px_#40E0D0]"
+                      />
+                    </div>
+                    <span className="text-gray-300 text-sm">
+                      Station LavaTrans
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Station de lavage standard"
+                        width={35}
+                        height={35}
+                        className="filter drop-shadow-[0_0_4px_#40E0D0]"
+                      />
+                    </div>
+                    <span className="text-gray-300 text-sm">
+                      Station de lavage standard
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 flex items-center justify-center bg-[#8B00FF]/20 rounded-lg">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Parking"
+                        width={35}
+                        height={35}
+                        className="filter drop-shadow-[0_0_4px_#8B00FF]"
+                      />
+                    </div>
+                    <span className="text-gray-300 text-sm">Parking</span>
+                  </div>
+                </div>
+
+                {/* Statuts */}
+                <div className="pt-2 border-t border-gray-700/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-emerald-400"></div>
+                    <span className="text-gray-300 text-sm">Active</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="w-3 h-3 rounded-full bg-amber-400"></div>
+                    <span className="text-gray-300 text-sm">En attente</span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                    <span className="text-gray-300 text-sm">Inactive</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Bouton de géolocalisation */}
             <button
               onClick={handleGeolocation}
@@ -753,9 +888,6 @@ export default function LocalisationStation2() {
               )}
               {isLocating ? "Localisation..." : "Me localiser"}
             </button>
-
-            {/* Titre */}
-            <h2 className="text-xl font-bold text-white mb-6">Filtres</h2>
 
             {/* Barre de recherche avec contexte */}
             <div className="bg-[#252B43] rounded-lg p-4 shadow-lg">

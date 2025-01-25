@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
+import { Label } from "@/app/components/ui/label";
 
 interface FormDataType {
   type: StationType;
@@ -77,6 +78,7 @@ interface FormDataType {
     wasteWaterDisposal: boolean;
     blackWaterDisposal: boolean;
   };
+  isLavaTrans?: boolean;
 }
 
 const modalStyles = `
@@ -299,6 +301,7 @@ export default function AddPointModal({
           email: sessionData?.user?.email || "",
         },
         images: uploadedImages,
+        isLavaTrans: formData.isLavaTrans,
       };
 
       console.log("Données envoyées:", dataToSubmit);
@@ -352,6 +355,7 @@ export default function AddPointModal({
         maxVehicleLength: "",
         tarif: "",
         paymentMethods: [],
+        isLavaTrans: false,
       });
     }
   }, [isOpen, onFormDataChange]);
@@ -418,6 +422,7 @@ export default function AddPointModal({
                     blackWaterDisposal: false,
                     maxVehicleLength: "",
                     paymentMethods: [],
+                    isLavaTrans: false,
                   })
                 }
               >
@@ -475,6 +480,53 @@ export default function AddPointModal({
                 required
               />
             </div>
+
+            {/* Option LavaTrans pour les stations de lavage */}
+            {formData.type === StationType.STATION_LAVAGE && (
+              <div className="space-y-2">
+                <Label>Type d'icône</Label>
+                <div className="flex items-center gap-4 p-2 bg-[#252B43] rounded-lg">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="iconType"
+                      checked={!formData.isLavaTrans}
+                      onChange={() => onFormDataChange({ isLavaTrans: false })}
+                      className="text-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Standard"
+                        width={30}
+                        height={30}
+                        className="filter drop-shadow-[0_0_4px_#40E0D0] p-1 bg-[#40E0D0]/20 rounded-lg"
+                      />
+                      <span className="text-sm">Standard</span>
+                    </div>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="iconType"
+                      checked={formData.isLavaTrans}
+                      onChange={() => onFormDataChange({ isLavaTrans: true })}
+                      className="text-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src="/images/lavatranssplas.png"
+                        alt="LavaTrans"
+                        width={30}
+                        height={30}
+                        className="filter drop-shadow-[0_0_4px_#40E0D0] p-1 bg-[#40E0D0]/20 rounded-lg"
+                      />
+                      <span className="text-sm">LavaTrans</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
 
             {/* Contenu existant ... */}
             {formData.type === StationType.STATION_LAVAGE ? (
