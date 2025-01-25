@@ -1,34 +1,27 @@
 import {
-  Service as PrismaService,
-  Station as PrismaStation,
-  Service,
-  Review,
   ElectricityType,
+  HighPressureType,
+  type Station as PrismaBaseStation,
 } from "@prisma/client";
-import { ServiceType, StationStatus } from "./index";
+import { Icon } from "leaflet";
 
-export type StationWithPrismaServices = {
-  id: string;
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  services: PrismaService[];
-  status: StationStatus;
-};
-
-export type CreateStationInput = {
-  name: string;
-  address: string;
-  latitude: number;
-  longitude: number;
-  description?: string;
-  services: Omit<ServiceType, "id" | "stationId">;
-};
-
-export interface StationWithDetails extends PrismaStation {
-  services: Service | null;
-  images: string[];
+// Interface de base pour les stations
+export interface ExtendedStation extends PrismaBaseStation {
+  isLavaTrans?: boolean;
+  services: {
+    id: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    paymentMethods: string[];
+  } | null;
   parkingDetails: {
     id: string;
     isPayant: boolean;
@@ -44,28 +37,10 @@ export interface StationWithDetails extends PrismaStation {
     wasteWater: boolean;
     wasteWaterDisposal: boolean;
     blackWaterDisposal: boolean;
-    createdAt: Date;
   } | null;
-  reviews: Review[];
-  averageRating: number;
 }
 
-export interface Station {
-  id: string;
-  name: string;
-  address: string;
-  city?: string;
-  postalCode?: string;
-  latitude: number;
-  longitude: number;
-  images: string[];
-  status: "active" | "en_attente" | "inactive";
-  type: "STATION_LAVAGE" | "PARKING";
-  validatedAt?: Date;
-  validatedBy?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  authorId: string;
-  userId?: string;
-  hasParking?: boolean;
+// Interface pour les stations avec la fonction getMarkerIcon
+export interface StationWithMarker extends ExtendedStation {
+  getMarkerIcon: () => Icon;
 }

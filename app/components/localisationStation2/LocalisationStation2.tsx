@@ -8,7 +8,6 @@ import {
   HighPressureType,
   ElectricityType,
   StationStatus,
-  type Station as PrismaBaseStation,
 } from "@prisma/client";
 import AddStationModal from "@/app/components/Map/AddStationModal";
 import { cn } from "@/lib/utils";
@@ -39,6 +38,7 @@ import {
   createGuestSession,
 } from "@/app/utils/guestSession";
 import Image from "next/image";
+import { ExtendedStation, StationWithMarker } from "@/app/types/station";
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic(
@@ -101,42 +101,6 @@ interface StationData {
   description?: string;
 }
 
-// Étendre l'interface PrismaStation pour inclure services et parkingDetails
-interface PrismaStation extends PrismaBaseStation {
-  isLavaTrans?: boolean;
-  services: {
-    id: string;
-    highPressure: HighPressureType;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    waterPoint: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    maxVehicleLength: number | null;
-    paymentMethods: string[];
-  } | null;
-  parkingDetails: {
-    id: string;
-    isPayant: boolean;
-    tarif: number | null;
-    taxeSejour: number | null;
-    hasElectricity: ElectricityType;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-    waterPoint: boolean;
-    wasteWater: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-  } | null;
-}
-
-// Déplacer defaultFormData avant son utilisation
 const defaultFormData: StationData = {
   name: "",
   address: "",
@@ -269,18 +233,13 @@ const handleMapClick = (
   }
 };
 
-// Interface pour les stations avec la fonction getMarkerIcon
-interface StationWithOptionalFields extends PrismaStation {
-  getMarkerIcon: () => Icon;
-}
-
 export default function LocalisationStation2() {
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<StationData>(defaultFormData);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const mapCenter: [number, number] = [46.603354, 1.888334];
-  const [stations, setStations] = useState<PrismaStation[]>([]);
+  const [stations, setStations] = useState<ExtendedStation[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { data: sessionData, status } = useSession();
   const mapRef = useRef<Map | null>(null);
@@ -553,49 +512,14 @@ export default function LocalisationStation2() {
     });
   };
 
-  // Convertir les stations au type StationWithOptionalFields
-  const convertedStations = stations.map(
-    (station): StationWithOptionalFields => {
-      // Créer un objet de base avec les propriétés communes
-      const baseStation: StationWithOptionalFields = {
-        ...station,
-        services: station.services || {
-          id: "",
-          highPressure: HighPressureType.NONE,
-          tirePressure: false,
-          vacuum: false,
-          handicapAccess: false,
-          wasteWater: false,
-          waterPoint: false,
-          wasteWaterDisposal: false,
-          blackWaterDisposal: false,
-          electricity: ElectricityType.NONE,
-          maxVehicleLength: null,
-          paymentMethods: [],
-        },
-        parkingDetails: station.parkingDetails || {
-          id: "",
-          isPayant: false,
-          tarif: null,
-          taxeSejour: null,
-          hasElectricity: ElectricityType.NONE,
-          commercesProches: [],
-          handicapAccess: false,
-          totalPlaces: 0,
-          hasWifi: false,
-          hasChargingPoint: false,
-          waterPoint: false,
-          wasteWater: false,
-          wasteWaterDisposal: false,
-          blackWaterDisposal: false,
-        },
-        getMarkerIcon: () =>
-          getMarkerIcon(station.status, station.type, station.isLavaTrans),
-      };
-
-      return baseStation;
-    }
-  );
+  // Convertir les stations au type StationWithMarker
+  const convertedStations = stations.map((station): StationWithMarker => {
+    return {
+      ...station,
+      getMarkerIcon: () =>
+        getMarkerIcon(station.status, station.type, station.isLavaTrans),
+    };
+  });
 
   return (
     <div className="min-h-screen bg-[#1E2337]">
