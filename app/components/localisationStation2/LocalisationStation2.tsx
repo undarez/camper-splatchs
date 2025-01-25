@@ -269,7 +269,7 @@ const handleMapClick = (
   }
 };
 
-// Définir l'interface StationWithOptionalFields qui étend PrismaStation
+// Interface pour les stations avec la fonction getMarkerIcon
 interface StationWithOptionalFields extends PrismaStation {
   getMarkerIcon: () => Icon;
 }
