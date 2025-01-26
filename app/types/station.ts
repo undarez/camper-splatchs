@@ -5,7 +5,6 @@ import {
   Service,
   Review,
   StationType,
-  StationStatus,
 } from "@prisma/client";
 import { Icon } from "leaflet";
 
@@ -44,17 +43,33 @@ export interface ExtendedStation extends PrismaBaseStation {
   } | null;
 }
 
+export interface ParkingDetails {
+  id: string;
+  isPayant: boolean;
+  tarif: number | null;
+  hasElectricity: ElectricityType;
+  commercesProches: string[];
+  handicapAccess: boolean;
+  hasWifi?: boolean;
+  hasChargingPoint?: boolean;
+  waterPoint?: boolean;
+  wasteWater?: boolean;
+  wasteWaterDisposal?: boolean;
+  blackWaterDisposal?: boolean;
+}
+
 // Interface pour les stations avec champs optionnels
 export interface StationWithOptionalFields {
   id: string;
   name: string;
   address: string;
-  city: string | null;
-  postalCode: string | null;
+  city: string;
+  postalCode: string;
   latitude: number;
   longitude: number;
-  status: StationStatus;
+  status: string;
   type: StationType;
+  isLavaTrans?: boolean;
   services: {
     id: string;
     highPressure: HighPressureType;
@@ -66,18 +81,10 @@ export interface StationWithOptionalFields {
     wasteWaterDisposal: boolean;
     blackWaterDisposal: boolean;
     electricity: ElectricityType;
-    maxVehicleLength: number | null;
+    maxVehicleLength: string | null;
     paymentMethods: string[];
   } | null;
-  parkingDetails: {
-    id: string;
-    isPayant: boolean;
-    tarif: number | null;
-    hasElectricity: ElectricityType;
-    commercesProches: string[];
-    handicapAccess: boolean;
-  } | null;
-  isLavaTrans?: boolean;
+  parkingDetails: ParkingDetails | null;
 }
 
 // Interface pour les stations avec la fonction getMarkerIcon

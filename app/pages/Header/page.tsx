@@ -100,7 +100,7 @@ const Header = () => {
                     </span>
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
+                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48 z-[1003]">
                   {stationsLinks.map((link) => (
                     <MenubarItem key={link.name} className={menuItemClass}>
                       <Link href={link.href} className="w-full">
@@ -120,7 +120,7 @@ const Header = () => {
                     </span>
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
+                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48 z-[1003]">
                   <MenubarItem className={menuItemClass}>
                     <Link href="/pages/About" className="w-full">
                       À propos
@@ -138,7 +138,7 @@ const Header = () => {
                     </span>
                   </Button>
                 </MenubarTrigger>
-                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
+                <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48 z-[1003]">
                   <MenubarItem className={menuItemClass}>
                     <Link href="/pages/Guide" className="w-full">
                       Guides
@@ -163,7 +163,7 @@ const Header = () => {
                       </span>
                     </Button>
                   </MenubarTrigger>
-                  <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48">
+                  <MenubarContent className="bg-[#1E2337]/95 backdrop-blur-md animate-in slide-in-from-top-2 rounded-lg border border-gray-700/50 shadow-xl p-1 w-48 z-[1003]">
                     <MenubarItem className={menuItemClass}>
                       <Link href="/pages/profil" className="w-full">
                         Profil
