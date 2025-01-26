@@ -12,7 +12,7 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
-import { StationWithOptionalFields } from "@/app/types/station";
+import type { StationWithOptionalFields } from "@/app/types/station";
 import { cn } from "@/lib/utils";
 import { signIn } from "next-auth/react";
 

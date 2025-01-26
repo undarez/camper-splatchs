@@ -18,7 +18,7 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
-import { MapComponentProps } from "@/app/components/Map/index";
+import type { MapComponentProps } from "@/app/components/Map/index";
 import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
@@ -33,7 +33,7 @@ import {
   createGuestSession,
 } from "@/app/utils/guestSession";
 import Image from "next/image";
-import { StationWithOptionalFields } from "@/app/types/station";
+import type { StationWithOptionalFields } from "@/app/types/station";
 import { StationData } from "./types";
 
 // Import dynamique de la carte complète
