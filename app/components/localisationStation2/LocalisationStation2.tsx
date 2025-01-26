@@ -580,12 +580,7 @@ export default function LocalisationStation2() {
                   station.services.highPressure !== "NONE"
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Haute pression</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Haute pression</span>
                       <p class="text-xs text-white mt-1">${station.services.highPressure}</p>
                     </div>`
                     : ""
@@ -594,12 +589,7 @@ export default function LocalisationStation2() {
                   station.services.tirePressure
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Gonflage pneus</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Gonflage pneus</span>
                     </div>`
                     : ""
                 }
@@ -607,13 +597,7 @@ export default function LocalisationStation2() {
                   station.services.vacuum
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Aspirateur</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Aspirateur</span>
                     </div>`
                     : ""
                 }
@@ -621,12 +605,7 @@ export default function LocalisationStation2() {
                   station.services.waterPoint
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Point d'eau</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Point d'eau</span>
                     </div>`
                     : ""
                 }
@@ -634,12 +613,7 @@ export default function LocalisationStation2() {
                   station.services.wasteWater
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Eaux usées</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Eaux usées</span>
                     </div>`
                     : ""
                 }
@@ -647,12 +621,7 @@ export default function LocalisationStation2() {
                   station.services.wasteWaterDisposal
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Vidange eaux usées</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Vidange eaux usées</span>
                     </div>`
                     : ""
                 }
@@ -660,12 +629,7 @@ export default function LocalisationStation2() {
                   station.services.blackWaterDisposal
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Vidange eaux noires</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Vidange eaux noires</span>
                     </div>`
                     : ""
                 }
@@ -673,12 +637,7 @@ export default function LocalisationStation2() {
                   station.services.electricity !== "NONE"
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Électricité</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Électricité</span>
                       <p class="text-xs text-white mt-1">${station.services.electricity}</p>
                     </div>`
                     : ""
@@ -687,12 +646,7 @@ export default function LocalisationStation2() {
                   station.services.maxVehicleLength
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Longueur max.</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Longueur max.</span>
                       <p class="text-xs text-white mt-1">${station.services.maxVehicleLength}m</p>
                     </div>`
                     : ""
@@ -701,12 +655,7 @@ export default function LocalisationStation2() {
                   station.services.handicapAccess
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"/>
-                        </svg>
-                        <span class="text-sm text-[#40E0D0] font-medium">Accès PMR</span>
-                      </div>
+                      <span class="text-sm text-[#40E0D0] font-medium">Accès PMR</span>
                     </div>`
                     : ""
                 }
