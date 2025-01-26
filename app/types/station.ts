@@ -57,7 +57,7 @@ export interface StationWithOptionalFields {
   type: StationType;
   services: {
     id: string;
-    highPressure: string;
+    highPressure: HighPressureType;
     tirePressure: boolean;
     vacuum: boolean;
     handicapAccess: boolean;

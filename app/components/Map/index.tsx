@@ -6,43 +6,11 @@ import { divIcon, marker, Map as LeafletMap, Icon, IconOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
 import { Button } from "@/app/components/ui/button";
-import {
-  Station as PrismaStation,
-  StationStatus,
-  StationType,
-  ElectricityType,
-  HighPressureType,
-} from "@prisma/client";
-
-// Étendre l'interface Station pour inclure isLavaTrans et les services
-interface Station extends PrismaStation {
-  isLavaTrans?: boolean;
-  services?: {
-    id: string;
-    highPressure: HighPressureType;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    waterPoint: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    maxVehicleLength: number | null;
-    paymentMethods: string[];
-  } | null;
-  parkingDetails?: {
-    id: string;
-    isPayant: boolean;
-    tarif: number | null;
-    hasElectricity: ElectricityType;
-    commercesProches: string[];
-    handicapAccess: boolean;
-  } | null;
-}
+import { StationStatus, StationType } from "@prisma/client";
+import { StationWithOptionalFields } from "@/app/types/station";
 
 export interface MapComponentProps {
-  stations: Station[];
+  stations: StationWithOptionalFields[];
   getMarkerIcon: (
     status: StationStatus,
     type: StationType,
@@ -51,7 +19,7 @@ export interface MapComponentProps {
   center: [number, number];
   zoom: number;
   onMapReady?: (map: LeafletMap) => void;
-  createPopupContent?: (station: Station) => string;
+  createPopupContent?: (station: StationWithOptionalFields) => string;
 }
 
 function MapEvents({ onMapReady }: { onMapReady?: (map: LeafletMap) => void }) {

@@ -8,7 +8,6 @@ import {
   HighPressureType,
   ElectricityType,
   StationStatus,
-  Station as PrismaStation,
 } from "@prisma/client";
 import AddStationModal from "@/app/components/Map/AddStationModal";
 import { cn } from "@/lib/utils";
@@ -39,35 +38,8 @@ import {
   createGuestSession,
 } from "@/app/utils/guestSession";
 import Image from "next/image";
-import { ExtendedStation } from "@/app/types/station";
+import { StationWithOptionalFields } from "@/app/types/station";
 import { StationData } from "./types";
-
-// Étendre l'interface Station pour inclure isLavaTrans et les champs optionnels
-interface Station extends PrismaStation {
-  isLavaTrans?: boolean;
-  services?: {
-    id: string;
-    highPressure: HighPressureType;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    waterPoint: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    maxVehicleLength: number | null;
-    paymentMethods: string[];
-  } | null;
-  parkingDetails?: {
-    id: string;
-    isPayant: boolean;
-    tarif: number | null;
-    hasElectricity: ElectricityType;
-    commercesProches: string[];
-    handicapAccess: boolean;
-  } | null;
-}
 
 // Import dynamique de la carte complète
 const MapComponent = dynamic<MapComponentProps>(
@@ -233,7 +205,7 @@ export default function LocalisationStation2() {
   const [formData, setFormData] = useState<StationData>(defaultFormData);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const mapCenter: [number, number] = [46.603354, 1.888334];
-  const [stations, setStations] = useState<ExtendedStation[]>([]);
+  const [stations, setStations] = useState<StationWithOptionalFields[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { data: sessionData, status } = useSession();
   const mapRef = useRef<Map | null>(null);
@@ -507,38 +479,40 @@ export default function LocalisationStation2() {
   };
 
   // Convertir les stations au type Station
-  const convertedStations: Station[] = stations.map((station) => ({
-    ...station,
-    services: station.services
-      ? {
-          id: station.services.id,
-          highPressure: station.services.highPressure,
-          tirePressure: station.services.tirePressure,
-          vacuum: station.services.vacuum,
-          handicapAccess: station.services.handicapAccess,
-          wasteWater: station.services.wasteWater,
-          waterPoint: station.services.waterPoint,
-          wasteWaterDisposal: station.services.wasteWaterDisposal,
-          blackWaterDisposal: station.services.blackWaterDisposal,
-          electricity: station.services.electricity as ElectricityType,
-          maxVehicleLength: station.services.maxVehicleLength,
-          paymentMethods: station.services.paymentMethods,
-        }
-      : null,
-    parkingDetails: station.parkingDetails
-      ? {
-          id: station.parkingDetails.id,
-          isPayant: station.parkingDetails.isPayant,
-          tarif: station.parkingDetails.tarif,
-          hasElectricity: station.parkingDetails
-            .hasElectricity as ElectricityType,
-          commercesProches: station.parkingDetails.commercesProches,
-          handicapAccess: station.parkingDetails.handicapAccess,
-        }
-      : null,
-  }));
+  const convertedStations: StationWithOptionalFields[] = stations.map(
+    (station) => ({
+      ...station,
+      services: station.services
+        ? {
+            id: station.services.id,
+            highPressure: station.services.highPressure as HighPressureType,
+            tirePressure: station.services.tirePressure,
+            vacuum: station.services.vacuum,
+            handicapAccess: station.services.handicapAccess,
+            wasteWater: station.services.wasteWater,
+            waterPoint: station.services.waterPoint,
+            wasteWaterDisposal: station.services.wasteWaterDisposal,
+            blackWaterDisposal: station.services.blackWaterDisposal,
+            electricity: station.services.electricity as ElectricityType,
+            maxVehicleLength: station.services.maxVehicleLength,
+            paymentMethods: station.services.paymentMethods,
+          }
+        : null,
+      parkingDetails: station.parkingDetails
+        ? {
+            id: station.parkingDetails.id,
+            isPayant: station.parkingDetails.isPayant,
+            tarif: station.parkingDetails.tarif,
+            hasElectricity: station.parkingDetails
+              .hasElectricity as ElectricityType,
+            commercesProches: station.parkingDetails.commercesProches,
+            handicapAccess: station.parkingDetails.handicapAccess,
+          }
+        : null,
+    })
+  );
 
-  const createPopupContent = (station: Station) => {
+  const createPopupContent = (station: StationWithOptionalFields) => {
     const isAuthenticated = sessionData !== null;
 
     if (!isAuthenticated) {
