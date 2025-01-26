@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import { divIcon, marker, Map as LeafletMap, Icon } from "leaflet";
+import { divIcon, marker, Map as LeafletMap, Icon, IconOptions } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
 import { Button } from "@/app/components/ui/button";
@@ -10,11 +10,35 @@ import {
   Station as PrismaStation,
   StationStatus,
   StationType,
+  ElectricityType,
+  HighPressureType,
 } from "@prisma/client";
 
-// Étendre l'interface Station pour inclure isLavaTrans
+// Étendre l'interface Station pour inclure isLavaTrans et les services
 interface Station extends PrismaStation {
   isLavaTrans?: boolean;
+  services?: {
+    id: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    paymentMethods: string[];
+  } | null;
+  parkingDetails?: {
+    id: string;
+    isPayant: boolean;
+    tarif: number | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+  } | null;
 }
 
 export interface MapComponentProps {
@@ -23,10 +47,11 @@ export interface MapComponentProps {
     status: StationStatus,
     type: StationType,
     isLavaTrans?: boolean
-  ) => Icon;
+  ) => Icon<IconOptions>;
   center: [number, number];
   zoom: number;
   onMapReady?: (map: LeafletMap) => void;
+  createPopupContent?: (station: Station) => string;
 }
 
 function MapEvents({ onMapReady }: { onMapReady?: (map: LeafletMap) => void }) {
@@ -47,6 +72,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   center,
   zoom,
   onMapReady,
+  createPopupContent,
 }) => {
   const mapRef = useRef<LeafletMap | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
@@ -122,11 +148,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
             )}
           >
             <Popup>
-              <div>
-                <h3 className="font-bold">{station.name}</h3>
-                <p>{station.address}</p>
-                {station.city && <p>{station.city}</p>}
-              </div>
+              {createPopupContent ? (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: createPopupContent(station),
+                  }}
+                />
+              ) : (
+                <div>
+                  <h3 className="font-bold">{station.name}</h3>
+                  <p>{station.address}</p>
+                  {station.city && <p>{station.city}</p>}
+                </div>
+              )}
             </Popup>
           </Marker>
         ))}

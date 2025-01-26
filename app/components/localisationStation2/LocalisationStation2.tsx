@@ -8,6 +8,7 @@ import {
   HighPressureType,
   ElectricityType,
   StationStatus,
+  Station as PrismaStation,
 } from "@prisma/client";
 import AddStationModal from "@/app/components/Map/AddStationModal";
 import { cn } from "@/lib/utils";
@@ -38,16 +39,39 @@ import {
   createGuestSession,
 } from "@/app/utils/guestSession";
 import Image from "next/image";
-import { ExtendedStation, StationWithMarker } from "@/app/types/station";
+import { ExtendedStation } from "@/app/types/station";
 import { StationData } from "./types";
 
+// Étendre l'interface Station pour inclure isLavaTrans et les champs optionnels
+interface Station extends PrismaStation {
+  isLavaTrans?: boolean;
+  services?: {
+    id: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    paymentMethods: string[];
+  } | null;
+  parkingDetails?: {
+    id: string;
+    isPayant: boolean;
+    tarif: number | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+  } | null;
+}
+
 // Import dynamique de la carte complète
-const MapComponent = dynamic(
-  () =>
-    import("@/app/components/Map").then((mod) => {
-      const Component = mod.default;
-      return Component as unknown as React.ComponentType<MapComponentProps>;
-    }),
+const MapComponent = dynamic<MapComponentProps>(
+  () => import("@/app/components/Map/index"),
   {
     ssr: false,
     loading: () => (
@@ -482,14 +506,86 @@ export default function LocalisationStation2() {
     });
   };
 
-  // Convertir les stations au type StationWithMarker
-  const convertedStations = stations.map((station): StationWithMarker => {
-    return {
-      ...station,
-      getMarkerIcon: () =>
-        getMarkerIcon(station.status, station.type, station.isLavaTrans),
-    };
-  });
+  // Convertir les stations au type Station
+  const convertedStations: Station[] = stations.map((station) => ({
+    ...station,
+    services: station.services
+      ? {
+          id: station.services.id,
+          highPressure: station.services.highPressure,
+          tirePressure: station.services.tirePressure,
+          vacuum: station.services.vacuum,
+          handicapAccess: station.services.handicapAccess,
+          wasteWater: station.services.wasteWater,
+          waterPoint: station.services.waterPoint,
+          wasteWaterDisposal: station.services.wasteWaterDisposal,
+          blackWaterDisposal: station.services.blackWaterDisposal,
+          electricity: station.services.electricity as ElectricityType,
+          maxVehicleLength: station.services.maxVehicleLength,
+          paymentMethods: station.services.paymentMethods,
+        }
+      : null,
+    parkingDetails: station.parkingDetails
+      ? {
+          id: station.parkingDetails.id,
+          isPayant: station.parkingDetails.isPayant,
+          tarif: station.parkingDetails.tarif,
+          hasElectricity: station.parkingDetails
+            .hasElectricity as ElectricityType,
+          commercesProches: station.parkingDetails.commercesProches,
+          handicapAccess: station.parkingDetails.handicapAccess,
+        }
+      : null,
+  }));
+
+  const createPopupContent = (station: Station) => {
+    const isAuthenticated = sessionData !== null;
+
+    if (!isAuthenticated) {
+      return `
+        <div class="p-4 max-w-xs">
+          <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
+          <p class="text-sm text-gray-600">Type: ${
+            station.type === "STATION_LAVAGE" ? "Station de lavage" : "Parking"
+          }</p>
+          <div class="mt-2">
+            <p class="text-sm text-gray-600 italic">Connectez-vous pour voir l'adresse exacte et les détails complets</p>
+            <button onclick="window.signIn()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors w-full">
+              Se connecter
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="p-4 max-w-xs">
+        <h3 class="text-lg font-semibold mb-2">${station.name}</h3>
+        <p class="text-sm text-gray-600 mb-2">${station.address}</p>
+        <p class="text-sm mb-2">Coordonnées : ${station.latitude.toFixed(
+          6
+        )}, ${station.longitude.toFixed(6)}</p>
+        ${
+          station.services
+            ? `
+          <div class="mt-2 text-sm">
+            <p class="font-semibold">Services disponibles :</p>
+            <ul class="list-disc pl-4">
+              ${
+                station.services.tirePressure
+                  ? "<li>Gonflage des pneus</li>"
+                  : ""
+              }
+              ${station.services.vacuum ? "<li>Aspirateur</li>" : ""}
+              ${station.services.waterPoint ? "<li>Point d'eau</li>" : ""}
+            </ul>
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+  };
 
   return (
     <div className="min-h-screen bg-[#1E2337]">
@@ -898,6 +994,7 @@ export default function LocalisationStation2() {
                   mapRef.current = map;
                   setIsMapReady(true);
                 }}
+                createPopupContent={createPopupContent}
               />
               {!hasFullAccess() && (
                 <div className="map-blur-overlay">
