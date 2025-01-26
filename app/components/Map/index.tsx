@@ -12,9 +12,9 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
-import type { StationWithOptionalFields } from "@/app/types/station";
 import { cn } from "@/lib/utils";
 import { signIn } from "next-auth/react";
+import type { StationWithOptionalFields } from "@/app/types/station";
 
 // Déclaration du type global pour window.signIn
 declare global {
