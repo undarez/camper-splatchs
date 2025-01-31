@@ -2,15 +2,63 @@
 
 import { useEffect, useState } from "react";
 import { MapViewComponent } from "./MapViewComponent";
-import { Map } from "leaflet";
-import { type Station as PrismaStation } from "@prisma/client";
+import { Map, Icon } from "leaflet";
+import {
+  ElectricityType,
+  HighPressureType,
+  type Station as PrismaStation,
+  StationType,
+} from "@prisma/client";
+import { convertStationsToOptionalFields } from "@/app/components/localisationStation/LocalisationStation2";
+import type { StationWithDetails } from "@/types/station";
 
-type Station = PrismaStation & {
+type Station = Omit<PrismaStation, "iconType" | "userId"> & {
+  iconType: "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE" | null;
   city: string | null;
   postalCode: string | null;
   createdAt: Date;
   updatedAt: Date;
-  userId: string | null;
+  userId: string;
+  services: {
+    id: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    maxVehicleHeight: number | null;
+    maxVehicleWidth: number | null;
+    paymentMethods: string[];
+  } | null;
+  parkingDetails: {
+    id: string;
+    isPayant: boolean;
+    tarif: number | null;
+    taxeSejour: number | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    hasCctv: boolean;
+    hasBarrier: boolean;
+    maxDuration: string | null;
+    maxVehicleHeight: number | null;
+    maxVehicleLength: number | null;
+    maxVehicleWidth: number | null;
+    createdAt: Date;
+  } | null;
+  reviews: { rating: number }[];
 };
 
 interface MapViewProps {
@@ -50,5 +98,59 @@ export default function MapView({
     );
   }
 
-  return <MapViewComponent stations={stations} onInit={onInit} />;
+  if (!stations) {
+    return null;
+  }
+
+  const borneIcon = new Icon({
+    iconUrl: "/markers/borne-marker.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+  const stationIcon = new Icon({
+    iconUrl: "/markers/station-marker.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+  return (
+    <MapViewComponent
+      stations={
+        convertStationsToOptionalFields(stations).map((station) => ({
+          ...station,
+          services: station.services || null,
+          parkingDetails: station.parkingDetails
+            ? {
+                ...station.parkingDetails,
+                tarif: station.parkingDetails.tarif?.toString() || null,
+              }
+            : null,
+          reviews:
+            station.reviews?.map((review) => ({
+              ...review,
+              content: review.comment || "",
+              encryptedContent: "",
+              userId: review.authorId,
+            })) || [],
+          averageRating: station.reviews
+            ? station.reviews.reduce((acc, review) => acc + review.rating, 0) /
+              station.reviews.length
+            : 0,
+        })) as StationWithDetails[]
+      }
+      onInit={onInit}
+      getMarkerIcon={(station) => {
+        return station.type === StationType.STATION_LAVAGE
+          ? borneIcon
+          : stationIcon;
+      }}
+      onStationClick={(station) => {
+        console.log("Station clicked:", station);
+      }}
+      selectedStation={null}
+    />
+  );
 }
