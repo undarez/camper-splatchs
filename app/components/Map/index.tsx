@@ -30,7 +30,7 @@ declare global {
   }
 }
 
-export interface MapComponentProps {
+export interface MapProps {
   stations: StationWithOptionalFields[];
   getMarkerIcon: (
     status: StationStatus,
@@ -73,7 +73,7 @@ function MapEvents({ onMapReady }: { onMapReady?: (map: LeafletMap) => void }) {
   return null;
 }
 
-export function MapComponent({
+export const MapComponent = ({
   stations,
   getMarkerIcon,
   center,
@@ -82,7 +82,7 @@ export function MapComponent({
   createPopupContent,
   onGeolocation,
   isLocating,
-}: MapComponentProps): JSX.Element {
+}: MapProps): JSX.Element => {
   const mapRef = useRef<LeafletMap | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const { latitude, longitude } = useGeolocation();
@@ -302,6 +302,6 @@ export function MapComponent({
       </style>
     </div>
   );
-}
+};
 
 export default MapComponent;
