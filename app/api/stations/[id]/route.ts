@@ -78,6 +78,17 @@ export async function GET(
         phoneNumber: true,
         services: true,
         parkingDetails: true,
+        iconType: true,
+        validatedAt: true,
+        validatedBy: true,
+        createdAt: true,
+        updatedAt: true,
+        isLavaTrans: true,
+        authorId: true,
+        encryptedName: true,
+        encryptedAddress: true,
+        hasParking: true,
+        userId: true,
         reviews: {
           include: {
             author: {
@@ -85,6 +96,7 @@ export async function GET(
                 id: true,
                 name: true,
                 email: true,
+                image: true,
               },
             },
           },
@@ -97,6 +109,7 @@ export async function GET(
             id: true,
             name: true,
             email: true,
+            image: true,
           },
         },
       },
@@ -116,30 +129,24 @@ export async function GET(
     }
 
     // Transformer les données pour le front-end
-    const transformedStation = {
-      ...station,
-      phone_number: station.phoneNumber,
-      postal_code: station.postalCode,
-    };
+    const stationWithRelations = station as StationWithRelations;
 
-    // Supprimer les propriétés en camelCase
-    delete transformedStation.phoneNumber;
-    delete transformedStation.postalCode;
-
-    const stationWithRelations = transformedStation as StationWithRelations;
-
-    // Calculer la moyenne des notes
-    const averageRating =
-      stationWithRelations.reviews.length > 0
-        ? stationWithRelations.reviews.reduce(
-            (acc: number, review) => acc + review.rating,
-            0
-          ) / stationWithRelations.reviews.length
-        : 0;
-
+    // Ajouter les versions snake_case des propriétés
     const response = {
       ...stationWithRelations,
-      averageRating: Number(averageRating.toFixed(1)),
+      phone_number: station.phoneNumber,
+      postal_code: station.postalCode,
+      averageRating:
+        stationWithRelations.reviews.length > 0
+          ? Number(
+              (
+                stationWithRelations.reviews.reduce(
+                  (acc: number, review) => acc + review.rating,
+                  0
+                ) / stationWithRelations.reviews.length
+              ).toFixed(1)
+            )
+          : 0,
     };
 
     console.log("Réponse préparée avec succès");
