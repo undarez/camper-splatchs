@@ -41,7 +41,7 @@ import { StationData } from "./types";
 
 // Import dynamique de la carte complète
 const DynamicMap = dynamic<MapComponentProps>(
-  () => import("@/app/components/Map/index").then((mod) => mod.MapComponent),
+  () => import("@/app/components/Map/index").then((mod) => mod.default),
   {
     ssr: false,
     loading: () => (

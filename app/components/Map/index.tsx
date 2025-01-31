@@ -46,7 +46,10 @@ export interface MapComponentProps {
 
 export interface MapViewComponentProps {
   stations: StationWithOptionalFields[];
-  getMarkerIcon: (station: StationWithOptionalFields) => Icon<IconOptions>;
+  getMarkerIcon: (
+    status: StationStatus,
+    type: StationType
+  ) => Icon<IconOptions>;
   center?: LatLngExpression;
   zoom?: number;
   onMapReady?: (ready: boolean) => void;
