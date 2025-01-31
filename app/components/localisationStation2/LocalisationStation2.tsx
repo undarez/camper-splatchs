@@ -37,10 +37,14 @@ import type {
   StationWithOptionalFields,
 } from "@/app/types/station";
 import { StationData } from "./types";
-import { MapComponent as StaticMapComponent } from "@/app/components/Map/index";
+import type { MapComponentProps } from "@/app/components/Map/index";
 
 // Import dynamique de la carte complète
-const DynamicMap = dynamic(() => Promise.resolve(StaticMapComponent), {
+const DynamicMap = dynamic<
+  Omit<MapComponentProps, "getMarkerIcon"> & {
+    getMarkerIcon: (status: StationStatus, type: StationType) => Icon;
+  }
+>(() => import("@/app/components/Map/index").then((mod) => mod.MapComponent), {
   ssr: false,
   loading: () => (
     <div className="h-full w-full flex items-center justify-center">
