@@ -94,6 +94,7 @@ CREATE TABLE "Station" (
     "encryptedAddress" TEXT,
     "hasParking" BOOLEAN NOT NULL DEFAULT false,
     "userId" TEXT,
+    "isLavaTrans" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Station_pkey" PRIMARY KEY ("id")
 );
