@@ -123,7 +123,7 @@ export function convertStationsToOptionalFields(
           id: station.parkingDetails.id,
           stationId: station.id,
           isPayant: station.parkingDetails.isPayant,
-          tarif: station.parkingDetails.tarif,
+          tarif: station.parkingDetails.tarif?.toString() || null,
           taxeSejour: station.parkingDetails.taxeSejour?.toString() || null,
           hasElectricity: station.parkingDetails
             .hasElectricity as ElectricityType,
