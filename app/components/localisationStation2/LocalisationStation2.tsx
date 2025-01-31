@@ -18,7 +18,6 @@ import {
 } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useToast } from "@/hooks/use-toast";
-import type { MapComponentProps } from "@/app/components/Map/index";
 import { Button } from "@/app/components/ui/button";
 import {
   Dialog,
@@ -38,23 +37,17 @@ import type {
   StationWithOptionalFields,
 } from "@/app/types/station";
 import { StationData } from "./types";
+import { MapComponent as StaticMapComponent } from "@/app/components/Map/index";
 
 // Import dynamique de la carte complète
-const DynamicMap = dynamic<MapComponentProps>(
-  () =>
-    import("@/app/components/Map/index").then((mod) => {
-      const Component = mod.MapComponent;
-      return Component;
-    }),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-full w-full flex items-center justify-center">
-        <p>Chargement de la carte...</p>
-      </div>
-    ),
-  }
-);
+const DynamicMap = dynamic(() => Promise.resolve(StaticMapComponent), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full flex items-center justify-center">
+      <p>Chargement de la carte...</p>
+    </div>
+  ),
+});
 
 interface GeoapifyProperties {
   lat: number;
