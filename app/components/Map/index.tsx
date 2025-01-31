@@ -14,7 +14,11 @@ import "leaflet/dist/leaflet.css";
 import { useGeolocation } from "@/app/hooks/useGeolocation";
 import { cn } from "@/lib/utils";
 import { signIn } from "next-auth/react";
-import type { StationWithOptionalFields } from "@/app/types/station";
+import type {
+  StationWithOptionalFields,
+  StationStatus,
+  StationType,
+} from "@/app/types/station";
 
 // Réexporter le type pour qu'il soit disponible
 export type { StationWithOptionalFields };
@@ -28,7 +32,10 @@ declare global {
 
 export interface MapComponentProps {
   stations: StationWithOptionalFields[];
-  getMarkerIcon: (station: StationWithOptionalFields) => Icon<IconOptions>;
+  getMarkerIcon: (
+    status: StationStatus,
+    type: StationType
+  ) => Icon<IconOptions>;
   center: LatLngExpression;
   zoom: number;
   onMapReady?: (map: LeafletMap) => void;
@@ -106,7 +113,7 @@ export function MapComponent({
     markers.current = [];
 
     stations.forEach((station) => {
-      const markerIcon = getMarkerIcon(station);
+      const markerIcon = getMarkerIcon(station.status, station.type);
       const newMarker = marker([station.latitude, station.longitude], {
         icon: markerIcon,
         riseOnHover: true, // L'icône s'élève au survol
@@ -212,7 +219,7 @@ export function MapComponent({
           <Marker
             key={station.id}
             position={[station.latitude, station.longitude]}
-            icon={getMarkerIcon(station)}
+            icon={getMarkerIcon(station.status, station.type)}
           >
             <Popup className="custom-popup">
               <div

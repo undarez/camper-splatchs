@@ -33,7 +33,10 @@ import {
   createGuestSession,
 } from "@/app/utils/guestSession";
 import Image from "next/image";
-import type { StationWithOptionalFields } from "@/app/types/station";
+import type {
+  StationStatus,
+  StationWithOptionalFields,
+} from "@/app/types/station";
 import { StationData } from "./types";
 
 // Import dynamique de la carte complète
@@ -457,19 +460,13 @@ export default function LocalisationStation2() {
     return <AuthDialog />;
   }
 
-  const getMarkerIcon = (station: StationWithOptionalFields): Icon => {
+  const getMarkerIcon = (status: StationStatus, type: StationType): Icon => {
     let iconUrl = "/images/logo.png";
 
-    if (station.isLavaTrans) {
-      iconUrl = "/images/lavatranssplas.png";
-    } else if (station.type === StationType.PARKING) {
+    if (type === StationType.PARKING) {
       iconUrl = "/images/parking-icon.png";
-    } else if (station.iconType === "PASSERELLE") {
-      iconUrl = "/images/passerelle-icon.png";
-    } else if (station.iconType === "PORTIQUE") {
-      iconUrl = "/images/portique-icon.png";
-    } else if (station.iconType === "ECHAFAUDAGE") {
-      iconUrl = "/images/echafaudage-icon.png";
+    } else if (type === StationType.STATION_LAVAGE) {
+      iconUrl = "/images/lavatranssplas.png";
     }
 
     return new Icon({
@@ -480,9 +477,9 @@ export default function LocalisationStation2() {
       iconAnchor: [12, 25],
       popupAnchor: [0, -25],
       shadowSize: [41, 41],
-      className: `station-marker ${station.status} ${
-        station.type === StationType.PARKING ? "parking" : "station-lavage"
-      } ${station.isLavaTrans ? "lavatrans" : ""}`,
+      className: `station-marker ${status} ${
+        type === StationType.PARKING ? "parking" : "station-lavage"
+      }`,
     });
   };
 

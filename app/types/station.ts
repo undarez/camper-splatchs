@@ -166,4 +166,4 @@ export interface Review extends PrismaReview {
   updatedAt: Date;
 }
 
-export { StationType };
+export { StationType, StationStatus };
