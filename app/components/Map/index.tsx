@@ -16,6 +16,9 @@ import { cn } from "@/lib/utils";
 import { signIn } from "next-auth/react";
 import type { StationWithOptionalFields } from "@/app/types/station";
 
+// Réexporter le type pour qu'il soit disponible
+export type { StationWithOptionalFields };
+
 // Déclaration du type global pour window.signIn
 declare global {
   interface Window {
