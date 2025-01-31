@@ -72,7 +72,7 @@ export function MapComponent({
   createPopupContent,
   onGeolocation,
   isLocating,
-}: MapComponentProps) {
+}: MapComponentProps): JSX.Element {
   const mapRef = useRef<LeafletMap | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
   const { latitude, longitude } = useGeolocation();
@@ -293,3 +293,5 @@ export function MapComponent({
     </div>
   );
 }
+
+export default MapComponent;

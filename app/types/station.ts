@@ -5,6 +5,7 @@ import {
   type Review as PrismaReview,
   StationType,
   Prisma,
+  StationStatus,
 } from "@prisma/client";
 import { Icon } from "leaflet";
 
@@ -74,10 +75,70 @@ export interface ExtendedStation extends Station {
 }
 
 // Interface pour les stations avec champs optionnels
-export interface StationWithOptionalFields extends ExtendedStation {
-  services: ServiceDetails | null;
-  parkingDetails: ParkingDetails | null;
-  reviews?: PrismaReview[];
+export interface StationWithOptionalFields
+  extends Omit<Station, "parkingDetails" | "services"> {
+  isLavaTrans?: boolean;
+  iconType: "PASSERELLE" | "PORTIQUE" | "ECHAFAUDAGE" | null;
+  status: StationStatus;
+  phoneNumber: string | null;
+  description: string | null;
+  parkingDetails?: {
+    id: string;
+    createdAt: Date;
+    stationId: string;
+    isPayant: boolean;
+    tarif: number | null;
+    taxeSejour: string | null;
+    hasElectricity: ElectricityType;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    hasCctv: boolean;
+    hasBarrier: boolean;
+    maxDuration: string | null;
+    maxVehicleHeight: number | null;
+    maxVehicleLength: number | null;
+    maxVehicleWidth: number | null;
+  } | null;
+  services?: {
+    id: string;
+    createdAt: Date;
+    stationId: string;
+    highPressure: HighPressureType;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: ElectricityType;
+    maxVehicleLength: number | null;
+    maxVehicleHeight: number | null;
+    maxVehicleWidth: number | null;
+    paymentMethods: string[];
+  } | null;
+  author?: {
+    name: string | null;
+    email: string | null;
+  } | null;
+  reviews?:
+    | {
+        id: string;
+        rating: number;
+        comment: string;
+        createdAt: Date;
+        updatedAt: Date;
+        authorId: string;
+        stationId: string;
+      }[]
+    | null;
 }
 
 // Interface pour les stations avec la fonction getMarkerIcon
