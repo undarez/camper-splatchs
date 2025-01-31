@@ -15,8 +15,15 @@ const MapViewComponent = dynamic(
 export default function MapViewPage() {
   const [stations, setStations] = useState<StationWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     fetch("/api/stations")
       .then((res) => res.json())
       .then((data) => {
@@ -48,9 +55,9 @@ export default function MapViewPage() {
         setStations(convertedStations);
         setIsLoading(false);
       });
-  }, []);
+  }, [isMounted]);
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return <div>Chargement...</div>;
   }
 
