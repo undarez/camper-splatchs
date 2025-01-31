@@ -497,7 +497,7 @@ export default function HomePage() {
             <div className="relative h-96 rounded-lg overflow-hidden shadow-xl">
               <div className="absolute inset-0 bg-gradient-to-t from-[#1E2337]/80 to-transparent z-10" />
               <Image
-                src="/images/eco-wash-hero.jpg"
+                src="/images/eco-wash-hero.webp"
                 alt="Éco-lavage de camping-car"
                 fill
                 style={{ objectFit: "cover" }}

@@ -49,6 +49,9 @@ interface StationWithRelations extends Station {
   };
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
@@ -60,22 +63,28 @@ export async function GET(
       where: {
         id: params.id,
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        postalCode: true,
+        latitude: true,
+        longitude: true,
+        images: true,
+        status: true,
+        type: true,
+        description: true,
+        phoneNumber: true,
         services: true,
         parkingDetails: true,
         reviews: {
-          select: {
-            id: true,
-            content: true,
-            rating: true,
-            createdAt: true,
-            authorId: true,
-            stationId: true,
+          include: {
             author: {
               select: {
                 id: true,
                 name: true,
-                image: true,
+                email: true,
               },
             },
           },
@@ -87,7 +96,7 @@ export async function GET(
           select: {
             id: true,
             name: true,
-            image: true,
+            email: true,
           },
         },
       },
@@ -106,7 +115,18 @@ export async function GET(
       );
     }
 
-    const stationWithRelations = station as StationWithRelations;
+    // Transformer les données pour le front-end
+    const transformedStation = {
+      ...station,
+      phone_number: station.phoneNumber,
+      postal_code: station.postalCode,
+    };
+
+    // Supprimer les propriétés en camelCase
+    delete transformedStation.phoneNumber;
+    delete transformedStation.postalCode;
+
+    const stationWithRelations = transformedStation as StationWithRelations;
 
     // Calculer la moyenne des notes
     const averageRating =
@@ -132,6 +152,58 @@ export async function GET(
     return NextResponse.json(
       {
         error: "Erreur lors de la récupération de la station",
+        details: error instanceof Error ? error.message : "Erreur inconnue",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    console.log("Début de la mise à jour de la station:", params.id);
+
+    const body = await request.json();
+    console.log("Données reçues:", body);
+
+    const { description, phone_number } = body;
+
+    if (!description && !phone_number) {
+      console.log("Aucune donnée valide fournie pour la mise à jour");
+      return NextResponse.json(
+        { error: "Aucune donnée valide fournie pour la mise à jour" },
+        { status: 400 }
+      );
+    }
+
+    console.log("Mise à jour de la station avec:", {
+      description,
+      phoneNumber: phone_number,
+    });
+
+    const updatedStation = await prisma.station.update({
+      where: {
+        id: params.id,
+      },
+      data: {
+        ...(description && { description }),
+        ...(phone_number && { phoneNumber: phone_number }),
+      },
+    });
+
+    console.log("Station mise à jour avec succès:", updatedStation);
+    return NextResponse.json(updatedStation);
+  } catch (error) {
+    console.error(
+      "Erreur détaillée lors de la mise à jour de la station:",
+      error
+    );
+    return NextResponse.json(
+      {
+        error: "Erreur lors de la mise à jour de la station",
         details: error instanceof Error ? error.message : "Erreur inconnue",
       },
       { status: 500 }

@@ -1,90 +1,83 @@
 import {
   ElectricityType,
   HighPressureType,
-  type Station as PrismaBaseStation,
-  Service,
-  Review,
+  type Station,
+  type Review as PrismaReview,
   StationType,
+  Prisma,
 } from "@prisma/client";
 import { Icon } from "leaflet";
 
-// Interface de base pour les stations
-export interface ExtendedStation extends PrismaBaseStation {
-  isLavaTrans?: boolean;
-  services: {
-    id: string;
-    highPressure: HighPressureType;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    waterPoint: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    maxVehicleLength: number | null;
-    paymentMethods: string[];
-  } | null;
-  parkingDetails: {
-    id: string;
-    isPayant: boolean;
-    tarif: number | null;
-    taxeSejour: number | null;
-    hasElectricity: ElectricityType;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-    waterPoint: boolean;
-    wasteWater: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-  } | null;
+export type BaseStation = Prisma.StationGetPayload<{
+  include: {
+    services: true;
+    parkingDetails: true;
+    reviews: true;
+  };
+}>;
+
+// Type pour les services avec tous les champs requis
+export interface ServiceDetails {
+  id: string;
+  createdAt: Date;
+  stationId: string;
+  highPressure: HighPressureType;
+  tirePressure: boolean;
+  vacuum: boolean;
+  handicapAccess: boolean;
+  wasteWater: boolean;
+  waterPoint: boolean;
+  wasteWaterDisposal: boolean;
+  blackWaterDisposal: boolean;
+  electricity: ElectricityType;
+  maxVehicleLength: number | null;
+  maxVehicleHeight: number | null;
+  maxVehicleWidth: number | null;
+  paymentMethods: string[];
 }
 
+// Interface pour les détails de parking
 export interface ParkingDetails {
   id: string;
+  createdAt: Date;
+  stationId: string;
   isPayant: boolean;
-  tarif: number | null;
+  tarif: string | null;
+  taxeSejour: string | null;
   hasElectricity: ElectricityType;
   commercesProches: string[];
   handicapAccess: boolean;
-  hasWifi?: boolean;
-  hasChargingPoint?: boolean;
-  waterPoint?: boolean;
-  wasteWater?: boolean;
-  wasteWaterDisposal?: boolean;
-  blackWaterDisposal?: boolean;
+  totalPlaces: number;
+  hasWifi: boolean;
+  hasChargingPoint: boolean;
+  waterPoint: boolean;
+  wasteWater: boolean;
+  wasteWaterDisposal: boolean;
+  blackWaterDisposal: boolean;
+  hasCctv: boolean;
+  hasBarrier: boolean;
+  maxDuration: string | null;
+  maxVehicleHeight: number | null;
+  maxVehicleLength: number | null;
+  maxVehicleWidth: number | null;
+}
+
+// Interface de base pour les stations
+export interface ExtendedStation extends Station {
+  isLavaTrans: boolean;
+  phoneNumber: string | null;
+  description: string | null;
+  iconType: "PASSERELLE" | "PORTIQUE" | "ECHAFAUDAGE" | null;
+  status: "active" | "en_attente" | "inactive";
+  services: ServiceDetails | null;
+  parkingDetails: ParkingDetails | null;
 }
 
 // Interface pour les stations avec champs optionnels
-export interface StationWithOptionalFields {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  postalCode: string;
-  latitude: number;
-  longitude: number;
-  status: string;
-  type: StationType;
-  isLavaTrans?: boolean;
-  services: {
-    id: string;
-    highPressure: HighPressureType;
-    tirePressure: boolean;
-    vacuum: boolean;
-    handicapAccess: boolean;
-    wasteWater: boolean;
-    waterPoint: boolean;
-    wasteWaterDisposal: boolean;
-    blackWaterDisposal: boolean;
-    electricity: ElectricityType;
-    maxVehicleLength: string | null;
-    paymentMethods: string[];
-  } | null;
+export interface StationWithOptionalFields extends ExtendedStation {
+  services: ServiceDetails | null;
   parkingDetails: ParkingDetails | null;
+  reviews?: PrismaReview[];
 }
 
 // Interface pour les stations avec la fonction getMarkerIcon
@@ -93,8 +86,23 @@ export interface StationWithMarker extends ExtendedStation {
 }
 
 export interface StationWithDetails extends ExtendedStation {
-  services: Service | null;
+  services: ServiceDetails | null;
   images: string[];
-  reviews: Review[];
+  reviews: PrismaReview[];
   averageRating: number;
+  parkingDetails: ParkingDetails | null;
+  phoneNumber: string | null;
+  description: string | null;
 }
+
+export interface Review extends PrismaReview {
+  id: string;
+  stationId: string;
+  userId: string;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export { StationType };

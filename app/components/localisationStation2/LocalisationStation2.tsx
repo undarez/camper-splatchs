@@ -464,6 +464,12 @@ export default function LocalisationStation2() {
       iconUrl = "/images/lavatranssplas.png";
     } else if (station.type === StationType.PARKING) {
       iconUrl = "/images/parking-icon.png";
+    } else if (station.iconType === "PASSERELLE") {
+      iconUrl = "/images/passerelle-icon.png";
+    } else if (station.iconType === "PORTIQUE") {
+      iconUrl = "/images/portique-icon.png";
+    } else if (station.iconType === "ECHAFAUDAGE") {
+      iconUrl = "/images/echafaudage-icon.png";
     }
 
     return new Icon({
@@ -484,31 +490,58 @@ export default function LocalisationStation2() {
   const convertedStations: StationWithOptionalFields[] = stations.map(
     (station) => ({
       ...station,
+      phoneNumber: station.phoneNumber || null,
+      description: station.description || null,
+      iconType: station.iconType || null,
+      isLavaTrans: station.isLavaTrans || false,
+      status: station.status || "inactive",
       services: station.services
         ? {
             id: station.services.id,
+            createdAt: station.services.createdAt || new Date(),
+            stationId: station.services.stationId || station.id,
             highPressure: station.services.highPressure as HighPressureType,
-            tirePressure: station.services.tirePressure,
-            vacuum: station.services.vacuum,
-            handicapAccess: station.services.handicapAccess,
-            wasteWater: station.services.wasteWater,
-            waterPoint: station.services.waterPoint,
-            wasteWaterDisposal: station.services.wasteWaterDisposal,
-            blackWaterDisposal: station.services.blackWaterDisposal,
+            tirePressure: station.services.tirePressure || false,
+            vacuum: station.services.vacuum || false,
+            handicapAccess: station.services.handicapAccess || false,
+            wasteWater: station.services.wasteWater || false,
+            waterPoint: station.services.waterPoint || false,
+            wasteWaterDisposal: station.services.wasteWaterDisposal || false,
+            blackWaterDisposal: station.services.blackWaterDisposal || false,
             electricity: station.services.electricity as ElectricityType,
-            maxVehicleLength: station.services.maxVehicleLength,
-            paymentMethods: station.services.paymentMethods,
+            maxVehicleLength: station.services.maxVehicleLength || null,
+            maxVehicleHeight: station.services.maxVehicleHeight || null,
+            maxVehicleWidth: station.services.maxVehicleWidth || null,
+            paymentMethods: station.services.paymentMethods || [],
           }
         : null,
       parkingDetails: station.parkingDetails
         ? {
             id: station.parkingDetails.id,
-            isPayant: station.parkingDetails.isPayant,
-            tarif: station.parkingDetails.tarif,
+            createdAt: station.parkingDetails.createdAt || new Date(),
+            stationId: station.parkingDetails.stationId || station.id,
+            isPayant: station.parkingDetails.isPayant || false,
+            tarif: station.parkingDetails.tarif || null,
+            taxeSejour: station.parkingDetails.taxeSejour || null,
             hasElectricity: station.parkingDetails
               .hasElectricity as ElectricityType,
-            commercesProches: station.parkingDetails.commercesProches,
-            handicapAccess: station.parkingDetails.handicapAccess,
+            commercesProches: station.parkingDetails.commercesProches || [],
+            handicapAccess: station.parkingDetails.handicapAccess || false,
+            totalPlaces: station.parkingDetails.totalPlaces || 0,
+            hasWifi: station.parkingDetails.hasWifi || false,
+            hasChargingPoint: station.parkingDetails.hasChargingPoint || false,
+            waterPoint: station.parkingDetails.waterPoint || false,
+            wasteWater: station.parkingDetails.wasteWater || false,
+            wasteWaterDisposal:
+              station.parkingDetails.wasteWaterDisposal || false,
+            blackWaterDisposal:
+              station.parkingDetails.blackWaterDisposal || false,
+            hasCctv: station.parkingDetails.hasCctv || false,
+            hasBarrier: station.parkingDetails.hasBarrier || false,
+            maxDuration: station.parkingDetails.maxDuration || null,
+            maxVehicleHeight: station.parkingDetails.maxVehicleHeight || null,
+            maxVehicleLength: station.parkingDetails.maxVehicleLength || null,
+            maxVehicleWidth: station.parkingDetails.maxVehicleWidth || null,
           }
         : null,
     })
@@ -547,7 +580,7 @@ export default function LocalisationStation2() {
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-xl font-bold text-white">${station.name}</h3>
           <span class="px-3 py-1 text-xs rounded-full bg-[#40E0D0] text-[#1E2337] font-medium">
-            Active
+            ${station.type === "STATION_LAVAGE" ? "Station" : "Parking"}
           </span>
         </div>
 
@@ -559,6 +592,33 @@ export default function LocalisationStation2() {
             </svg>
             <p class="text-sm text-white">${station.address}</p>
           </div>
+
+          ${
+            station.phoneNumber
+              ? `
+            <div class="flex items-center gap-3 bg-[#252B43] p-3 rounded-lg">
+              <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+              <p class="text-sm text-white">${station.phoneNumber}</p>
+            </div>
+          `
+              : ""
+          }
+
+          ${
+            station.description
+              ? `
+            <div class="flex items-start gap-3 bg-[#252B43] p-3 rounded-lg">
+              <svg class="w-5 h-5 text-[#40E0D0] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <p class="text-sm text-white">${station.description}</p>
+            </div>
+          `
+              : ""
+          }
+
           <div class="flex items-start gap-3 bg-[#252B43] p-3 rounded-lg">
             <svg class="w-5 h-5 text-[#40E0D0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
@@ -680,19 +740,44 @@ export default function LocalisationStation2() {
                   }</p>
                 </div>
                 ${
-                  station.parkingDetails.hasElectricity !== "NONE"
+                  station.parkingDetails.maxVehicleHeight
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <span class="text-sm text-[#40E0D0] font-medium">Électricité</span>
-                      <p class="text-xs text-white mt-1">${station.parkingDetails.hasElectricity}</p>
+                      <span class="text-sm text-[#40E0D0] font-medium">Hauteur max.</span>
+                      <p class="text-xs text-white mt-1">${station.parkingDetails.maxVehicleHeight}m</p>
                     </div>`
                     : ""
                 }
                 ${
-                  station.parkingDetails.handicapAccess
+                  station.parkingDetails.hasWifi
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <span class="text-sm text-[#40E0D0] font-medium">Accès PMR</span>
+                      <span class="text-sm text-[#40E0D0] font-medium">WiFi</span>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.hasCctv
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Vidéosurveillance</span>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.hasBarrier
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Barrière</span>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.maxDuration
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Durée max.</span>
+                      <p class="text-xs text-white mt-1">${station.parkingDetails.maxDuration}</p>
                     </div>`
                     : ""
                 }

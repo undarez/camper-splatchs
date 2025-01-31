@@ -1,48 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import {
-  Map,
-  map as createMap,
-  tileLayer,
-  Marker,
-  marker,
-  DivIcon,
-} from "leaflet";
+import { Map, map as createMap, tileLayer, Marker, marker } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { type Station } from "@prisma/client";
 import Image from "next/image";
+import { StationWithDetails } from "@/app/types/station";
 
 interface MapViewComponentProps {
-  stations: Station[];
-  onInit?: (map: Map) => void;
-  onMapReady?: (isReady: boolean) => void;
+  stations: StationWithDetails[];
+  onInit?: (map: L.Map) => void;
+  onMapReady?: (ready: boolean) => void;
+  getMarkerIcon: (station: StationWithDetails) => L.Icon;
+  onStationClick: (station: StationWithDetails) => void;
+  selectedStation: StationWithDetails | null;
 }
-
 export function MapViewComponent({
   stations,
   onInit,
   onMapReady,
+  getMarkerIcon,
 }: MapViewComponentProps) {
   const mapRef = useRef<Map | null>(null);
 
-  const getMarkerIcon = useCallback((type: string) => {
-    const color = type === "STATION_LAVAGE" ? "#40E0D0" : "#8B00FF";
-    return new DivIcon({
-      html: `
-        <div class="marker-container">
-          <img src="/images/logo.png" alt="marker" style="filter: drop-shadow(0 0 4px ${color}) drop-shadow(0 0 8px ${color});" />
-        </div>
-      `,
-      className: "station-marker",
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40],
-    });
-  }, []);
-
   const updateMarkers = useCallback(
-    (filteredStations: Station[]) => {
+    (filteredStations: StationWithDetails[]) => {
       if (!mapRef.current) return;
 
       // Supprimer tous les marqueurs existants
@@ -54,7 +35,7 @@ export function MapViewComponent({
 
       // Ajouter les nouveaux marqueurs filtrés
       filteredStations.forEach((station) => {
-        const markerIcon = getMarkerIcon(station.type);
+        const markerIcon = getMarkerIcon(station);
 
         marker([station.latitude, station.longitude], {
           icon: markerIcon,

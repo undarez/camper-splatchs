@@ -66,6 +66,9 @@ export function StationCardClient() {
   const mapRef = useRef<LeafletMap | null>(null);
   const userMarkerRef = useRef<LeafletMarker | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [selectedStation, setSelectedStation] =
+    useState<StationWithDetails | null>(null);
+  const [isMapView, setIsMapView] = useState(true);
 
   const hasFullAccess = useCallback(() => {
     return !!sessionData?.user;
@@ -254,8 +257,103 @@ export function StationCardClient() {
     indexOfLastStation
   );
 
+  const handleStationClick = (station: StationWithDetails) => {
+    setSelectedStation(station);
+  };
+
+  const getMarkerIcon = (station: StationWithDetails): Icon => {
+    let iconUrl = "/images/logo.png" as string;
+    const iconSize: [number, number] = [25, 25];
+    let className = "station-marker";
+
+    if (station.type === "STATION_LAVAGE") {
+      if (station.iconType === "PASSERELLE") {
+        iconUrl = "/images/passerelle-icon.png";
+      } else if (station.iconType === "PORTIQUE") {
+        iconUrl = "/images/portique-icon.png";
+      } else if (station.iconType === "ECHAFAUDAGE") {
+        iconUrl = "/images/echafaudage-icon.png";
+      }
+      className += " station-lavage";
+    } else if (station.type === "PARKING") {
+      iconUrl = "/images/parking-icon.png";
+      className += " parking";
+    }
+
+    if (station.isLavaTrans) {
+      iconUrl = "/images/lavatranssplas.png";
+      className += " lavatrans";
+    }
+
+    className += ` ${station.status}`;
+
+    return new Icon({
+      iconUrl,
+      iconRetinaUrl: iconUrl,
+      shadowUrl: "/images/marker-shadow.png",
+      iconSize: iconSize as [number, number],
+      iconAnchor: [12, 25] as [number, number],
+      popupAnchor: [0, -25] as [number, number],
+      shadowSize: [41, 41] as [number, number],
+      className,
+    });
+  };
+
   return (
     <div className="relative z-0 min-h-screen bg-[#1E2337]">
+      <style>
+        {`
+          .station-marker {
+            filter: drop-shadow(0 0 4px var(--glow-color));
+            transition: all 0.3s ease;
+          }
+          .station-marker img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+          .station-marker.active {
+            --glow-color: #10B981;
+            filter: drop-shadow(0 0 8px var(--glow-color));
+          }
+          .station-marker.en_attente {
+            --glow-color: #F59E0B;
+            filter: drop-shadow(0 0 8px var(--glow-color));
+          }
+          .station-marker.inactive {
+            --glow-color: #EF4444;
+            filter: drop-shadow(0 0 8px var(--glow-color));
+            opacity: 0.7;
+          }
+          .station-marker.parking {
+            --glow-color: #8B00FF;
+          }
+          .station-marker.station-lavage {
+            --glow-color: #40E0D0;
+          }
+          .station-marker:hover {
+            transform: scale(1.1);
+            z-index: 1000 !important;
+          }
+          .leaflet-popup-content-wrapper {
+            background: #1E2337;
+            color: white;
+            border-radius: 12px;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+          }
+          .leaflet-popup-tip {
+            background: #1E2337;
+            border: 1px solid rgba(75, 85, 99, 0.5);
+          }
+          .service-card {
+            background: rgba(64, 224, 208, 0.15);
+            transition: all 0.2s ease;
+          }
+          .service-card:hover {
+            background: rgba(64, 224, 208, 0.25);
+          }
+        `}
+      </style>
       {!hasFullAccess() && (
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 mb-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -489,7 +587,45 @@ export function StationCardClient() {
         {/* Contenu principal */}
         <main className="flex-1 min-h-screen">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
-            {viewMode === "cards" ? (
+            <div className="flex justify-end mb-4 space-x-2">
+              <button
+                onClick={() => setIsMapView(true)}
+                className={`px-4 py-2 rounded-lg ${
+                  isMapView
+                    ? "bg-[#40E0D0] text-[#1E2337]"
+                    : "bg-[#252B43] text-white"
+                }`}
+              >
+                Vue carte
+              </button>
+              <button
+                onClick={() => setIsMapView(false)}
+                className={`px-4 py-2 rounded-lg ${
+                  !isMapView
+                    ? "bg-[#40E0D0] text-[#1E2337]"
+                    : "bg-[#252B43] text-white"
+                }`}
+              >
+                Vue liste
+              </button>
+            </div>
+
+            {isMapView ? (
+              <div className="relative h-[calc(100vh-180px)]">
+                <div className="h-full rounded-lg overflow-hidden shadow-lg">
+                  <MapView
+                    stations={filteredStations}
+                    onStationClick={handleStationClick}
+                    selectedStation={selectedStation}
+                    getMarkerIcon={getMarkerIcon}
+                    onInit={(map) => {
+                      mapRef.current = map;
+                    }}
+                    onMapReady={(ready) => setIsMapReady(ready)}
+                  />
+                </div>
+              </div>
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {currentStations.map((station) => (
                   <div key={station.id} className="relative group">
@@ -514,20 +650,6 @@ export function StationCardClient() {
                   </div>
                 ))}
               </div>
-            ) : (
-              hasFullAccess() && (
-                <div className="relative h-[calc(100vh-180px)]">
-                  <div className="h-full rounded-lg overflow-hidden shadow-lg">
-                    <MapView
-                      stations={filteredStations}
-                      onInit={(map) => {
-                        mapRef.current = map;
-                      }}
-                      onMapReady={(ready) => setIsMapReady(ready)}
-                    />
-                  </div>
-                </div>
-              )
             )}
 
             {/* Pagination */}

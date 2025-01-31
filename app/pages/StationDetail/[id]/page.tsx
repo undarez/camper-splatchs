@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
-import { Station, Review, Service } from "@prisma/client";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButton";
 import { Carousel } from "@/app/components/ui/carousel";
 import { Badge } from "@/app/components/ui/badge";
@@ -22,29 +21,16 @@ import {
   Trash2,
   Droplets,
   Share2,
+  Phone,
+  Info,
+  MapPin,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Button } from "@/app/components/ui/button";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+// import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 type PaymentMethod = "CARTE_BANCAIRE" | "ESPECES" | "JETON";
-
-interface StationWithDetails extends Station {
-  services: Service | null;
-  parkingDetails: {
-    isPayant: boolean;
-    tarif: string | null;
-    taxeSejour: string | null;
-    hasElectricity: string;
-    commercesProches: string[];
-    handicapAccess: boolean;
-    totalPlaces: number;
-    hasWifi: boolean;
-    hasChargingPoint: boolean;
-  } | null;
-  reviews: Review[];
-}
 
 interface ServiceValue {
   value: boolean | string | number | string[] | Date | PaymentMethod[] | null;
@@ -145,7 +131,75 @@ const renderServiceValue = (
   return value?.toString() || "Non spécifié";
 };
 
-export default function Page({ params }: { params: { id: string } }) {
+interface Review {
+  id: string;
+  content: string;
+  rating: number;
+  created_at: string;
+  author_id: string;
+  author?: {
+    id: string;
+    name: string | null;
+    email: string | null;
+  } | null;
+}
+
+interface StationWithDetails {
+  id: string;
+  name: string;
+  address: string;
+  city: string | null;
+  postal_code: string | null;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  type: string;
+  description: string | null;
+  phone_number: string | null;
+  services: {
+    id: string;
+    high_pressure: string;
+    tire_pressure: boolean;
+    vacuum: boolean;
+    handicap_access: boolean;
+    waste_water: boolean;
+    water_point: boolean;
+    waste_water_disposal: boolean;
+    black_water_disposal: boolean;
+    electricity: string;
+    max_vehicle_length: number | null;
+  } | null;
+  parking_details: {
+    id: string;
+    is_payant: boolean;
+    tarif: number | null;
+    taxe_sejour: number | null;
+    has_electricity: string;
+    commerces_proches: string[];
+    handicap_access: boolean;
+    total_places: number;
+    has_wifi: boolean;
+    has_charging_point: boolean;
+    water_point: boolean;
+    waste_water: boolean;
+    waste_water_disposal: boolean;
+    black_water_disposal: boolean;
+  } | null;
+  reviews: Review[];
+  author: {
+    id: string;
+    email: string | null;
+  } | null;
+}
+
+interface StationDetailProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function StationDetail({ params }: StationDetailProps) {
   const [station, setStation] = useState<StationWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [reviewsCount, setReviewsCount] = useState(0);
@@ -153,8 +207,15 @@ export default function Page({ params }: { params: { id: string } }) {
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { data: session } = useSession();
-  const supabase = createClientComponentClient();
+  // const supabase = createClientComponentClient({
+  //   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  //   supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  // });
   const [error, setError] = useState<string | null>(null);
+  // Nouveaux états pour l'édition
+  const [isEditing, setIsEditing] = useState(false);
+  const [editDescription, setEditDescription] = useState("");
+  const [editPhoneNumber, setEditPhoneNumber] = useState("");
 
   const handleRatingChange = (rating: number) => {
     setNewRating(rating);
@@ -185,127 +246,78 @@ export default function Page({ params }: { params: { id: string } }) {
       setNewRating(null);
       setNewComment("");
 
-      // Mettre à jour les avis
-      const updatedStation = await fetch(`/api/stations/${params.id}`).then(
-        (res) => res.json()
-      );
-      setStation(updatedStation);
-      setReviewsCount(updatedStation.reviews?.length || 0);
+      // Recharger les détails de la station pour avoir les avis à jour
+      const updatedResponse = await fetch(`/api/stations/${params.id}`);
+      const updatedData = await updatedResponse.json();
+
+      if (!updatedResponse.ok) {
+        throw new Error("Erreur lors de la mise à jour des avis");
+      }
+
+      setStation(updatedData);
+      setReviewsCount(updatedData.reviews?.length || 0);
     } catch (error) {
       console.error("Erreur lors de l'ajout de l'avis:", error);
-      // Vous pouvez ajouter une notification d'erreur ici
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Erreur lors de l'ajout de l'avis"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
-    const fetchStation = async () => {
+    const fetchStationDetails = async () => {
+      if (!params.id) {
+        setError("Identifiant de station invalide");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        console.log("Début de fetchStation - ID de la station:", params.id);
-
-        const response = await fetch(`/api/stations/${params.id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache",
-          },
-        });
-
-        console.log("Réponse reçue:", {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries(response.headers.entries()),
-        });
+        const response = await fetch(`/api/stations/${params.id}`);
+        const data = await response.json();
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error("Erreur détaillée:", errorData);
           throw new Error(
-            `Erreur HTTP: ${response.status}. ${errorData.error || ""}`
+            data.error || "Erreur lors du chargement de la station"
           );
         }
 
-        const data = await response.json();
-        console.log(
-          "Données complètes de la station:",
-          JSON.stringify(data, null, 2)
-        );
-
-        if (!data || !data.id) {
-          console.error("Données invalides reçues:", data);
-          throw new Error(
-            "Les données de la station sont invalides ou incomplètes"
-          );
+        if (!data) {
+          setError("Station non trouvée");
+          return;
         }
 
-        console.log("Station trouvée avec succès:", {
-          id: data.id,
+        console.log("Données complètes de la station:", {
+          description: data.description,
+          phone_number: data.phone_number,
           name: data.name,
-          nbReviews: data.reviews?.length,
+          address: data.address,
+          // autres champs pour vérification
         });
 
         setStation(data);
         setReviewsCount(data.reviews?.length || 0);
-
-        // Enregistrer la visite seulement si l'utilisateur est connecté
-        if (session?.user) {
-          await fetch("/api/visits", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ stationId: params.id }),
-          });
-        }
       } catch (error) {
-        console.error(
-          "Erreur détaillée lors de la récupération de la station:",
-          error
-        );
+        console.error("Erreur lors de la récupération des détails:", error);
         setError(
-          error instanceof Error ? error.message : "Une erreur est survenue"
+          error instanceof Error
+            ? error.message
+            : "Une erreur inattendue s'est produite lors du chargement de la station"
         );
       } finally {
         setLoading(false);
       }
     };
 
-    if (params.id) {
-      fetchStation();
-    } else {
-      console.error("Pas d'ID de station fourni");
-      setError("ID de station manquant");
-      setLoading(false);
-    }
-
-    // Mettre à jour la subscription Supabase pour les avis
-    const reviewsSubscription = supabase
-      .channel("reviews-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Review",
-          filter: `stationId=eq.${params.id}`,
-        },
-        async (_payload) => {
-          // Mettre à jour le nombre d'avis et la station
-          const response = await fetch(`/api/stations/${params.id}`);
-          const updatedStation = await response.json();
-          setStation(updatedStation);
-          setReviewsCount(updatedStation.reviews?.length || 0);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      // Nettoyer la subscription lors du démontage du composant
-      supabase.removeChannel(reviewsSubscription);
-    };
-  }, [params.id, session, supabase]);
+    fetchStationDetails();
+  }, [params.id]);
 
   const handleShare = async () => {
     try {
@@ -402,6 +414,40 @@ export default function Page({ params }: { params: { id: string } }) {
             </Badge>
           </div>
 
+          {/* Section pour le téléphone et la description */}
+          <div className="mt-6 space-y-4">
+            {station.phone_number && (
+              <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                <Phone className="w-5 h-5 text-blue-500 mt-1" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Contact
+                  </h3>
+                  <a
+                    href={`tel:${station.phone_number}`}
+                    className="text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    {station.phone_number}
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {station.description && (
+              <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                <Info className="w-5 h-5 text-blue-500 mt-1" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Description
+                  </h3>
+                  <p className="text-gray-600 whitespace-pre-wrap mt-1">
+                    {station.description}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Tags et caractéristiques principales */}
           <div className="flex flex-wrap gap-2 mb-6">
             {station.type === "STATION_LAVAGE" && (
@@ -414,7 +460,7 @@ export default function Page({ params }: { params: { id: string } }) {
                 Parking
               </span>
             )}
-            {station.services?.handicapAccess && (
+            {station.services?.handicap_access && (
               <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                 Accès handicapé
               </span>
@@ -431,7 +477,7 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
             <div className="text-center border-l border-gray-100">
               <p className="text-2xl font-semibold text-blue-600">
-                {station.parkingDetails?.totalPlaces || "N/A"}
+                {station.parking_details?.total_places || "N/A"}
               </p>
               <p className="text-sm text-gray-500">Places</p>
             </div>
@@ -516,9 +562,9 @@ export default function Page({ params }: { params: { id: string } }) {
                     ))}
                 </>
               )}
-              {station.type === "PARKING" && station.parkingDetails && (
+              {station.type === "PARKING" && station.parking_details && (
                 <>
-                  {Object.entries(station.parkingDetails)
+                  {Object.entries(station.parking_details)
                     .filter(([key]) => key !== "id" && key !== "stationId")
                     .map(([key, value]) => (
                       <div
@@ -541,6 +587,134 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
+
+        {/* Section Contact et Description */}
+        {(station.description || station.phone_number || isEditing) && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold">Contact et Description</h3>
+              {(session?.user?.email === station.author?.email ||
+                session?.user?.email === "fortuna77320@gmail.com") && (
+                <Button
+                  onClick={() => {
+                    if (isEditing) {
+                      setIsEditing(false);
+                    } else {
+                      setEditDescription(station.description || "");
+                      setEditPhoneNumber(station.phone_number || "");
+                      setIsEditing(true);
+                    }
+                  }}
+                  variant="outline"
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  {isEditing ? "Annuler" : "Modifier"}
+                </Button>
+              )}
+            </div>
+
+            {isEditing ? (
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const response = await fetch(`/api/stations/${params.id}`, {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        description: editDescription.trim(),
+                        phone_number: editPhoneNumber.trim(),
+                      }),
+                    });
+
+                    if (!response.ok) {
+                      const error = await response.json();
+                      console.error("Erreur lors de la mise à jour:", error);
+                      return;
+                    }
+
+                    const updatedStation = await response.json();
+                    setStation({
+                      ...station,
+                      description: updatedStation.description,
+                      phone_number: updatedStation.phoneNumber,
+                    });
+                    setIsEditing(false);
+                  } catch (error) {
+                    console.error("Erreur:", error);
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label
+                    htmlFor="phone_number"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Numéro de téléphone
+                  </label>
+                  <input
+                    id="phone_number"
+                    type="tel"
+                    value={editPhoneNumber}
+                    onChange={(e) => setEditPhoneNumber(e.target.value)}
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Ex: 0123456789"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    rows={4}
+                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Décrivez votre station..."
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Enregistrer
+                  </Button>
+                </div>
+              </form>
+            ) : (
+              <>
+                {station.phone_number && (
+                  <div className="flex items-center gap-3 mb-4">
+                    <Phone className="h-5 w-5 text-blue-500" />
+                    <a
+                      href={`tel:${station.phone_number}`}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {station.phone_number}
+                    </a>
+                  </div>
+                )}
+
+                {station.description && (
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-gray-500 mt-1" />
+                    <p className="text-gray-700">{station.description}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
 
         {/* Avis et Commentaires */}
         <div className="mt-8">
@@ -637,7 +811,7 @@ export default function Page({ params }: { params: { id: string } }) {
                           ))}
                         </div>
                         <span className="text-sm text-gray-500">
-                          {new Date(review.createdAt).toLocaleDateString()}
+                          {new Date(review.created_at).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
@@ -651,6 +825,67 @@ export default function Page({ params }: { params: { id: string } }) {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Boutons d'action */}
+        <div className="flex gap-4 mt-6">
+          <Button
+            onClick={() =>
+              window.open(
+                `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`,
+                "_blank"
+              )
+            }
+            className="flex-1 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600"
+          >
+            <MapPin className="w-4 h-4 mr-2" />Y aller
+          </Button>
+
+          {station.phone_number && (
+            <Button
+              onClick={() =>
+                (window.location.href = `tel:${station.phone_number}`)
+              }
+              className="flex-1 bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600"
+            >
+              <Phone className="w-4 h-4 mr-2" />
+              Appeler
+            </Button>
+          )}
+
+          {/* Bouton temporaire pour tester la mise à jour */}
+          <Button
+            onClick={async () => {
+              try {
+                const response = await fetch(`/api/stations/${params.id}`, {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    description:
+                      "Station de lavage poids lourds avec portique haute pression. Accueil chaleureux et professionnel.",
+                    phone_number: "0123456789",
+                  }),
+                });
+
+                if (!response.ok) {
+                  const error = await response.json();
+                  console.error("Erreur lors de la mise à jour:", error);
+                  return;
+                }
+
+                const updatedStation = await response.json();
+                console.log("Station mise à jour:", updatedStation);
+                window.location.reload();
+              } catch (error) {
+                console.error("Erreur:", error);
+              }
+            }}
+            className="flex-1 bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600"
+          >
+            Mettre à jour les infos
+          </Button>
         </div>
       </div>
     </div>

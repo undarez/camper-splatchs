@@ -93,6 +93,9 @@ model Station {
   images           String[]        @default([])
   status           StationStatus   @default(en_attente)
   type             StationType     @default(STATION_LAVAGE)
+  phoneNumber      String?
+  description      String?         @db.Text
+  iconType         String?
   validatedAt      DateTime?
   validatedBy      String?
   createdAt        DateTime        @default(now())

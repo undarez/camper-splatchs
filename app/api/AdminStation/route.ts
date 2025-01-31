@@ -51,6 +51,23 @@ export async function POST(req: Request) {
     const data = await req.json();
     console.log("Données reçues dans l'API:", data);
 
+    // Vérifier si l'utilisateur existe
+    let user = await prisma.user.findUnique({
+      where: {
+        email: session.user.email,
+      },
+    });
+
+    // Si l'utilisateur n'existe pas, le créer
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: session.user.email,
+          name: session.user.name || "Utilisateur",
+        },
+      });
+    }
+
     // Vérifier et formater les données du parking
     const parkingDetails =
       data.type === "PARKING"
@@ -102,9 +119,11 @@ export async function POST(req: Request) {
         type: data.type,
         status: "en_attente",
         images: data.images || [],
+        description: data.description || null,
+        phoneNumber: data.phoneNumber || null,
         author: {
           connect: {
-            email: session.user.email,
+            id: user.id,
           },
         },
         services:

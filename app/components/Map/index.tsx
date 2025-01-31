@@ -34,6 +34,20 @@ export interface MapComponentProps {
   isLocating?: boolean;
 }
 
+export interface MapViewComponentProps {
+  stations: StationWithOptionalFields[];
+  getMarkerIcon: (station: StationWithOptionalFields) => Icon<IconOptions>;
+  center?: LatLngExpression;
+  zoom?: number;
+  onMapReady?: (ready: boolean) => void;
+  createPopupContent?: (station: StationWithOptionalFields) => string;
+  onGeolocation?: () => void;
+  isLocating?: boolean;
+  onInit?: (map: LeafletMap) => void;
+  onStationClick?: (station: StationWithOptionalFields) => void;
+  selectedStation?: StationWithOptionalFields | null;
+}
+
 function MapEvents({ onMapReady }: { onMapReady?: (map: LeafletMap) => void }) {
   const map = useMap();
 
