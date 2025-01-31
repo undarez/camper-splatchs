@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { convertStationsToOptionalFields } from "@/app/components/localisationStation/LocalisationStation2";
 import type { StationWithDetails } from "@/types/station";
-import { Icon } from "leaflet";
+import type { Icon as LeafletIcon } from "leaflet";
 
 // Import dynamique du composant Map pour éviter les erreurs côté serveur
 const MapViewComponent = dynamic(
@@ -16,9 +16,29 @@ export default function MapViewPage() {
   const [stations, setStations] = useState<StationWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [icons, setIcons] = useState<{
+    borneIcon: LeafletIcon;
+    stationIcon: LeafletIcon;
+  } | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
+    import("leaflet").then(({ Icon }) => {
+      setIcons({
+        borneIcon: new Icon({
+          iconUrl: "/markers/borne-marker.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+        }),
+        stationIcon: new Icon({
+          iconUrl: "/markers/station-marker.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+        }),
+      });
+    });
   }, []);
 
   useEffect(() => {
@@ -57,29 +77,15 @@ export default function MapViewPage() {
       });
   }, [isMounted]);
 
-  if (!isMounted || isLoading) {
+  if (!isMounted || isLoading || !icons) {
     return <div>Chargement...</div>;
   }
-
-  const borneIcon = new Icon({
-    iconUrl: "/markers/borne-marker.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
-
-  const stationIcon = new Icon({
-    iconUrl: "/markers/station-marker.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
 
   return (
     <MapViewComponent
       stations={stations}
       getMarkerIcon={(station) =>
-        station.type === "STATION_LAVAGE" ? borneIcon : stationIcon
+        station.type === "STATION_LAVAGE" ? icons.borneIcon : icons.stationIcon
       }
       onStationClick={(station) => console.log("Station clicked:", station)}
       selectedStation={null}
