@@ -6,6 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    console.log("Début de la requête GET /api/stations/latest");
     const latestStations = await prisma.station.findMany({
       where: {
         status: "active",
@@ -33,11 +34,15 @@ export async function GET() {
       take: 3,
     });
 
+    console.log("Stations trouvées:", latestStations.length);
+
     if (!latestStations || latestStations.length === 0) {
+      console.log("Aucune station trouvée");
       return NextResponse.json([]);
     }
 
     const stationsWithDetails = latestStations.map((station) => {
+      console.log("Traitement de la station:", station.id);
       const averageRating = station.reviews.length
         ? station.reviews.reduce((acc, review) => acc + review.rating, 0) /
           station.reviews.length
@@ -78,9 +83,13 @@ export async function GET() {
       };
     });
 
+    console.log("Réponse finale:", stationsWithDetails);
     return NextResponse.json(stationsWithDetails);
   } catch (error) {
-    console.error("Erreur lors de la récupération des stations:", error);
+    console.error(
+      "Erreur détaillée lors de la récupération des stations:",
+      error
+    );
     return NextResponse.json(
       { error: "Erreur lors de la récupération des stations" },
       { status: 500 }

@@ -37,24 +37,30 @@ export default function HomeClient() {
     // Charger les dernières stations
     const fetchLatestStations = async () => {
       try {
+        console.log("Début du chargement des stations");
         const response = await fetch("/api/stations/latest", {
           cache: "no-store",
           headers: {
             "Cache-Control": "no-cache",
           },
         });
+        console.log("Réponse reçue:", response.status);
         if (response.ok) {
           const data = await response.json();
-          console.log("Stations chargées:", data);
+          console.log("Données reçues:", data);
           setLatestStations(data);
         } else {
           console.error(
             "Erreur lors du chargement des stations:",
-            response.status
+            response.status,
+            await response.text()
           );
         }
       } catch (error) {
-        console.error("Erreur lors du chargement des stations:", error);
+        console.error(
+          "Erreur détaillée lors du chargement des stations:",
+          error
+        );
       }
     };
 

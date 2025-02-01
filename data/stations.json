@@ -1,185 +1,482 @@
 {
   "stations": [
     {
-      "id": "1",
-      "name": "Station Camping-Car Park Millau",
-      "address": "Rue des Erables, 12100 Millau",
-      "latitude": 44.0978,
-      "longitude": 3.0825,
-      "type": "STATION_LAVAGE",
-      "status": "active",
-      "description": "Station de lavage spécialisée pour camping-cars avec aire de service complète",
-      "equipments": [
-        "Lavage haute pression",
-        "Vidange eaux grises",
-        "Vidange eaux noires",
-        "Remplissage eau propre",
-        "Électricité"
+      "id": "station_01",
+      "name": "Lavatrans Dunkerque",
+      "address": "4116 Rue DE LOOPERSFORT PORT",
+      "city": "Craywick",
+      "postalCode": "59279",
+      "latitude": 50.971,
+      "longitude": 2.2362,
+
+      "images": [
+        "/images/stations-lavatrans/dunkerque.jpg",
+        "/images/stations-lavatrans/acceuil_dunkerque.jpg",
+        "/images/stations-lavatrans/dunkerquelavage.jpg"
       ],
-      "openingHours": {
-        "monday": { "open": "00:00", "close": "23:59" },
-        "tuesday": { "open": "00:00", "close": "23:59" },
-        "wednesday": { "open": "00:00", "close": "23:59" },
-        "thursday": { "open": "00:00", "close": "23:59" },
-        "friday": { "open": "00:00", "close": "23:59" },
-        "saturday": { "open": "00:00", "close": "23:59" },
-        "sunday": { "open": "00:00", "close": "23:59" }
-      },
-      "pricing": {
-        "washing": "5€/15min",
-        "greyWaterDisposal": "2€",
-        "blackWaterDisposal": "2€",
-        "freshWater": "2€/100L"
-      },
-      "images": [],
-      "averageRating": 4.5,
-      "reviews": []
+
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 28 22 53 03",
+      "description": "Notre véhicule Toujours dans l’esprit du détail, notre station de Dunkerque (1er station franchisé du réseau Lavatrans), vous accueille tous les jours de 8h00 à 19h30 sans interruption.",
+      "isLavaTrans": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
     },
     {
-      "id": "2",
-      "name": "Aire de Service Cap d'Agde",
-      "address": "Avenue des Sergents, 34300 Cap d'Agde",
-      "latitude": 43.2796,
-      "longitude": 3.5046,
-      "type": "STATION_LAVAGE",
-      "status": "active",
-      "description": "Station de lavage et aire de service pour camping-cars en bord de mer",
-      "equipments": [
-        "Lavage haute pression",
-        "Vidange eaux grises",
-        "Vidange eaux noires",
-        "Remplissage eau propre",
-        "Électricité",
-        "WiFi"
+      "id": "station_02",
+      "name": "Lavatrans Lille",
+      "address": "178, rue des Sureaux - P.A.M 59262 SAINGHIN EN MELANTOIS",
+      "city": "Sainghin en Melantois",
+      "postalCode": "59262",
+      "latitude": 50.586397,
+      "longitude": 3.13976,
+
+      "images": [
+        "/images/stations-lavatrans/camion_lille_fev_2016_3_.jpg",
+        "/images/stations-lavatrans/dsc00166.jpg"
       ],
-      "openingHours": {
-        "monday": { "open": "00:00", "close": "23:59" },
-        "tuesday": { "open": "00:00", "close": "23:59" },
-        "wednesday": { "open": "00:00", "close": "23:59" },
-        "thursday": { "open": "00:00", "close": "23:59" },
-        "friday": { "open": "00:00", "close": "23:59" },
-        "saturday": { "open": "00:00", "close": "23:59" },
-        "sunday": { "open": "00:00", "close": "23:59" }
-      },
-      "pricing": {
-        "washing": "6€/15min",
-        "greyWaterDisposal": "3€",
-        "blackWaterDisposal": "3€",
-        "freshWater": "3€/100L"
-      },
-      "images": [],
-      "averageRating": 4.2,
-      "reviews": []
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 20 54 57 72",
+
+      "description": "Située dans le parc du Mélantois (CRT de Lesquin), notre station de Lille est au carrefour de L'Europe.Equipée de 2 pistes de lavage avec rouleaux, nos équipes motivées et dynamiques, seront apporter le plus grand soin à votre véhicule.Toujours dans l’esprit du détail, chaque lavage bénéficiera d’une finition cire déperlante pour plus de brillance.",
+      "isLavaTrans": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["ESPECES", "CARTE_BANCAIRE"]
+      }
     },
     {
-      "id": "3",
-      "name": "Station Camping-Car Carcassonne",
-      "address": "Avenue du Général Leclerc, 11000 Carcassonne",
-      "latitude": 43.2130,
-      "longitude": 2.3491,
-      "type": "STATION_LAVAGE",
-      "status": "active",
-      "description": "Station de lavage moderne avec tous les services nécessaires",
-      "equipments": [
-        "Lavage haute pression",
-        "Vidange eaux grises",
-        "Vidange eaux noires",
-        "Remplissage eau propre",
-        "Électricité",
-        "Aspirateur",
-        "Gonflage pneus"
+      "id": "station_03",
+      "name": "SLavatrans Derval",
+      "address": "ZI des estuaires - 44590 DERVAL",
+      "city": "Derval",
+      "postalCode": "44590",
+      "latitude": 47.6384335,
+      "longitude": -1.6559554,
+
+      "images": [
+        "/images/stations-lavatrans/derval.jpg",
+        "/images/stations-lavatrans/derval2.jpg",
+        "/images/stations-lavatrans/derval3.jpg"
       ],
-      "openingHours": {
-        "monday": { "open": "07:00", "close": "21:00" },
-        "tuesday": { "open": "07:00", "close": "21:00" },
-        "wednesday": { "open": "07:00", "close": "21:00" },
-        "thursday": { "open": "07:00", "close": "21:00" },
-        "friday": { "open": "07:00", "close": "21:00" },
-        "saturday": { "open": "08:00", "close": "20:00" },
-        "sunday": { "open": "08:00", "close": "20:00" }
-      },
-      "pricing": {
-        "washing": "5€/15min",
-        "greyWaterDisposal": "2€",
-        "blackWaterDisposal": "2€",
-        "freshWater": "2€/100L"
-      },
-      "images": [],
-      "averageRating": 4.7,
-      "reviews": []
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "09 60 00 14 09",
+
+      "description": "L'équipe LAVATRANS DERVAL vous reçoit de 7h à 19h, du lundi au vendredi.Elle est située entre Rennes et Nantes.La station est équipée de 3 pistes de lavages : deux avec portiques et une en libre service.Vous pouvez aussi trouver dans la même zone une station AS24, un restaurant routier ainsi qu’un garage poids lourd.",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
     },
     {
-      "id": "4",
-      "name": "Aire de Service Toulouse",
-      "address": "Route de Narbonne, 31000 Toulouse",
-      "latitude": 43.6047,
-      "longitude": 1.4442,
-      "type": "STATION_LAVAGE",
-      "status": "active",
-      "description": "Station de lavage et aire de service complète proche du centre-ville",
-      "equipments": [
-        "Lavage haute pression",
-        "Vidange eaux grises",
-        "Vidange eaux noires",
-        "Remplissage eau propre",
-        "Électricité",
-        "WiFi",
-        "Aire de pique-nique"
+      "id": "station_04",
+      "name": "Lavatrans Tours",
+      "address": "400 rue Morane Saulnier - 37210 PARCAY-MESLAY",
+      "city": "Parcay-Meslay",
+      "postalCode": "37210",
+      "latitude": 47.44830322265625,
+      "longitude": 0.720239520072937,
+
+      "images": [
+        "/images/stations-lavatrans/lavatranstour2.png",
+        "/images/stations-lavatrans/lavatranstour2.jpg"
       ],
-      "openingHours": {
-        "monday": { "open": "06:00", "close": "22:00" },
-        "tuesday": { "open": "06:00", "close": "22:00" },
-        "wednesday": { "open": "06:00", "close": "22:00" },
-        "thursday": { "open": "06:00", "close": "22:00" },
-        "friday": { "open": "06:00", "close": "22:00" },
-        "saturday": { "open": "07:00", "close": "21:00" },
-        "sunday": { "open": "07:00", "close": "21:00" }
-      },
-      "pricing": {
-        "washing": "6€/15min",
-        "greyWaterDisposal": "3€",
-        "blackWaterDisposal": "3€",
-        "freshWater": "2.5€/100L"
-      },
-      "images": [],
-      "averageRating": 4.3,
-      "reviews": []
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "09 60 00 14 09",
+
+      "description": "La station LAVATRANS TOURS a ouvert ses portes dans la ville de Parçay-Meslay proche de Tours. Située au croisement de trois routes majeures : A10, A28 et la D910, la ville est au cœur d’un axe routier important.Notre station est équipée d'un portique de lavage et d'une piste libre service ouverte 7j/7 et 24h/24.Nous vous attendons dans notre station flambant neuve avec le sourire !",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
     },
     {
-      "id": "5",
-      "name": "Station Camping-Car Montpellier",
-      "address": "Avenue de la Mer, 34000 Montpellier",
-      "latitude": 43.6108,
-      "longitude": 3.8767,
-      "type": "STATION_LAVAGE",
-      "status": "active",
-      "description": "Station moderne avec borne de paiement automatique",
-      "equipments": [
-        "Lavage haute pression",
-        "Vidange eaux grises",
-        "Vidange eaux noires",
-        "Remplissage eau propre",
-        "Électricité",
-        "Borne de paiement CB 24/7"
+      "id": "station_05",
+      "name": "Lavatrans Vierzon",
+      "address": "7 Allee Germaine Tillion - 18100 Vierzon",
+      "city": "Vierzon",
+      "postalCode": "18100",
+      "latitude": 47.2446514,
+      "longitude": 2.0763983,
+
+      "images": [
+        "/images/stations-lavatrans/fichier_31vierzon.jpg",
+        "/images/stations-lavatrans/vierzon2.jpg"
       ],
-      "openingHours": {
-        "monday": { "open": "00:00", "close": "23:59" },
-        "tuesday": { "open": "00:00", "close": "23:59" },
-        "wednesday": { "open": "00:00", "close": "23:59" },
-        "thursday": { "open": "00:00", "close": "23:59" },
-        "friday": { "open": "00:00", "close": "23:59" },
-        "saturday": { "open": "00:00", "close": "23:59" },
-        "sunday": { "open": "00:00", "close": "23:59" }
-      },
-      "pricing": {
-        "washing": "5€/15min",
-        "greyWaterDisposal": "2€",
-        "blackWaterDisposal": "2€",
-        "freshWater": "2€/100L"
-      },
-      "images": [],
-      "averageRating": 4.6,
-      "reviews": []
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 48 51 66 86",
+
+      "description": "Notre station de lavage poids lourd LAVATRANS VIERZON se situe 2 Allée Germaine Tillion au sein du parc d'activité de Sologne à Vierzon au coeur de la région centre Val de Loire ! ",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_06",
+      "name": "Lavatrans Limoges",
+      "address": "6, rue Jacques Goddet - ZIN Limoges Nord - 87280 LIMOGES",
+      "city": "Limoges",
+      "postalCode": "87280",
+      "latitude": 45.8315,
+      "longitude": 1.2578,
+
+      "images": ["/images/stations-lavatrans/limoges.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "05 55 35 41 80",
+
+      "description": "Créée en 1999, la station de Limoges est le carrefour du lavage de poids lourds dans le centre de la France.La station est située sur le Centre Routier de Limoges, dans la zone industrielle nord.",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_07",
+      "name": "Lavatrans Toulouse Eurocentre",
+      "address": "3 rue de l'Ourmède - 31620 CASTELNAU D'ESTRETEFONDS",
+      "city": "Castelnaud-Estretefonds",
+      "postalCode": "31620",
+      "latitude": 43.7655437,
+      "longitude": 1.3700125,
+
+      "images": [
+        "/images/stations-lavatrans/eurocentre_jour_deux_tunnels.jpg",
+        "/images/stations-lavatrans/20181002_095046.jpg"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "05 61 09 16 90",
+
+      "description": "C’est depuis 2004, que la station LAVATRANS EUROCENTRE, implantée juste au nord de Toulouse, vous propose ses services tant en lavage extérieur des véhicules, qu’en lavage intérieur de citernes alimentaires, chimiques et pulvérulents.",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_08",
+      "name": "Lavatrans Toulouse Fondeyre",
+      "address": "1 avenue de Fondeyre - 31200 TOULOUSE",
+      "city": "Toulouse",
+      "postalCode": "31200",
+
+      "latitude": 43.642226,
+      "longitude": 1.425681,
+
+      "images": ["/images/stations-lavatrans/lavatrans-fondeyre-face3.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "05 61 57 11 74",
+
+      "description": "Notre station est la première du réseau national Lavatrans. Ouverte en 1989, elle est située au coeur du pôle logistique, sur le centre routier de Toulouse.. La station est équipée d'une arche de lavage qui prélave les poids-lourds en entrée de piste. 25% de temps économisé en moyenne. La pulvériseration en fine gouttelette de notre shampoing carrosserie favorise un lavage plus homogène et plus efficace dans les zones difficiles d'accès.",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_09",
+      "name": "Lavatrans Béziers",
+      "address": "8 rue Paul Langevin - 34500 BEZIERS",
+      "city": "Béziers",
+      "postalCode": "34500",
+
+      "latitude": 43.3316896,
+      "longitude": 3.2600323,
+
+      "images": [
+        "/images/stations-lavatrans/img_3021.jpg",
+        "/images/stations-lavatrans/12334007_136087393423360_1894622938_o.jpg"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "04 34 33 90 55",
+
+      "description": "La station de lavage de Béziers vous accueille du lundi au vendredi de 7h00 jusqu’à 18h00 en NON STOP et le samedi de 07h30 à 12h00",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_10",
+      "name": "Lavatrans Nimes",
+      "address": "Zone MITRA, avenue de Courbade, 30128 GARONS",
+      "city": "Garons",
+      "postalCode": "30128",
+
+      "latitude": 43.7686,
+      "longitude": 4.4275,
+
+      "images": ["/images/stations-lavatrans/vierzon2.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "04 11 71 89 59",
+
+      "description": "Afin de vous offrir encore plus de disponibilité LAVATRANS vous annonce l'ouverture de sa nouvelle Station au sein de la Zone MITRA, avenue de Courbade à 30128 GARONS Vous y trouverez également un portique de lavage et une piste libre service ouverte 7j/7 et 24h/24. Un espace détente ainsi que des douches sont également mis à votre disposition pour vous assurer un maximum de confort. !",
+      "isLavaTrans": true,
+
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_11",
+      "name": "Lavatrans Cavaillon",
+      "address": "230 chemin du midi - 84300 CAVAILLON",
+      "city": "Cavaillon",
+      "postalCode": "84300",
+
+      "latitude": 43.826984,
+      "longitude": 5.0580521,
+
+      "images": [
+        "/images/stations-lavatrans/cavaillon8.jpg",
+        "/images/stations-lavatrans/img_2118.jpg"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "04 90 78 00 30",
+
+      "description": "Installée sur un axe routier majeur du transport poids lourds entre Lyon et Marseille, notre station LAVATRANS CAVAILLON bénéficie d’une localisation privilégiée.",
+      "isLavaTrans": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    }
+  ],
+  "parkings": [
+    {
+      "id": "parking_01",
+      "name": "Parking Central Montpellier",
+      "address": "789 Boulevard du Camping, 34000 Montpellier",
+      "city": "Montpellier",
+      "postalCode": "34000",
+      "latitude": 43.610769,
+      "longitude": 3.876716,
+      "images": [
+        "/images/parkings/parking1_1.jpg",
+        "/images/parkings/parking1_2.jpg",
+        "/images/parkings/parking1_3.jpg"
+      ],
+      "status": "active",
+      "type": "PARKING",
+      "phoneNumber": "0467123456",
+      "description": "Parking sécurisé au cœur de Montpellier",
+      "isLavaTrans": false,
+      "parkingDetails": {
+        "isPayant": true,
+        "tarif": 15.5,
+        "taxeSejour": 0.75,
+        "hasElectricity": "AMP_15",
+        "commercesProches": [
+          "NOURRITURE",
+          "CENTRE_VILLE",
+          "BANQUE",
+          "STATION_SERVICE"
+        ],
+        "handicapAccess": true,
+        "totalPlaces": 30,
+        "hasWifi": true,
+        "hasChargingPoint": true,
+        "waterPoint": true,
+        "wasteWater": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "hasCctv": true,
+        "hasBarrier": true
+      }
+    },
+    {
+      "id": "parking_02",
+      "name": "Parking Nature Lyon",
+      "address": "321 Chemin des Campeurs, 69000 Lyon",
+      "city": "Lyon",
+      "postalCode": "69000",
+      "latitude": 45.764043,
+      "longitude": 4.835659,
+      "images": [
+        "/images/parkings/parking2_1.jpg",
+        "/images/parkings/parking2_2.jpg"
+      ],
+      "status": "active",
+      "type": "PARKING",
+      "phoneNumber": null,
+      "description": "Parking calme en bordure de parc",
+      "isLavaTrans": false,
+      "parkingDetails": {
+        "isPayant": false,
+        "tarif": null,
+        "taxeSejour": null,
+        "hasElectricity": "NONE",
+        "commercesProches": ["NOURRITURE", "LAVERIE"],
+        "handicapAccess": true,
+        "totalPlaces": 15,
+        "hasWifi": false,
+        "hasChargingPoint": false,
+        "waterPoint": true,
+        "wasteWater": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "hasCctv": false,
+        "hasBarrier": false
+      }
+    },
+    {
+      "id": "parking_03",
+      "name": "Parking Mer Marseille",
+      "address": "456 Corniche Kennedy, 13007 Marseille",
+      "city": "Marseille",
+      "postalCode": "13007",
+      "latitude": 43.290555,
+      "longitude": 5.374446,
+      "images": [
+        "/images/parkings/parking3_1.jpg",
+        "/images/parkings/parking3_2.jpg",
+        "/images/parkings/parking3_3.jpg"
+      ],
+      "status": "active",
+      "type": "PARKING",
+      "phoneNumber": "0491234567",
+      "description": "Magnifique parking avec vue sur la Méditerranée",
+      "isLavaTrans": false,
+      "parkingDetails": {
+        "isPayant": true,
+        "tarif": 20.0,
+        "taxeSejour": 1.0,
+        "hasElectricity": "AMP_15",
+        "commercesProches": [
+          "NOURRITURE",
+          "CENTRE_VILLE",
+          "STATION_SERVICE",
+          "GARAGE",
+          "BANQUE"
+        ],
+        "handicapAccess": true,
+        "totalPlaces": 25,
+        "hasWifi": true,
+        "hasChargingPoint": true,
+        "waterPoint": true,
+        "wasteWater": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "hasCctv": true,
+        "hasBarrier": true
+      }
     }
   ]
-} 
+}
