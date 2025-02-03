@@ -2,6 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
 import stationsData from "../data/stations.json";
 
+// Fonction pour nettoyer les noms de fichiers
+function cleanImagePath(imageName: string): string {
+  return `/images/stations-lavatrans/${imageName}`
+    .replace(/[^a-zA-Z0-9-./]/g, "")
+    .toLowerCase();
+}
+
 // Définition des types
 // interface OpeningHours {
 //   open: string;
@@ -109,9 +116,7 @@ async function importStations() {
             type: station.type,
             status: station.status,
             description: station.description,
-            images: station.images.map(
-              (image) => `/images/station-lavatrans/${image}`
-            ),
+            images: station.images.map(cleanImagePath),
           })
           .eq("id", existingStation.id);
 
@@ -130,9 +135,7 @@ async function importStations() {
             type: station.type,
             status: station.status,
             description: station.description,
-            images: station.images.map(
-              (image) => `/images/station-lavatrans/${image}`
-            ),
+            images: station.images.map(cleanImagePath),
           })
           .select()
           .single();
