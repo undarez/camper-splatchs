@@ -142,10 +142,7 @@
       "latitude": 47.2446514,
       "longitude": 2.0763983,
 
-      "images": [
-        "/images/stations-lavatrans/fichier_31vierzon.jpg",
-        "/images/stations-lavatrans/vierzon2.jpg"
-      ],
+      "images": ["/images/stations-lavatrans/fichier_31vierzon.jpg"],
       "status": "active",
       "type": "STATION_LAVAGE",
       "phoneNumber": "02 48 51 66 86",

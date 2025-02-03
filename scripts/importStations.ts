@@ -4,9 +4,13 @@ import stationsData from "../data/stations.json";
 
 // Fonction pour nettoyer les noms de fichiers
 function cleanImagePath(imageName: string): string {
-  return `/images/stations-lavatrans/${imageName}`
-    .replace(/[^a-zA-Z0-9-./]/g, "")
-    .toLowerCase();
+  // Vérifier si le fichier existe déjà avec ce nom exact
+  if (imageName.startsWith("/images/stations-lavatrans/")) {
+    return imageName;
+  }
+
+  // Sinon, construire le chemin
+  return `/images/stations-lavatrans/${imageName}`;
 }
 
 // Définition des types
