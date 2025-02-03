@@ -11,7 +11,7 @@
 
       "images": [
         "/images/stations-lavatrans/dunkerque.jpg",
-        "/images/stations-lavatrans/acceuil_dunkerque.jpg",
+        "/images/stations-lavatrans/accueil_dunkerque.jpg",
         "/images/stations-lavatrans/dunkerquelavage.jpg"
       ],
 
@@ -299,7 +299,7 @@
       "latitude": 43.7686,
       "longitude": 4.4275,
 
-      "images": ["/images/stations-lavatrans/nime.jpg"],
+      "images": ["/images/stations-lavatrans/nime.jpg?v=1"],
       "status": "active",
       "type": "STATION_LAVAGE",
       "phoneNumber": "04 11 71 89 59",
