@@ -18,7 +18,7 @@
       "status": "active",
       "type": "STATION_LAVAGE",
       "phoneNumber": "03 28 22 53 03",
-      "description": "Notre véhicule Toujours dans l’esprit du détail, notre station de Dunkerque (1er station franchisé du réseau Lavatrans), vous accueille tous les jours de 8h00 à 19h30 sans interruption.",
+      "description": "Notre véhicule Toujours dans l'esprit du détail, notre station de Dunkerque (1er station franchisé du réseau Lavatrans), vous accueille tous les jours de 8h00 à 19h30 sans interruption.",
       "isLavaTrans": true,
       "services": {
         "highPressure": "PORTIQUE",
@@ -50,7 +50,7 @@
       "type": "STATION_LAVAGE",
       "phoneNumber": "03 20 54 57 72",
 
-      "description": "Située dans le parc du Mélantois (CRT de Lesquin), notre station de Lille est au carrefour de L'Europe.Equipée de 2 pistes de lavage avec rouleaux, nos équipes motivées et dynamiques, seront apporter le plus grand soin à votre véhicule.Toujours dans l’esprit du détail, chaque lavage bénéficiera d’une finition cire déperlante pour plus de brillance.",
+      "description": "Située dans le parc du Mélantois (CRT de Lesquin), notre station de Lille est au carrefour de L'Europe.Equipée de 2 pistes de lavage avec rouleaux, nos équipes motivées et dynamiques, seront apporter le plus grand soin à votre véhicule.Toujours dans l'esprit du détail, chaque lavage bénéficiera d'une finition cire déperlante pour plus de brillance.",
       "isLavaTrans": true,
       "services": {
         "highPressure": "PORTIQUE",
@@ -84,7 +84,7 @@
       "type": "STATION_LAVAGE",
       "phoneNumber": "09 60 00 14 09",
 
-      "description": "L'équipe LAVATRANS DERVAL vous reçoit de 7h à 19h, du lundi au vendredi.Elle est située entre Rennes et Nantes.La station est équipée de 3 pistes de lavages : deux avec portiques et une en libre service.Vous pouvez aussi trouver dans la même zone une station AS24, un restaurant routier ainsi qu’un garage poids lourd.",
+      "description": "L'équipe LAVATRANS DERVAL vous reçoit de 7h à 19h, du lundi au vendredi.Elle est située entre Rennes et Nantes.La station est équipée de 3 pistes de lavages : deux avec portiques et une en libre service.Vous pouvez aussi trouver dans la même zone une station AS24, un restaurant routier ainsi qu'un garage poids lourd.",
       "isLavaTrans": true,
 
       "services": {
@@ -109,15 +109,12 @@
       "latitude": 47.44830322265625,
       "longitude": 0.720239520072937,
 
-      "images": [
-        "/images/stations-lavatrans/lavatranstour2.png",
-        "/images/stations-lavatrans/lavatranstour2.jpg"
-      ],
+      "images": ["/images/stations-lavatrans/lavatranstour2.png"],
       "status": "active",
       "type": "STATION_LAVAGE",
       "phoneNumber": "09 60 00 14 09",
 
-      "description": "La station LAVATRANS TOURS a ouvert ses portes dans la ville de Parçay-Meslay proche de Tours. Située au croisement de trois routes majeures : A10, A28 et la D910, la ville est au cœur d’un axe routier important.Notre station est équipée d'un portique de lavage et d'une piste libre service ouverte 7j/7 et 24h/24.Nous vous attendons dans notre station flambant neuve avec le sourire !",
+      "description": "La station LAVATRANS TOURS a ouvert ses portes dans la ville de Parçay-Meslay proche de Tours. Située au croisement de trois routes majeures : A10, A28 et la D910, la ville est au cœur d'un axe routier important.Notre station est équipée d'un portique de lavage et d'une piste libre service ouverte 7j/7 et 24h/24.Nous vous attendons dans notre station flambant neuve avec le sourire !",
       "isLavaTrans": true,
 
       "services": {
@@ -210,7 +207,7 @@
       "type": "STATION_LAVAGE",
       "phoneNumber": "05 61 09 16 90",
 
-      "description": "C’est depuis 2004, que la station LAVATRANS EUROCENTRE, implantée juste au nord de Toulouse, vous propose ses services tant en lavage extérieur des véhicules, qu’en lavage intérieur de citernes alimentaires, chimiques et pulvérulents.",
+      "description": "C'est depuis 2004, que la station LAVATRANS EUROCENTRE, implantée juste au nord de Toulouse, vous propose ses services tant en lavage extérieur des véhicules, qu'en lavage intérieur de citernes alimentaires, chimiques et pulvérulents.",
       "isLavaTrans": true,
 
       "services": {
@@ -269,13 +266,14 @@
 
       "images": [
         "/images/stations-lavatrans/img_3021.jpg",
-        "/images/stations-lavatrans/12334007_136087393423360_1894622938_o.jpg"
+        "/images/stations-lavatrans/12334007_136087393423360_1894622938_o.jpg",
+        "/images/stations-lavatrans/station_beziers_sept15_2_.jpg"
       ],
       "status": "active",
       "type": "STATION_LAVAGE",
       "phoneNumber": "04 34 33 90 55",
 
-      "description": "La station de lavage de Béziers vous accueille du lundi au vendredi de 7h00 jusqu’à 18h00 en NON STOP et le samedi de 07h30 à 12h00",
+      "description": "La station de lavage de Béziers vous accueille du lundi au vendredi de 7h00 jusqu'à 18h00 en NON STOP et le samedi de 07h30 à 12h00",
       "isLavaTrans": true,
 
       "services": {
@@ -340,7 +338,7 @@
       "type": "STATION_LAVAGE",
       "phoneNumber": "04 90 78 00 30",
 
-      "description": "Installée sur un axe routier majeur du transport poids lourds entre Lyon et Marseille, notre station LAVATRANS CAVAILLON bénéficie d’une localisation privilégiée.",
+      "description": "Installée sur un axe routier majeur du transport poids lourds entre Lyon et Marseille, notre station LAVATRANS CAVAILLON bénéficie d'une localisation privilégiée.",
       "isLavaTrans": true,
       "services": {
         "highPressure": "PORTIQUE",
