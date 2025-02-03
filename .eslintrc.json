@@ -21,7 +21,13 @@
       "version": "detect"
     },
     "import/resolver": {
-      "typescript": {}
+      "typescript": {},
+      "alias": {
+        "map": [
+          ["@", "."]
+        ],
+        "extensions": [".ts", ".tsx", ".js", ".jsx", ".json"]
+      }
     }
   },
   "rules": {

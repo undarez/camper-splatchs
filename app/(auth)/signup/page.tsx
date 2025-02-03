@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
 import Image from "next/image";
-import AuthWrapper from "../../components/AuthWrapper";
-import { SignUpForm } from "../../components/SignUpForm";
+import AuthWrapper from "@/app/components/AuthWrapper";
+import { SignUpForm } from "@/app/components/SignUpForm";
 
 export default function SignUp() {
   return (

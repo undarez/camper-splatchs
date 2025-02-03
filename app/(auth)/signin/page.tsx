@@ -1,18 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import AuthWrapper from "../../components/AuthWrapper";
-import React, { useState, useEffect } from "react";
+import AuthWrapper from "@/app/components/AuthWrapper";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
-import { Button } from "../../components/ui/button";
+} from "@/app/components/ui/dialog";
+import { Button } from "@/app/components/ui/button";
 import { useRouter } from "next/navigation";
-import { AuthForm } from "../../components/AuthForm";
+import { AuthForm } from "@/app/components/AuthForm";
 
 export default function SignIn() {
   const [showModal, setShowModal] = useState(false);
