@@ -109,6 +109,9 @@ async function importStations() {
             type: station.type,
             status: station.status,
             description: station.description,
+            images: station.images.map(
+              (image) => `/images/station-lavatrans/${image}`
+            ),
           })
           .eq("id", existingStation.id);
 
@@ -127,6 +130,9 @@ async function importStations() {
             type: station.type,
             status: station.status,
             description: station.description,
+            images: station.images.map(
+              (image) => `/images/station-lavatrans/${image}`
+            ),
           })
           .select()
           .single();
