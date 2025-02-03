@@ -2,6 +2,73 @@ import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
 import stationsData from "../data/stations.json";
 
+// Définition des types
+// interface OpeningHours {
+//   open: string;
+//   close: string;
+// }
+
+interface Station {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  type: string;
+  phoneNumber: string;
+  description: string;
+  isLavaTrans: boolean;
+  services: {
+    highPressure: string;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: string;
+    paymentMethods: string[];
+  };
+}
+
+interface Parking {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  type: string;
+  phoneNumber: string | null;
+  description: string;
+  isLavaTrans: boolean;
+  parkingDetails: {
+    isPayant: boolean;
+    tarif: string | null;
+    taxeSejour: string | null;
+    hasElectricity: string;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    hasBarrier: boolean;
+  };
+}
+
+interface StationsData {
+  stations: Station[];
+  parkings: Parking[];
+}
+
 // Charger les variables d'environnement
 dotenv.config();
 
@@ -18,7 +85,9 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 async function importStations() {
   console.log("Début de l'importation des stations...");
 
-  for (const station of stationsData.stations) {
+  const typedStationsData = stationsData as StationsData;
+
+  for (const station of typedStationsData.stations) {
     try {
       // Vérifier si la station existe déjà
       const { data: existingStation } = await supabase
@@ -40,7 +109,6 @@ async function importStations() {
             type: station.type,
             status: station.status,
             description: station.description,
-            averageRating: station.averageRating,
           })
           .eq("id", existingStation.id);
 
@@ -59,57 +127,63 @@ async function importStations() {
             type: station.type,
             status: station.status,
             description: station.description,
-            averageRating: station.averageRating,
           })
           .select()
           .single();
 
         if (insertError) throw insertError;
 
-        // Ajouter les équipements
-        if (station.equipments.length > 0) {
+        // Ajouter les services comme équipements
+        const services = Object.entries(station.services)
+          .filter(
+            ([key, value]) =>
+              (typeof value === "boolean" && value === true) ||
+              ((key === "highPressure" || key === "electricity") &&
+                value !== "")
+          )
+          .map(([key]) => ({
+            station_id: newStation.id,
+            name: key,
+          }));
+
+        if (services.length > 0) {
           const { error: equipmentError } = await supabase
             .from("station_equipments")
-            .insert(
-              station.equipments.map((equipment) => ({
-                station_id: newStation.id,
-                name: equipment,
-              }))
-            );
+            .insert(services);
 
           if (equipmentError) throw equipmentError;
         }
 
-        // Ajouter les horaires d'ouverture
-        const openingHours = Object.entries(station.openingHours).map(
-          ([day, hours]) => ({
+        // Ajouter les tarifs pour l'électricité et la haute pression si disponibles
+        const pricing = [];
+        if (
+          station.services.electricity &&
+          station.services.electricity !== ""
+        ) {
+          pricing.push({
             station_id: newStation.id,
-            day: day.toLowerCase(),
-            open_time: hours.open,
-            close_time: hours.close,
-          })
-        );
-
-        const { error: hoursError } = await supabase
-          .from("opening_hours")
-          .insert(openingHours);
-
-        if (hoursError) throw hoursError;
-
-        // Ajouter les tarifs
-        const pricing = Object.entries(station.pricing).map(
-          ([service, price]) => ({
+            service_type: "electricity",
+            price: parseFloat(station.services.electricity),
+          });
+        }
+        if (
+          station.services.highPressure &&
+          station.services.highPressure !== ""
+        ) {
+          pricing.push({
             station_id: newStation.id,
-            service_type: service,
-            price: price,
-          })
-        );
+            service_type: "highPressure",
+            price: parseFloat(station.services.highPressure),
+          });
+        }
 
-        const { error: pricingError } = await supabase
-          .from("pricing")
-          .insert(pricing);
+        if (pricing.length > 0) {
+          const { error: pricingError } = await supabase
+            .from("pricing")
+            .insert(pricing);
 
-        if (pricingError) throw pricingError;
+          if (pricingError) throw pricingError;
+        }
       }
 
       console.log(`Station "${station.name}" traitée avec succès`);
