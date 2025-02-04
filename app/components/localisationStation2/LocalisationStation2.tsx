@@ -726,21 +726,31 @@ export default function LocalisationStation2() {
           station.type === StationType.PARKING && station.parkingDetails
             ? `
             <div class="border-t border-gray-700 pt-4 mt-4">
-              <h4 class="text-sm font-bold text-white mb-3">Informations parking</h4>
+              <h4 class="text-sm font-bold text-white mb-3">Services disponibles</h4>
               <div class="grid grid-cols-2 gap-3">
                 <div class="service-card rounded-lg p-3">
                   <span class="text-sm text-[#40E0D0] font-medium">Tarif</span>
                   <p class="text-xs text-white mt-1">${
                     station.parkingDetails.isPayant
-                      ? `${station.parkingDetails.tarif}€`
+                      ? `${station.parkingDetails.tarif}€/jour`
                       : "Gratuit"
                   }</p>
                 </div>
+                ${
+                  station.parkingDetails.totalPlaces
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Places</span>
+                      <p class="text-xs text-white mt-1">${station.parkingDetails.totalPlaces} places</p>
+                    </div>`
+                    : ""
+                }
                 ${
                   station.parkingDetails.waterPoint
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">Point d'eau</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -749,6 +759,7 @@ export default function LocalisationStation2() {
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">Vidange eaux usées</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -757,6 +768,7 @@ export default function LocalisationStation2() {
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">Évacuation eaux usées</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -765,6 +777,7 @@ export default function LocalisationStation2() {
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">Évacuation eaux noires</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -773,6 +786,7 @@ export default function LocalisationStation2() {
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">WiFi</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -781,6 +795,7 @@ export default function LocalisationStation2() {
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">Point de recharge</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -789,6 +804,7 @@ export default function LocalisationStation2() {
                     ? `
                     <div class="service-card rounded-lg p-3">
                       <span class="text-sm text-[#40E0D0] font-medium">Accès handicapé</span>
+                      <p class="text-xs text-white mt-1">Disponible</p>
                     </div>`
                     : ""
                 }
@@ -801,6 +817,18 @@ export default function LocalisationStation2() {
                         "AMP_",
                         ""
                       )}A</p>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.commercesProches &&
+                  station.parkingDetails.commercesProches.length > 0
+                    ? `
+                    <div class="service-card rounded-lg p-3 col-span-2">
+                      <span class="text-sm text-[#40E0D0] font-medium">Commerces à proximité</span>
+                      <p class="text-xs text-white mt-1">${station.parkingDetails.commercesProches.join(
+                        ", "
+                      )}</p>
                     </div>`
                     : ""
                 }
