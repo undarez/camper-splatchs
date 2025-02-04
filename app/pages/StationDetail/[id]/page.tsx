@@ -130,19 +130,6 @@ const renderServiceValue = (
   return value?.toString() || "Non spécifié";
 };
 
-interface Review {
-  id: string;
-  content: string;
-  rating: number;
-  created_at: string;
-  author_id: string;
-  author?: {
-    id: string;
-    name: string | null;
-    email: string | null;
-  } | null;
-}
-
 interface StationWithDetails {
   id: string;
   name: string;
@@ -153,23 +140,21 @@ interface StationWithDetails {
   longitude: number;
   images: string[];
   status: string;
-  type: string;
+  type: "STATION_LAVAGE" | "PARKING";
   description: string | null;
   phone_number: string | null;
-  services: {
+  services?: {
     id: string;
     high_pressure: string;
     tire_pressure: boolean;
     vacuum: boolean;
-    handicap_access: boolean;
-    waste_water: boolean;
     water_point: boolean;
+    waste_water: boolean;
     waste_water_disposal: boolean;
     black_water_disposal: boolean;
-    electricity: string;
-    max_vehicle_length: number | null;
-  } | null;
-  parking_details: {
+    handicap_access: boolean;
+  };
+  parking_details?: {
     id: string;
     is_payant: boolean;
     tarif: number | null;
@@ -184,8 +169,13 @@ interface StationWithDetails {
     waste_water: boolean;
     waste_water_disposal: boolean;
     black_water_disposal: boolean;
-  } | null;
-  reviews: Review[];
+  };
+  reviews?: Array<{
+    id: string;
+    rating: number;
+    content: string;
+    created_at: string;
+  }>;
   author: {
     id: string;
     email: string | null;
@@ -269,46 +259,64 @@ export default function StationDetail({ params }: StationDetailProps) {
 
   useEffect(() => {
     const fetchStationDetails = async () => {
-      if (!params.id) {
-        setError("Identifiant de station invalide");
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
       try {
+        setLoading(true);
         const response = await fetch(`/api/stations/${params.id}`);
         const data = await response.json();
 
+        console.log("Données complètes de la station:", data);
+
         if (!response.ok) {
           throw new Error(
-            data.error || "Erreur lors du chargement de la station"
+            data.message || "Erreur lors du chargement de la station"
           );
         }
 
-        if (!data) {
-          setError("Station non trouvée");
-          return;
-        }
+        // Vérification et transformation des données
+        const transformedData: StationWithDetails = {
+          ...data,
+          type: data.type || "PARKING", // Valeur par défaut
+          services: data.services || {},
+          parking_details:
+            data.type === "PARKING"
+              ? {
+                  id: data.id,
+                  is_payant: data.parking_details?.is_payant || false,
+                  tarif: data.parking_details?.tarif || null,
+                  taxe_sejour: data.parking_details?.taxe_sejour || null,
+                  has_electricity:
+                    data.parking_details?.has_electricity || "NONE",
+                  commerces_proches:
+                    data.parking_details?.commerces_proches || [],
+                  handicap_access:
+                    data.parking_details?.handicap_access || false,
+                  total_places: data.parking_details?.total_places || 0,
+                  has_wifi: data.parking_details?.has_wifi || false,
+                  has_charging_point:
+                    data.parking_details?.has_charging_point || false,
+                  water_point: data.parking_details?.water_point || false,
+                  waste_water: data.parking_details?.waste_water || false,
+                  waste_water_disposal:
+                    data.parking_details?.waste_water_disposal || false,
+                  black_water_disposal:
+                    data.parking_details?.black_water_disposal || false,
+                }
+              : undefined,
+          reviews: data.reviews || [],
+        };
 
-        console.log("Données complètes de la station:", {
-          description: data.description,
-          phone_number: data.phone_number,
-          name: data.name,
-          address: data.address,
-          // autres champs pour vérification
-        });
+        setStation(transformedData);
+        setReviewsCount(transformedData.reviews?.length || 0);
 
-        setStation(data);
-        setReviewsCount(data.reviews?.length || 0);
+        // Initialiser les champs d'édition avec les valeurs actuelles
+        if (transformedData.description)
+          setEditDescription(transformedData.description);
+        if (transformedData.phone_number)
+          setEditPhoneNumber(transformedData.phone_number);
       } catch (error) {
-        console.error("Erreur lors de la récupération des détails:", error);
+        console.error("Erreur:", error);
         setError(
-          error instanceof Error
-            ? error.message
-            : "Une erreur inattendue s'est produite lors du chargement de la station"
+          error instanceof Error ? error.message : "Une erreur est survenue"
         );
       } finally {
         setLoading(false);
@@ -336,53 +344,10 @@ export default function StationDetail({ params }: StationDetailProps) {
     }
   };
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[#1E2337] flex items-center justify-center p-4">
-        <div className="bg-red-50 text-red-600 p-6 rounded-lg shadow-lg max-w-md w-full">
-          <h3 className="text-lg font-semibold mb-2">Erreur</h3>
-          <p className="mb-4">{error}</p>
-          <div className="flex justify-between">
-            <Button
-              onClick={() => window.history.back()}
-              className="bg-red-600 text-white hover:bg-red-700 transition-colors"
-            >
-              Retour
-            </Button>
-            <Button
-              onClick={() => window.location.reload()}
-              className="bg-red-600 text-white hover:bg-red-700 transition-colors"
-            >
-              Réessayer
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!station) {
-    return (
-      <div className="min-h-screen bg-[#1E2337] flex items-center justify-center p-4">
-        <div className="bg-yellow-50 text-yellow-600 p-6 rounded-lg shadow-lg max-w-md w-full">
-          <h3 className="text-lg font-semibold mb-2">Station non trouvée</h3>
-          <p className="mb-4">
-            La station que vous recherchez n'existe pas ou a été supprimée.
-          </p>
-          <Button
-            onClick={() => window.history.back()}
-            className="bg-yellow-600 text-white hover:bg-yellow-700 transition-colors"
-          >
-            Retour aux stations
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingScreen />;
+  if (error) return <div className="text-red-500 p-4">{error}</div>;
+  if (!station)
+    return <div className="text-gray-500 p-4">Station non trouvée</div>;
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-50">
