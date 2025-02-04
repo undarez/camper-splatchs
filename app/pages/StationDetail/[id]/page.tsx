@@ -7,7 +7,6 @@ import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/Navig
 import { Carousel } from "@/app/components/ui/carousel";
 import { Badge } from "@/app/components/ui/badge";
 import {
-  StarIcon,
   Droplet,
   Wifi,
   Plug,
@@ -23,7 +22,7 @@ import {
   Share2,
   Phone,
   Info,
-  MapPin,
+  StarIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -547,15 +546,15 @@ export default function StationDetail({ params }: StationDetailProps) {
                     .map(([key, value]) => (
                       <div
                         key={key}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100"
                       >
                         <div className="flex items-center gap-3">
                           {renderServiceIcon(key)}
-                          <span className="text-gray-700 font-medium">
+                          <span className="text-gray-800 font-medium">
                             {serviceLabels[key] || key}
                           </span>
                         </div>
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 bg-gray-50 px-3 py-1 rounded-full text-sm">
                           {renderServiceValue(key, value)}
                         </span>
                       </div>
@@ -563,27 +562,29 @@ export default function StationDetail({ params }: StationDetailProps) {
                 </>
               )}
               {station.type === "PARKING" && station.parking_details && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="space-y-4">
+                  {/* Tarif */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Euro className="h-5 w-5 text-green-500" />
-                      <span className="text-gray-700 font-medium">Tarif</span>
+                      <span className="text-gray-800 font-medium">Tarif</span>
                     </div>
-                    <span className="text-gray-600">
+                    <span className="text-gray-600 bg-gray-50 px-3 py-1 rounded-full text-sm">
                       {station.parking_details.is_payant
                         ? `${station.parking_details.tarif}€/jour`
                         : "Gratuit"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* Électricité */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Plug className="h-5 w-5 text-yellow-500" />
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium">
                         Électricité
                       </span>
                     </div>
-                    <span className="text-gray-600">
+                    <span className="text-gray-600 bg-gray-50 px-3 py-1 rounded-full text-sm">
                       {station.parking_details.has_electricity !== "NONE"
                         ? station.parking_details.has_electricity.replace(
                             "AMP_",
@@ -593,98 +594,147 @@ export default function StationDetail({ params }: StationDetailProps) {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* WiFi */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Wifi className="h-5 w-5 text-blue-500" />
-                      <span className="text-gray-700 font-medium">WiFi</span>
+                      <span className="text-gray-800 font-medium">WiFi</span>
                     </div>
-                    <span className="text-gray-600">
+                    <span
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm",
+                        station.parking_details.has_wifi
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-50 text-gray-600"
+                      )}
+                    >
                       {station.parking_details.has_wifi
                         ? "Disponible"
                         : "Non disponible"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* Accès handicapé */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Accessibility className="h-5 w-5 text-blue-500" />
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium">
                         Accès handicapé
                       </span>
                     </div>
-                    <span className="text-gray-600">
+                    <span
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm",
+                        station.parking_details.handicap_access
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-50 text-gray-600"
+                      )}
+                    >
                       {station.parking_details.handicap_access
                         ? "Disponible"
                         : "Non disponible"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* Point d'eau */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Droplet className="h-5 w-5 text-cyan-500" />
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium">
                         Point d'eau
                       </span>
                     </div>
-                    <span className="text-gray-600">
+                    <span
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm",
+                        station.parking_details.water_point
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-50 text-gray-600"
+                      )}
+                    >
                       {station.parking_details.water_point
                         ? "Disponible"
                         : "Non disponible"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* Vidange eaux usées */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Droplets className="h-5 w-5 text-blue-500" />
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium">
                         Vidange eaux usées
                       </span>
                     </div>
-                    <span className="text-gray-600">
+                    <span
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm",
+                        station.parking_details.waste_water
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-50 text-gray-600"
+                      )}
+                    >
                       {station.parking_details.waste_water
                         ? "Disponible"
                         : "Non disponible"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* Évacuation eaux usées */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Droplets className="h-5 w-5 text-blue-500" />
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium">
                         Évacuation eaux usées
                       </span>
                     </div>
-                    <span className="text-gray-600">
+                    <span
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm",
+                        station.parking_details.waste_water_disposal
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-50 text-gray-600"
+                      )}
+                    >
                       {station.parking_details.waste_water_disposal
                         ? "Disponible"
                         : "Non disponible"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  {/* Évacuation eaux noires */}
+                  <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
                       <Trash2 className="h-5 w-5 text-gray-500" />
-                      <span className="text-gray-700 font-medium">
+                      <span className="text-gray-800 font-medium">
                         Évacuation eaux noires
                       </span>
                     </div>
-                    <span className="text-gray-600">
+                    <span
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm",
+                        station.parking_details.black_water_disposal
+                          ? "bg-green-50 text-green-600"
+                          : "bg-gray-50 text-gray-600"
+                      )}
+                    >
                       {station.parking_details.black_water_disposal
                         ? "Disponible"
                         : "Non disponible"}
                     </span>
                   </div>
 
+                  {/* Commerces à proximité */}
                   {station.parking_details.commerces_proches &&
                     station.parking_details.commerces_proches.length > 0 && (
-                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                         <div className="flex items-center gap-3">
                           <ShoppingBag className="h-5 w-5 text-purple-500" />
-                          <span className="text-gray-700 font-medium">
+                          <span className="text-gray-800 font-medium">
                             Commerces à proximité
                           </span>
                         </div>
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 bg-gray-50 px-3 py-1 rounded-full text-sm max-w-[50%] truncate">
                           {station.parking_details.commerces_proches.join(", ")}
                         </span>
                       </div>
@@ -767,7 +817,11 @@ export default function StationDetail({ params }: StationDetailProps) {
                     type="tel"
                     value={editPhoneNumber}
                     onChange={(e) => setEditPhoneNumber(e.target.value)}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={cn(
+                      "w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                      isSubmitting && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={isSubmitting}
                     placeholder="Ex: 0123456789"
                   />
                 </div>
@@ -784,7 +838,11 @@ export default function StationDetail({ params }: StationDetailProps) {
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={4}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={cn(
+                      "w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                      isSubmitting && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={isSubmitting}
                     placeholder="Décrivez votre station..."
                   />
                 </div>
@@ -805,17 +863,10 @@ export default function StationDetail({ params }: StationDetailProps) {
                     <Phone className="h-5 w-5 text-blue-500" />
                     <a
                       href={`tel:${station.phone_number}`}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-600 hover:text-blue-700 transition-colors"
                     >
                       {station.phone_number}
                     </a>
-                  </div>
-                )}
-
-                {station.description && (
-                  <div className="flex items-start gap-3">
-                    <Info className="h-5 w-5 text-gray-500 mt-1" />
-                    <p className="text-gray-700">{station.description}</p>
                   </div>
                 )}
               </>
@@ -896,7 +947,7 @@ export default function StationDetail({ params }: StationDetailProps) {
             )}
 
             <div className="space-y-4">
-              {station.reviews && station.reviews.length > 0 ? (
+              {station?.reviews && station.reviews.length > 0 ? (
                 station.reviews.map((review) => (
                   <div
                     key={review.id}
@@ -932,67 +983,6 @@ export default function StationDetail({ params }: StationDetailProps) {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Boutons d'action */}
-        <div className="flex gap-4 mt-6">
-          <Button
-            onClick={() =>
-              window.open(
-                `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`,
-                "_blank"
-              )
-            }
-            className="flex-1 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600"
-          >
-            <MapPin className="w-4 h-4 mr-2" />Y aller
-          </Button>
-
-          {station.phone_number && (
-            <Button
-              onClick={() =>
-                (window.location.href = `tel:${station.phone_number}`)
-              }
-              className="flex-1 bg-gradient-to-r from-blue-400 to-indigo-500 hover:from-blue-500 hover:to-indigo-600"
-            >
-              <Phone className="w-4 h-4 mr-2" />
-              Appeler
-            </Button>
-          )}
-
-          {/* Bouton temporaire pour tester la mise à jour */}
-          <Button
-            onClick={async () => {
-              try {
-                const response = await fetch(`/api/stations/${params.id}`, {
-                  method: "PATCH",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    description:
-                      "Station de lavage poids lourds avec portique haute pression. Accueil chaleureux et professionnel.",
-                    phone_number: "0123456789",
-                  }),
-                });
-
-                if (!response.ok) {
-                  const error = await response.json();
-                  console.error("Erreur lors de la mise à jour:", error);
-                  return;
-                }
-
-                const updatedStation = await response.json();
-                console.log("Station mise à jour:", updatedStation);
-                window.location.reload();
-              } catch (error) {
-                console.error("Erreur:", error);
-              }
-            }}
-            className="flex-1 bg-gradient-to-r from-purple-400 to-pink-500 hover:from-purple-500 hover:to-pink-600"
-          >
-            Mettre à jour les infos
-          </Button>
         </div>
       </div>
     </div>
