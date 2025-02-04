@@ -737,11 +737,34 @@ export default function LocalisationStation2() {
                   }</p>
                 </div>
                 ${
-                  station.parkingDetails.maxVehicleHeight
+                  station.parkingDetails.waterPoint
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <span class="text-sm text-[#40E0D0] font-medium">Hauteur max.</span>
-                      <p class="text-xs text-white mt-1">${station.parkingDetails.maxVehicleHeight}m</p>
+                      <span class="text-sm text-[#40E0D0] font-medium">Point d'eau</span>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.wasteWater
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Vidange eaux usées</span>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.wasteWaterDisposal
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Évacuation eaux usées</span>
+                    </div>`
+                    : ""
+                }
+                ${
+                  station.parkingDetails.blackWaterDisposal
+                    ? `
+                    <div class="service-card rounded-lg p-3">
+                      <span class="text-sm text-[#40E0D0] font-medium">Évacuation eaux noires</span>
                     </div>`
                     : ""
                 }
@@ -754,27 +777,30 @@ export default function LocalisationStation2() {
                     : ""
                 }
                 ${
-                  station.parkingDetails.hasCctv
+                  station.parkingDetails.hasChargingPoint
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <span class="text-sm text-[#40E0D0] font-medium">Vidéosurveillance</span>
+                      <span class="text-sm text-[#40E0D0] font-medium">Point de recharge</span>
                     </div>`
                     : ""
                 }
                 ${
-                  station.parkingDetails.hasBarrier
+                  station.parkingDetails.handicapAccess
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <span class="text-sm text-[#40E0D0] font-medium">Barrière</span>
+                      <span class="text-sm text-[#40E0D0] font-medium">Accès handicapé</span>
                     </div>`
                     : ""
                 }
                 ${
-                  station.parkingDetails.maxDuration
+                  station.parkingDetails.hasElectricity !== "NONE"
                     ? `
                     <div class="service-card rounded-lg p-3">
-                      <span class="text-sm text-[#40E0D0] font-medium">Durée max.</span>
-                      <p class="text-xs text-white mt-1">${station.parkingDetails.maxDuration}</p>
+                      <span class="text-sm text-[#40E0D0] font-medium">Électricité</span>
+                      <p class="text-xs text-white mt-1">${station.parkingDetails.hasElectricity.replace(
+                        "AMP_",
+                        ""
+                      )}A</p>
                     </div>`
                     : ""
                 }
