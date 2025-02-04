@@ -357,27 +357,29 @@
   "parkings": [
     {
       "id": "parking_01",
-      "name": "Parking Central Montpellier",
-      "address": "789 Boulevard du Camping, 34000 Montpellier",
-      "city": "Montpellier",
-      "postalCode": "34000",
-      "latitude": 43.610769,
-      "longitude": 3.876716,
+      "name": "Camping-car ciry-salsogne",
+      "address": "7 Route de Conde 02220 Ciry Salsogne",
+      "city": "Ciry Salsogne",
+      "postalCode": "02220",
+      "latitude": 49.382359,
+      "longitude": 3.475306,
+
       "images": [
-        "/images/parkings/parking1_1.jpg",
-        "/images/parkings/parking1_2.jpg",
-        "/images/parkings/parking1_3.jpg"
+        "/images/parkings/ciry-11.png",
+        "/images/parkings/ciry-12.png",
+        "/images/parkings/ciry-13.png"
       ],
       "status": "active",
       "type": "PARKING",
       "phoneNumber": "0467123456",
-      "description": "Parking sécurisé au cœur de Montpellier",
+      "description": "Au bord des étangs Aire verdoyante Emplacements au calme  Nichée dans la vallée de la Vesle, faites une halte dans la ville de Ciry-Salsogne ! Avec ses nombreux étangs, la ville vous offre un cadre bucolique pour des escapades reposantes ! Ouvert à la pêche, le domaine des trois étangs permet la pêche de plusieurs espèces au coeur d'un espace naturel remarquable ! Accessible aux petits comme aux plus grands ! Et dans son église Saint Martin, la maquette du Christ rédempteur de Rio de Janeiro de 2,33 mètres. Elle a été donnée à l'Eglise Saint-Martin par le sculpteur Paul Landowski car il était ami avec l'architecte Edouard Monestès qui a reconstruit l'église entre 1924 et 1926. Idéalement située, Ciry-Salsogne vous permettra de facilement visiter la Ville de Soissons et sa cathédrale, mais également de relier deux régions historiques que sont la Picardie et la Champagne ! En effet, à 45 km de Compiègne et de Reims, partez découvrir ces régions riches ! Compiègne et son château vous attendent pour des balades chargées d'histoire ! Pour cause, ce ne sont pas moins de 30 bâtiments qui sont inscrits ou classés en tant que Monument Historique au sein de la ville ayant vu séjourner de nombreuses figures de l'Histoire française. Et vous trouverez également la cité de la langue française à Villers-Cotterêts Une escapade dans l'Aisne, c'est aussi la possibilité de s'intéresser aux théâtres de la Première Guerre Mondiale. Le Chemin des Dames, situé à 20 km de l'aire, en est le parfait exemple avec de nombreux hommages aux soldats de la Grande Guerre tout le long de la route.",
       "isLavaTrans": false,
       "parkingDetails": {
         "isPayant": true,
-        "tarif": 15.5,
-        "taxeSejour": 0.75,
+        "tarif": 13.82,
+        "taxeSejour": 1.32,
         "hasElectricity": "AMP_15",
+
         "commercesProches": [
           "NOURRITURE",
           "CENTRE_VILLE",
@@ -385,7 +387,7 @@
           "STATION_SERVICE"
         ],
         "handicapAccess": true,
-        "totalPlaces": 30,
+        "totalPlaces": 24,
         "hasWifi": true,
         "hasChargingPoint": true,
         "waterPoint": true,
@@ -398,37 +400,40 @@
     },
     {
       "id": "parking_02",
-      "name": "Parking Nature Lyon",
-      "address": "321 Chemin des Campeurs, 69000 Lyon",
-      "city": "Lyon",
-      "postalCode": "69000",
-      "latitude": 45.764043,
-      "longitude": 4.835659,
+      "name": "Braine airPark",
+      "address": "Chemin de la Chantereine 02220 Braine",
+      "city": "Braine",
+      "postalCode": "02220",
+      "latitude": 49.3444339015,
+      "longitude": 3.5371270846,
       "images": [
-        "/images/parkings/parking2_1.jpg",
-        "/images/parkings/parking2_2.jpg"
+        "/images/parkings/braine1.png",
+        "/images/parkings/braine2.png",
+        "/images/parkings/braine3.png"
       ],
       "status": "active",
       "type": "PARKING",
       "phoneNumber": null,
-      "description": "Parking calme en bordure de parc",
+      "description": "Bienvenue sur l'aire de camping-car de Braine ! Située au cœur de la France, la charmante ville de Braine est une destination idéale pour les amateurs de camping-car en quête d'une escapade authentique. Entourée d'un paysage pittoresque, Braine offre une atmosphère paisible propice à la détente. L'aire de camping-car de Braine offre 6 emplacements spacieux. Elle est équipée d'une barrière levante, propose une centrale de paiement 24h/24, une borne de vidange, une borne de ravitaillement en eau, des bornes électriques (10A) et de l'éclairage nocturne. Idéalement située au cœur de la ville, elle offre tout le confort nécessaire pour une halte agréable. Pour les amateurs d'histoire, Braine abrite des sites culturels captivants tels que son église abbatiale médiévale et les vestiges du château de la Folie, témoins d'un riche passé. Vous profiterez également de la tranquillité des espaces verdoyants et des rives paisibles de la rivière qui traverse la ville. Un peu plus loin vous attendent le fort de Condé et la Cité internationale de la langue française. Chaque vendredi matin, explorez le marché de Braine où vous pourrez vous ravitailler en produits frais sur la place Charles de Gaulle. Que ce soit pour une courte halte ou un séjour prolongé, l'aire de camping-car de Braine promet une expérience mémorable au cœur d'une ville alliant charme, histoire et sérénité.",
       "isLavaTrans": false,
+
       "parkingDetails": {
-        "isPayant": false,
-        "tarif": null,
-        "taxeSejour": null,
-        "hasElectricity": "NONE",
+        "isPayant": true,
+        "tarif": 9.0,
+        "taxeSejour": 0.66,
+        "hasElectricity": "AMP_15",
         "commercesProches": ["NOURRITURE", "LAVERIE"],
         "handicapAccess": true,
-        "totalPlaces": 15,
+        "totalPlaces": 4,
+
         "hasWifi": false,
         "hasChargingPoint": false,
         "waterPoint": true,
         "wasteWater": true,
-        "wasteWaterDisposal": false,
-        "blackWaterDisposal": false,
-        "hasCctv": false,
-        "hasBarrier": false
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "hasCctv": true,
+        "hasBarrier": true
       }
     },
     {

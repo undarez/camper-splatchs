@@ -63,8 +63,8 @@ interface Parking {
   isLavaTrans: boolean;
   parkingDetails: {
     isPayant: boolean;
-    tarif: string | null;
-    taxeSejour: string | null;
+    tarif: string | number | null;
+    taxeSejour: string | number | null;
     hasElectricity: string;
     commercesProches: string[];
     handicapAccess: boolean;
