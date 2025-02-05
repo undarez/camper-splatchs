@@ -464,7 +464,7 @@ export default function LocalisationStation2() {
     let iconUrl = "/images/logo.png";
 
     if (type === StationType.PARKING) {
-      iconUrl = "/images/parking-icon.png";
+      iconUrl = "/images/parking.png";
     } else if (type === StationType.STATION_LAVAGE) {
       iconUrl = "/images/lavatranssplas.png";
     }

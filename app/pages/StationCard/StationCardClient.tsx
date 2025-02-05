@@ -27,7 +27,7 @@ import {
   Circle as LeafletCircle,
   Marker as LeafletMarker,
 } from "leaflet";
-import { StationWithDetails } from "@/app/types/station";
+import { StationWithDetails, StationType } from "@/app/types/station";
 
 const StationCard = dynamic(
   () => import("@/app/components/StationCard").then((mod) => mod.default),
@@ -262,40 +262,25 @@ export function StationCardClient() {
   };
 
   const getMarkerIcon = (station: StationWithDetails): Icon => {
-    let iconUrl = "/images/logo.png" as string;
-    const iconSize: [number, number] = [25, 25];
-    let className = "station-marker";
+    let iconUrl = "/images/logo.png";
 
-    if (station.type === "STATION_LAVAGE") {
-      if (station.iconType === "PASSERELLE") {
-        iconUrl = "/images/passerelle-icon.png";
-      } else if (station.iconType === "PORTIQUE") {
-        iconUrl = "/images/portique-icon.png";
-      } else if (station.iconType === "ECHAFAUDAGE") {
-        iconUrl = "/images/echafaudage-icon.png";
-      }
-      className += " station-lavage";
-    } else if (station.type === "PARKING") {
-      iconUrl = "/images/parking-icon.png";
-      className += " parking";
-    }
-
-    if (station.isLavaTrans) {
+    if (station.type === StationType.PARKING) {
+      iconUrl = "/images/logo.png";
+    } else if (station.type === StationType.STATION_LAVAGE) {
       iconUrl = "/images/lavatranssplas.png";
-      className += " lavatrans";
     }
-
-    className += ` ${station.status}`;
 
     return new Icon({
       iconUrl,
       iconRetinaUrl: iconUrl,
       shadowUrl: "/images/marker-shadow.png",
-      iconSize: iconSize as [number, number],
-      iconAnchor: [12, 25] as [number, number],
-      popupAnchor: [0, -25] as [number, number],
-      shadowSize: [41, 41] as [number, number],
-      className,
+      iconSize: [25, 25],
+      iconAnchor: [12, 25],
+      popupAnchor: [0, -25],
+      shadowSize: [41, 41],
+      className: `station-marker ${station.status} ${
+        station.type === StationType.PARKING ? "parking" : "station-lavage"
+      }`,
     });
   };
 
