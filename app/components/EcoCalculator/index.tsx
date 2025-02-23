@@ -114,10 +114,14 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
       <div className="grid gap-6 md:grid-cols-2">
         {/* Type de lavage */}
         <div>
-          <label className="block text-sm font-medium text-gray-200 mb-2">
+          <label
+            htmlFor="washType"
+            className="block text-sm font-medium text-gray-200 mb-2"
+          >
             Type de lavage
           </label>
           <select
+            id="washType"
             className="w-full p-3 bg-[#2A3147] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             onChange={(e) =>
               setSelectedWashType(
@@ -137,10 +141,14 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
 
         {/* Taille du véhicule */}
         <div>
-          <label className="block text-sm font-medium text-gray-200 mb-2">
+          <label
+            htmlFor="vehicleSize"
+            className="block text-sm font-medium text-gray-200 mb-2"
+          >
             Taille du camping-car
           </label>
           <select
+            id="vehicleSize"
             className="w-full p-3 bg-[#2A3147] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             onChange={(e) =>
               setVehicleSize(e.target.value as "small" | "medium" | "large")
@@ -157,10 +165,14 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
 
         {/* Durée */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-200 mb-2">
+          <label
+            htmlFor="duration"
+            className="block text-sm font-medium text-gray-200 mb-2"
+          >
             Durée estimée (minutes)
           </label>
           <input
+            id="duration"
             type="number"
             min="1"
             max="30"
