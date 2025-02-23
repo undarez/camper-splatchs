@@ -23,6 +23,7 @@ import {
   Phone,
   Info,
   StarIcon,
+  Trash,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -275,33 +276,32 @@ export default function StationDetail({ params }: StationDetailProps) {
         // Vérification et transformation des données
         const transformedData: StationWithDetails = {
           ...data,
-          type: data.type || "PARKING", // Valeur par défaut
+          type: data.type || "PARKING",
           services: data.services || {},
-          parking_details:
-            data.type === "PARKING"
-              ? {
-                  id: data.id,
-                  is_payant: data.parking_details?.is_payant || false,
-                  tarif: data.parking_details?.tarif || null,
-                  taxe_sejour: data.parking_details?.taxe_sejour || null,
-                  has_electricity:
-                    data.parking_details?.has_electricity || "NONE",
-                  commerces_proches:
-                    data.parking_details?.commerces_proches || [],
-                  handicap_access:
-                    data.parking_details?.handicap_access || false,
-                  total_places: data.parking_details?.total_places || 0,
-                  has_wifi: data.parking_details?.has_wifi || false,
-                  has_charging_point:
-                    data.parking_details?.has_charging_point || false,
-                  water_point: data.parking_details?.water_point || false,
-                  waste_water: data.parking_details?.waste_water || false,
-                  waste_water_disposal:
-                    data.parking_details?.waste_water_disposal || false,
-                  black_water_disposal:
-                    data.parking_details?.black_water_disposal || false,
-                }
-              : undefined,
+          parking_details: data.parkingDetails
+            ? {
+                id: data.parkingDetails.id,
+                is_payant: Boolean(data.parkingDetails.isPayant),
+                tarif: data.parkingDetails.tarif,
+                taxe_sejour: data.parkingDetails.taxeSejour,
+                has_electricity: data.parkingDetails.hasElectricity,
+                commerces_proches: data.parkingDetails.commercesProches,
+                handicap_access: Boolean(data.parkingDetails.handicapAccess),
+                total_places: data.parkingDetails.totalPlaces,
+                has_wifi: Boolean(data.parkingDetails.hasWifi),
+                has_charging_point: Boolean(
+                  data.parkingDetails.hasChargingPoint
+                ),
+                water_point: Boolean(data.parkingDetails.waterPoint),
+                waste_water: Boolean(data.parkingDetails.wasteWater),
+                waste_water_disposal: Boolean(
+                  data.parkingDetails.wasteWaterDisposal
+                ),
+                black_water_disposal: Boolean(
+                  data.parkingDetails.blackWaterDisposal
+                ),
+              }
+            : undefined,
           reviews: data.reviews || [],
         };
 
@@ -604,7 +604,7 @@ export default function StationDetail({ params }: StationDetailProps) {
                   {/* Point d'eau */}
                   <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
-                      <Droplet className="h-5 w-5 text-cyan-500" />
+                      <Droplet className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-800 font-medium">
                         Point d'eau
                       </span>
@@ -648,7 +648,7 @@ export default function StationDetail({ params }: StationDetailProps) {
                   {/* Évacuation eaux usées */}
                   <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100">
                     <div className="flex items-center gap-3">
-                      <Droplets className="h-5 w-5 text-blue-500" />
+                      <Trash className="h-5 w-5 text-blue-500" />
                       <span className="text-gray-800 font-medium">
                         Évacuation eaux usées
                       </span>

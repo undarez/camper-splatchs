@@ -131,11 +131,39 @@ export async function GET(
     // Transformer les données pour le front-end
     const stationWithRelations = station as StationWithRelations;
 
-    // Ajouter les versions snake_case des propriétés
+    // Ajouter les versions snake_case des propriétés et transformer les services
     const response = {
       ...stationWithRelations,
       phone_number: station.phoneNumber,
       postal_code: station.postalCode,
+      services: station.services
+        ? {
+            ...station.services,
+            high_pressure: station.services.highPressure,
+            tire_pressure: station.services.tirePressure,
+            water_point: station.services.waterPoint,
+            waste_water: station.services.wasteWater,
+            waste_water_disposal: station.services.wasteWaterDisposal,
+            black_water_disposal: station.services.blackWaterDisposal,
+            handicap_access: station.services.handicapAccess,
+          }
+        : null,
+      parking_details: station.parkingDetails
+        ? {
+            ...station.parkingDetails,
+            is_payant: station.parkingDetails.isPayant,
+            has_electricity: station.parkingDetails.hasElectricity,
+            commerces_proches: station.parkingDetails.commercesProches,
+            handicap_access: station.parkingDetails.handicapAccess,
+            total_places: station.parkingDetails.totalPlaces,
+            has_wifi: station.parkingDetails.hasWifi,
+            has_charging_point: station.parkingDetails.hasChargingPoint,
+            water_point: station.parkingDetails.waterPoint,
+            waste_water: station.parkingDetails.wasteWater,
+            waste_water_disposal: station.parkingDetails.wasteWaterDisposal,
+            black_water_disposal: station.parkingDetails.blackWaterDisposal,
+          }
+        : null,
       averageRating:
         stationWithRelations.reviews.length > 0
           ? Number(
