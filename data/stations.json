@@ -321,32 +321,67 @@
       }
     },
     {
-      "id": "station_11",
-      "name": "Lavatrans Cavaillon",
-      "address": "230 chemin du midi - 84300 CAVAILLON",
-      "city": "Cavaillon",
-      "postalCode": "84300",
+      "id": "station_12",
+      "name": "SOCIETE LAVAGE DE L EST",
+      "address": "Lavage de l'est, 9A Rue de Cherbourg, 67100 Strasbourg",
+      "city": "Strasbourg",
+      "postalCode": "67100",
 
-      "latitude": 43.826984,
-      "longitude": 5.0580521,
+      "latitude": 48.5834,
+      "longitude": 7.743,
 
       "images": [
-        "/images/stations-lavatrans/cavaillon8.jpg",
-        "/images/stations-lavatrans/img_2118.jpg"
+        "/images/stations-grand-est/strasbourg1.webp",
+        "/images/stations-grand-est/strasbourg2.webp",
+        "/images/stations-grand-est/strasbourg3.webp"
       ],
       "status": "active",
       "type": "STATION_LAVAGE",
-      "phoneNumber": "04 90 78 00 30",
+      "phoneNumber": "03 88 39 68 43",
 
-      "description": "Installée sur un axe routier majeur du transport poids lourds entre Lyon et Marseille, notre station LAVATRANS CAVAILLON bénéficie d'une localisation privilégiée.",
-      "isLavaTrans": true,
+      "description": "LAVAGE POIDS LOURDS EXTERIEURS ET INTERIEURS (FRIGO, CITERNE, PULVE, BENNE)",
+      "isLavaTrans": false,
       "services": {
         "highPressure": "PORTIQUE",
         "tirePressure": true,
         "vacuum": true,
         "handicapAccess": true,
-        "wasteWater": true,
-        "waterPoint": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
+    },
+    {
+      "id": "station_13",
+      "name": "Lav-Car",
+      "address": "8 rue de Mulhouse, 68180 Horbourg-Wihr",
+      "city": "Horbourg-Wihr",
+      "postalCode": "68180",
+
+      "latitude": 48.07325744628906,
+      "longitude": 7.401822090148926,
+
+      "images": [
+        "/images/stations-grand-est/lavcargrandest1.webp",
+        "/images/stations-grand-est/lavcargrandest2.webp",
+        "/images/stations-grand-est/lavcargrandest3.webp"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06 68 79 99 87",
+
+      "description": "station de lavage de voiture et camping-car HP",
+      "isLavaTrans": false,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
         "wasteWaterDisposal": false,
         "blackWaterDisposal": false,
         "electricity": "Aucun",
@@ -438,27 +473,26 @@
     },
     {
       "id": "parking_03",
-      "name": "Parking Mer Marseille",
-      "address": "456 Corniche Kennedy, 13007 Marseille",
-      "city": "Marseille",
-      "postalCode": "13007",
-      "latitude": 43.290555,
-      "longitude": 5.374446,
+      "name": "Aire de vidange camping car",
+      "address": "Aire de Villeneuve Vauluisant (A5 - km85, 89190 Villeneuve-l'Archevêque",
+      "city": "Villeneuve-l'Archevêque",
+      "postalCode": "89190",
+      "latitude": 48.2001,
+      "longitude": 3.4774,
       "images": [
-        "/images/parkings/parking3_1.jpg",
-        "/images/parkings/parking3_2.jpg",
-        "/images/parkings/parking3_3.jpg"
+        "/images/stations-grand-est/grand-estautoroute1.jpg",
+        "/images/stations-grand-est/grand-estautoroute2.jpg"
       ],
       "status": "active",
       "type": "PARKING",
-      "phoneNumber": "0491234567",
-      "description": "Magnifique parking avec vue sur la Méditerranée",
+      "phoneNumber": "",
+      "description": "station qui ce trouve sur l'aire d'autoroute de Villeneuve Vauluisant (A5 - km85, 89190 Villeneuve-l'Archevêque)",
       "isLavaTrans": false,
       "parkingDetails": {
-        "isPayant": true,
-        "tarif": 20.0,
-        "taxeSejour": 1.0,
-        "hasElectricity": "AMP_15",
+        "isPayant": false,
+        "tarif": 0.0,
+        "taxeSejour": 0.0,
+        "hasElectricity": "NONE",
         "commercesProches": [
           "NOURRITURE",
           "CENTRE_VILLE",
@@ -468,8 +502,8 @@
         ],
         "handicapAccess": true,
         "totalPlaces": 25,
-        "hasWifi": true,
-        "hasChargingPoint": true,
+        "hasWifi": false,
+        "hasChargingPoint": false,
         "waterPoint": true,
         "wasteWater": true,
         "wasteWaterDisposal": true,

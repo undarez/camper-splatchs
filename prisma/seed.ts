@@ -98,12 +98,17 @@ async function main() {
         parkingDetails: parking.parkingDetails
           ? {
               create: {
-                isPayant: parking.parkingDetails.isPayant,
-                tarif: parking.parkingDetails.tarif,
-                taxeSejour: parking.parkingDetails.taxeSejour,
-                hasElectricity: parking.parkingDetails
-                  .hasElectricity as ElectricityType,
-                commercesProches: parking.parkingDetails.commercesProches,
+                isPayant: false,
+                tarif: 0,
+                taxeSejour: 0,
+                hasElectricity: "NONE",
+                commercesProches: [
+                  "NOURRITURE",
+                  "CENTRE_VILLE",
+                  "STATION_SERVICE",
+                  "GARAGE",
+                  "BANQUE",
+                ],
                 handicapAccess: parking.parkingDetails.handicapAccess,
                 totalPlaces: parking.parkingDetails.totalPlaces,
                 hasWifi: parking.parkingDetails.hasWifi,
