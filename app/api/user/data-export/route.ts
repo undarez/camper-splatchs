@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/AuthOptions";
 import prisma from "@/lib/prisma";
 import { decryptFromDatabase } from "@/lib/encryption";
 
+// Indiquer que cette route est dynamique
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
