@@ -23,77 +23,57 @@ const handler = NextAuth({
           throw new Error("Identifiants requis");
         }
 
-        const supabase = createRouteHandlerClient({ cookies });
+        try {
+          const supabase = createRouteHandlerClient({ cookies });
 
-        // Vérifier d'abord si l'utilisateur existe dans Prisma
-        const prismaUser = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+          // Vérifier d'abord si l'utilisateur existe dans Prisma
+          const prismaUser = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
 
-        if (!prismaUser) {
-          throw new Error("Compte non trouvé");
+          if (!prismaUser) {
+            throw new Error("Compte non trouvé");
+          }
+
+          // Ensuite vérifier les credentials avec Supabase
+          const {
+            data: { user },
+            error,
+          } = await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          });
+
+          if (error || !user) {
+            console.error("Erreur Supabase:", error);
+            throw new Error("Identifiants invalides");
+          }
+
+          return {
+            id: prismaUser.id,
+            email: prismaUser.email,
+            name: prismaUser.name,
+            role: prismaUser.role,
+          };
+        } catch (error) {
+          console.error("Erreur d'authentification:", error);
+          return null;
         }
-
-        // Ensuite vérifier les credentials avec Supabase
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.signInWithPassword({
-          email: credentials.email,
-          password: credentials.password,
-        });
-
-        if (error || !user) {
-          throw new Error("Identifiants invalides");
-        }
-
-        return {
-          id: prismaUser.id,
-          email: prismaUser.email,
-          name: prismaUser.name,
-          role: prismaUser.role,
-        };
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
-        const supabase = createRouteHandlerClient({ cookies });
-
         try {
-          // Vérifier si l'utilisateur existe déjà dans Prisma
+          // Vérifier/Créer l'utilisateur dans Prisma uniquement
           let prismaUser = await prisma.user.findUnique({
             where: { email: user.email || "" },
           });
 
           if (!prismaUser) {
-            // Créer l'utilisateur dans Supabase
-            const { data: supabaseUser, error: createError } =
-              await supabase.auth.signUp({
-                email: user.email || "",
-                password: Math.random().toString(36).slice(-8),
-                options: {
-                  data: {
-                    name: user.name,
-                    role: "USER",
-                    isActive: true,
-                  },
-                },
-              });
-
-            if (createError || !supabaseUser.user) {
-              console.error(
-                "Erreur lors de la création Supabase:",
-                createError
-              );
-              return false;
-            }
-
-            // Créer l'utilisateur dans Prisma
             prismaUser = await prisma.user.create({
               data: {
-                id: supabaseUser.user.id,
                 email: user.email || "",
                 name: user.name || "",
                 role: "USER",
@@ -103,7 +83,7 @@ const handler = NextAuth({
 
           return true;
         } catch (error) {
-          console.error("Erreur lors de l'authentification Google:", error);
+          console.error("Erreur authentification Google:", error);
           return false;
         }
       }
@@ -123,8 +103,8 @@ const handler = NextAuth({
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/(auth)/signin",
+    error: "/(auth)/error",
   },
 });
 

@@ -6,6 +6,7 @@ import { Toaster } from "./components/ui/toaster";
 import Script from "next/script";
 import { Providers } from "./components/providers";
 import { Metadata } from "next";
+import { Toaster as SonnerToaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -117,6 +118,7 @@ export default function RootLayout({
             <Footer />
           </div>
           <Toaster />
+          <SonnerToaster position="top-right" theme="dark" />
         </Providers>
         <Script
           id="register-sw"

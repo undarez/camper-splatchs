@@ -1,7 +1,7 @@
 export interface Note {
   /** Identifiant unique de la note */
   id: string;
-  /** Email de l'utilisateur (utilisé comme identifiant) */
+  /** Email de l'utilisateur */
   user_id: string;
   /** Date au format YYYY-MM-DD */
   date: string;

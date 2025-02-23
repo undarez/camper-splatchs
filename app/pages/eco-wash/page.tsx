@@ -5,19 +5,26 @@ import { useSession } from "next-auth/react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { EcoCalculator } from "@/app/components/EcoCalculator";
 import { EcoHistory } from "@/app/components/EcoHistory";
-import { WashHistory } from "@/app/types/ecoConsumption";
+import {
+  WashHistory,
+  WashData,
+  ExtendedSession,
+} from "@/app/types/ecoConsumption";
+import { toast } from "sonner";
 
-interface ExtendedUser {
+interface Station {
   id: string;
-  total_eco_points?: number;
-}
-
-interface ExtendedSession {
-  user: ExtendedUser;
+  name: string;
+  address: string;
+  city: string;
+  status: string;
 }
 
 export default function EcoWashPage() {
-  const { data: session } = useSession() as { data: ExtendedSession | null };
+  const { data: session, status } = useSession() as {
+    data: ExtendedSession | null;
+    status: string;
+  };
   const [stations, setStations] = useState<Station[]>([]);
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [washHistory, setWashHistory] = useState<WashHistory[]>([]);
@@ -26,116 +33,110 @@ export default function EcoWashPage() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    // Charger les stations validées
-    const loadStations = async () => {
+    if (status === "loading") return;
+
+    if (!session) {
+      setLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
       setLoading(true);
       setError(null);
-      console.log("Chargement des stations...");
+
       try {
-        const { data: stationsData, error } = await supabase
+        // Charger les stations actives
+        const { data: stationsData, error: stationsError } = await supabase
           .from("stations")
-          .select("*")
-          .eq("status", "ACTIVE")
+          .select("id, name, address, city, status")
+          .eq("status", "active")
           .eq("type", "STATION_LAVAGE");
 
-        if (error) {
-          console.error("Erreur lors du chargement des stations:", error);
-          setError("Erreur lors du chargement des stations");
-          return;
-        }
+        if (stationsError) throw stationsError;
 
-        if (stationsData) {
-          console.log("Stations chargées:", stationsData);
-          setStations(stationsData);
-        } else {
-          console.log("Aucune station trouvée");
-        }
-      } catch (error) {
-        console.error("Erreur lors de la requête:", error);
-        setError("Une erreur inattendue s'est produite");
+        // Charger l'historique des lavages
+        const { data: historyData, error: historyError } = await supabase
+          .from("wash_history")
+          .select(
+            `
+            *,
+            station:stations(name)
+          `
+          )
+          .eq("userId", session.user.id)
+          .order("date", { ascending: false });
+
+        if (historyError) throw historyError;
+
+        setStations(stationsData || []);
+        setWashHistory(historyData || []);
+      } catch (err) {
+        console.error("Erreur lors du chargement des données:", err);
+        setError("Une erreur est survenue lors du chargement des données");
+        toast.error("Erreur de chargement des données");
       } finally {
         setLoading(false);
       }
     };
 
-    // Charger l'historique des lavages
-    const loadWashHistory = async () => {
-      if (!session?.user?.id) return;
+    loadData();
+  }, [session, status, supabase]);
 
-      const { data: historyData, error } = await supabase
-        .from("wash_history")
-        .select(
-          `
-          *,
-          station:stations(name)
-        `
-        )
-        .eq("user_id", session.user.id)
-        .order("date", { ascending: false });
-
-      if (error) {
-        console.error("Erreur lors du chargement de l'historique:", error);
-      }
-
-      if (historyData) {
-        setWashHistory(historyData);
-      }
-    };
-
-    loadStations();
-    loadWashHistory();
-  }, [session?.user?.id, supabase]);
-
-  const handleWashComplete = async (
-    washData: Omit<WashHistory, "id" | "date" | "userId" | "stationId">
-  ) => {
-    if (!session?.user?.id || !selectedStation) return;
+  const handleWashComplete = async (washData: WashData) => {
+    if (!session?.user?.id || !selectedStation) {
+      toast.error("Veuillez vous connecter et sélectionner une station");
+      return;
+    }
 
     try {
-      // Insérer le nouveau lavage
+      const newWashData = {
+        userId: session.user.id,
+        stationId: selectedStation.id,
+        ...washData,
+        date: new Date().toISOString(),
+      };
+
       const { data: newWash, error } = await supabase
         .from("wash_history")
-        .insert([
-          {
-            user_id: session.user.id,
-            station_id: selectedStation.id,
-            ...washData,
-          },
-        ])
-        .select(
-          `
-          *,
-          station:stations(name)
-        `
-        )
+        .insert([newWashData])
+        .select()
         .single();
 
       if (error) throw error;
 
       // Mettre à jour les points de l'utilisateur
-      const newTotalPoints =
-        (session.user.total_eco_points || 0) + washData.ecoPoints;
-      await supabase.auth.updateUser({
-        data: {
-          total_eco_points: newTotalPoints,
-        },
-      });
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({
+          ecoPoints: (session.user.ecoPoints || 0) + washData.ecoPoints,
+        })
+        .eq("id", session.user.id);
 
-      // Mettre à jour l'historique localement avec le nouveau lavage
-      if (newWash) {
-        setWashHistory((prevHistory) => [newWash, ...prevHistory]);
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'enregistrement du lavage:", error);
+      if (updateError) throw updateError;
+
+      setWashHistory((prev) => [newWash, ...prev]);
+      toast.success("Lavage enregistré avec succès !");
+    } catch (err) {
+      console.error("Erreur lors de l'enregistrement:", err);
+      toast.error("Erreur lors de l'enregistrement du lavage");
     }
   };
 
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#1E2337] p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+      </div>
+    );
+  }
+
   if (!session) {
     return (
-      <div className="p-6 bg-[#1E2337] min-h-screen">
+      <div className="min-h-screen bg-[#1E2337] p-6">
         <div className="max-w-md mx-auto bg-[#252b43] p-8 rounded-lg shadow-lg border border-gray-700">
-          <p className="text-gray-300 text-center">
-            Veuillez vous connecter pour accéder à cette fonctionnalité.
+          <h2 className="text-xl font-bold text-white mb-4">Accès restreint</h2>
+          <p className="text-gray-300">
+            Veuillez vous connecter pour accéder au suivi de votre éco-lavage.
           </p>
         </div>
       </div>

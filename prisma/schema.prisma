@@ -59,6 +59,8 @@ model User {
   Station        Station[]
   activities     UserActivity[]
   visits         Visit[]
+  ecoPoints      Int            @default(0)
+  washHistory    WashHistory[]
 }
 
 model Station {
@@ -91,6 +93,7 @@ model Station {
   author           User            @relation("StationAuthor", fields: [authorId], references: [id])
   user             User?           @relation(fields: [userId], references: [id])
   visits           Visit[]
+  WashHistory      WashHistory[]
 }
 
 model ParkingDetails {
@@ -197,6 +200,24 @@ model Note {
 
   @@index([userId])
   @@index([date])
+}
+
+model WashHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  stationId   String
+  date        DateTime @default(now())
+  washType    String
+  vehicleSize String
+  duration    Int
+  waterUsed   Float
+  waterSaved  Float
+  ecoPoints   Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  station     Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stationId])
 }
 
 enum StationStatus {

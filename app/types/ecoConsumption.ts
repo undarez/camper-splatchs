@@ -1,3 +1,5 @@
+import { User, Session } from "./auth";
+
 export interface WashHistory {
   id: string;
   userId: string;
@@ -102,4 +104,21 @@ export interface WashResult {
   savings: number;
   ecoPoints: number;
   tips: string[];
+}
+
+export interface WashData {
+  washType: string;
+  vehicleSize: "small" | "medium" | "large";
+  duration: number;
+  waterUsed: number;
+  waterSaved: number;
+  ecoPoints: number;
+}
+
+export interface ExtendedUser extends User {
+  ecoPoints: number;
+}
+
+export interface ExtendedSession extends Session {
+  user: ExtendedUser;
 }

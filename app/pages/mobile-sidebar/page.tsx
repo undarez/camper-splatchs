@@ -87,13 +87,6 @@ export default function MobileSidebar() {
                   >
                     Profil
                   </Link>
-                  <Link
-                    href="/pages/Calendar"
-                    className="block px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                    onClick={() => setOpen(false)}
-                  >
-                    Mon Calendrier
-                  </Link>
                 </>
               )}
 

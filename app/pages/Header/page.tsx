@@ -169,11 +169,6 @@ const Header = () => {
                         Profil
                       </Link>
                     </MenubarItem>
-                    <MenubarItem className={menuItemClass}>
-                      <Link href="/pages/Calendar" className="w-full">
-                        Mon Calendrier
-                      </Link>
-                    </MenubarItem>
                     {isAdmin && (
                       <>
                         <MenubarSeparator className="my-1" />

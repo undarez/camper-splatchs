@@ -6,17 +6,12 @@ import {
   washTypes,
   vehicleSizes,
   VehicleSize,
+  WashData,
 } from "@/app/types/ecoConsumption";
+import { toast } from "sonner";
 
 interface EcoCalculatorProps {
-  onWashComplete: (washData: {
-    washType: string;
-    vehicleSize: "small" | "medium" | "large";
-    duration: number;
-    waterUsed: number;
-    waterSaved: number;
-    ecoPoints: number;
-  }) => void;
+  onWashComplete: (washData: WashData) => Promise<void>;
 }
 
 export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
@@ -27,6 +22,7 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
     "medium"
   );
   const [duration, setDuration] = useState<number>(10);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   const calculateWaterUsage = () => {
     if (!selectedWashType) return null;
@@ -34,7 +30,7 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
     const sizeFactor =
       vehicleSizes.find((size: VehicleSize) => size.id === vehicleSize)
         ?.factor || 1;
-    const durationFactor = duration / 10; // Base de calcul pour 10 minutes
+    const durationFactor = duration / 10;
 
     const waterUsage = {
       min: Math.round(
@@ -45,13 +41,10 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
       ),
     };
 
-    // Calcul des économies par rapport à un lavage traditionnel
-    const traditionalWashUsage = 200; // Litres pour un lavage traditionnel
+    const traditionalWashUsage = 200;
     const savings =
       traditionalWashUsage - (waterUsage.min + waterUsage.max) / 2;
-
-    // Calcul des points éco
-    const ecoPoints = Math.round(savings / 10); // 1 point pour 10L économisés
+    const ecoPoints = Math.round(savings / 10);
 
     return {
       waterUsage,
@@ -77,134 +70,144 @@ export function EcoCalculator({ onWashComplete }: EcoCalculatorProps) {
     return tips;
   };
 
-  const handleSubmit = () => {
-    if (!selectedWashType) return;
+  const handleSubmit = async () => {
+    if (!selectedWashType) {
+      toast.error("Veuillez sélectionner un type de lavage");
+      return;
+    }
 
-    const results = calculateWaterUsage();
-    if (!results) return;
+    setIsCalculating(true);
+    try {
+      const results = calculateWaterUsage();
+      if (!results) {
+        toast.error("Erreur lors du calcul");
+        return;
+      }
 
-    const averageWaterUsed = Math.round(
-      (results.waterUsage.min + results.waterUsage.max) / 2
-    );
+      const averageWaterUsed = Math.round(
+        (results.waterUsage.min + results.waterUsage.max) / 2
+      );
 
-    onWashComplete({
-      washType: selectedWashType.name,
-      vehicleSize,
-      duration,
-      waterUsed: averageWaterUsed,
-      waterSaved: results.savings,
-      ecoPoints: results.ecoPoints,
-    });
+      await onWashComplete({
+        washType: selectedWashType.name,
+        vehicleSize,
+        duration,
+        waterUsed: averageWaterUsed,
+        waterSaved: results.savings,
+        ecoPoints: results.ecoPoints,
+      });
+
+      // Réinitialiser le formulaire
+      setSelectedWashType(null);
+      setDuration(10);
+      toast.success("Lavage enregistré avec succès !");
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement:", error);
+      toast.error("Une erreur est survenue lors de l'enregistrement");
+    } finally {
+      setIsCalculating(false);
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Type de lavage */}
-      <div className="mb-4">
-        <label htmlFor="washType" className="block text-sm font-medium mb-2">
-          Type de lavage
-        </label>
-        <select
-          id="washType"
-          className="w-full p-2 border rounded"
-          onChange={(e) =>
-            setSelectedWashType(
-              washTypes.find((w: WashType) => w.id === e.target.value) || null
-            )
-          }
-        >
-          <option value="">Sélectionnez un type</option>
-          {washTypes.map((type: WashType) => (
-            <option key={type.id} value={type.id}>
-              {type.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Type de lavage */}
+        <div>
+          <label className="block text-sm font-medium text-gray-200 mb-2">
+            Type de lavage
+          </label>
+          <select
+            className="w-full p-3 bg-[#2A3147] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            onChange={(e) =>
+              setSelectedWashType(
+                washTypes.find((w) => w.id === e.target.value) || null
+              )
+            }
+            value={selectedWashType?.id || ""}
+          >
+            <option value="">Sélectionnez un type</option>
+            {washTypes.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Taille du véhicule */}
-      <div className="mb-4">
-        <label htmlFor="vehicleSize" className="block text-sm font-medium mb-2">
-          Taille du camping-car
-        </label>
-        <select
-          id="vehicleSize"
-          className="w-full p-2 border rounded"
-          onChange={(e) =>
-            setVehicleSize(e.target.value as "small" | "medium" | "large")
-          }
-          value={vehicleSize}
-        >
-          {vehicleSizes.map((size: VehicleSize) => (
-            <option key={size.id} value={size.id}>
-              {size.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        {/* Taille du véhicule */}
+        <div>
+          <label className="block text-sm font-medium text-gray-200 mb-2">
+            Taille du camping-car
+          </label>
+          <select
+            className="w-full p-3 bg-[#2A3147] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            onChange={(e) =>
+              setVehicleSize(e.target.value as "small" | "medium" | "large")
+            }
+            value={vehicleSize}
+          >
+            {vehicleSizes.map((size) => (
+              <option key={size.id} value={size.id}>
+                {size.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Durée estimée */}
-      <div className="mb-6">
-        <label htmlFor="duration" className="block text-sm font-medium mb-2">
-          Durée estimée (minutes)
-        </label>
-        <input
-          id="duration"
-          type="number"
-          min="1"
-          max="30"
-          value={duration}
-          onChange={(e) => setDuration(Number(e.target.value))}
-          className="w-full p-2 border rounded"
-        />
+        {/* Durée */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-200 mb-2">
+            Durée estimée (minutes)
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="30"
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+            className="w-full p-3 bg-[#2A3147] border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+          />
+        </div>
       </div>
 
       {/* Résultats */}
       {calculateWaterUsage() && (
-        <div className="space-y-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="font-semibold mb-2">Estimation de consommation</h3>
-            <div className="space-y-2">
-              <p>
-                Consommation d'eau estimée :
-                <span className="font-semibold">
-                  {calculateWaterUsage()?.waterUsage.min} -{" "}
-                  {calculateWaterUsage()?.waterUsage.max}L
-                </span>
+        <div className="space-y-4 bg-[#2A3147]/50 p-6 rounded-lg border border-gray-700/50">
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Estimation de votre impact
+          </h3>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="bg-[#2A3147] p-4 rounded-lg border border-gray-700/50">
+              <p className="text-sm text-gray-400">Consommation estimée</p>
+              <p className="text-xl font-bold text-cyan-500">
+                {calculateWaterUsage()?.waterUsage.min} -{" "}
+                {calculateWaterUsage()?.waterUsage.max}L
               </p>
-              <p>
-                Économie par rapport à un lavage traditionnel :
-                <span className="font-semibold text-green-600">
-                  {calculateWaterUsage()?.savings}L
-                </span>
+            </div>
+
+            <div className="bg-[#2A3147] p-4 rounded-lg border border-gray-700/50">
+              <p className="text-sm text-gray-400">Eau économisée</p>
+              <p className="text-xl font-bold text-green-500">
+                {calculateWaterUsage()?.savings}L
               </p>
-              <p>
-                Points éco à gagner :
-                <span className="font-semibold text-green-600">
-                  {calculateWaterUsage()?.ecoPoints} points
-                </span>
+            </div>
+
+            <div className="bg-[#2A3147] p-4 rounded-lg border border-gray-700/50">
+              <p className="text-sm text-gray-400">Points éco</p>
+              <p className="text-xl font-bold text-yellow-500">
+                +{calculateWaterUsage()?.ecoPoints} points
               </p>
             </div>
           </div>
 
-          {/* Conseils d'économie d'eau */}
-          {calculateWaterUsage()?.tips.length ? (
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h3 className="font-semibold mb-2">Conseils pour économiser</h3>
-              <ul className="list-disc list-inside space-y-1">
-                {calculateWaterUsage()?.tips.map((tip, index) => (
-                  <li key={index}>{tip}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {/* Bouton de validation */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors"
+            disabled={isCalculating}
+            className="w-full mt-6 bg-gradient-to-r from-cyan-500 to-blue-500 text-white py-3 px-4 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-[#1E2337] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Enregistrer ce lavage
+            {isCalculating ? "Enregistrement..." : "Enregistrer ce lavage"}
           </button>
         </div>
       )}

@@ -5,19 +5,77 @@ import { Button } from "@/app/components/ui/button";
 import { Card } from "@/app/components/ui/card";
 import Image from "next/image";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
-import { Check } from "lucide-react";
+
+interface ImageItem {
+  type: "image";
+  src: string;
+  alt: string;
+  caption: string;
+  className?: string;
+}
+
+interface VideoItem {
+  type: "video";
+  videoId: string;
+  title: string;
+  className?: string;
+}
+
+interface TestimonialItem {
+  type: "testimonial";
+  author: string;
+  role: string;
+  content: string;
+  rating: number;
+}
+
+interface ProductItem {
+  type: "product";
+  name: string;
+  description: string;
+  image?: string;
+  images?: string[];
+  link?: string;
+}
+
+interface StatsItem {
+  type: "stats";
+  items: string[];
+}
+
+interface QuoteItem {
+  type: "quote";
+  text: string;
+}
 
 interface Guide {
-  id: number;
+  id?: number;
   title: string;
   category: string;
   image: string;
   description: string;
   content: {
     subtitle: string;
-    text: string;
-    items?: string[];
+    text?: string;
+    items?: (
+      | string
+      | ImageItem
+      | VideoItem
+      | TestimonialItem
+      | ProductItem
+      | StatsItem
+      | QuoteItem
+    )[];
   }[];
+  link?: string;
+  date?: string;
+  customStyle?: {
+    headerBg: string;
+    accentColor: string;
+    buttonBg: string;
+    cardBg: string;
+    textColor: string;
+  };
 }
 
 const guides: Guide[] = [
@@ -179,6 +237,192 @@ const guides: Guide[] = [
       },
     ],
   },
+  {
+    id: 5,
+    title: "Lavatrans : L'histoire d'une entreprise innovante depuis 1987",
+    description:
+      "Découvrez l'histoire et les services de Lavatrans, leader du lavage poids lourds et camping-cars en France depuis 1987.",
+    image: "/images/article-lavatrans/lavatransicon-article.webp",
+    link: "/guide/lavatrans-histoire",
+    date: "2024-02-05",
+    category: "Entreprise",
+    content: [
+      {
+        subtitle: "Une présence nationale",
+        items: [
+          {
+            type: "video",
+            videoId: "OZJSBn1msx4",
+            title: "Découvrez Lavatrans en vidéo",
+            className: "max-w-3xl mx-auto",
+          },
+          {
+            type: "stats",
+            items: [
+              "Plus de 75 000 lavages par an",
+              "Une cadence rapide : un camion est lavé toutes les 3 minutes",
+              "Une disponibilité exceptionnelle avec 55 heures d'ouverture par semaine",
+            ],
+          },
+          {
+            type: "quote",
+            text: "« Roulez proprement, roulez écologiquement avec Lavatrans ! »",
+          },
+        ],
+        text: "Lavatrans s'est développé à travers la France, comptant aujourd'hui 11 stations de lavage accessibles aussi bien aux poids lourds qu'aux camping-cars.",
+      },
+      {
+        subtitle: "Présentation de Lavatrans",
+        text: "Lavatrans voit le jour en 1987 à Toulouse, grâce à l'initiative de Jean-Marie Collin. L'activité était alors centrée sur un concept novateur : le lavage de poids lourds directement au domicile des entreprises. Depuis avril 2020, Jean-Marie Collin a passé les rênes à son fils Mathieu Collin qui est aujourd'hui le visage de Lavatrans et son Président.",
+        items: [
+          {
+            type: "image",
+            src: "/images/article-lavatrans/jeanmarie.jpeg",
+            alt: "Jean-Marie Collin - Fondateur de Lavatrans",
+            caption: "Jean-Marie Collin, fondateur visionnaire de Lavatrans",
+            className: "inline-block w-1/2",
+          },
+          {
+            type: "image",
+            src: "/images/article-lavatrans/mathieu-Collin.png",
+            alt: "Mathieu Collin - Président de Lavatrans",
+            caption: "Mathieu Collin, Président actuel de Lavatrans",
+            className: "inline-block w-1/2",
+          },
+        ],
+      },
+      {
+        subtitle:
+          "Matthieu Collin : Un acteur clé du développement de Lavatrans",
+        text: "Fils de Jean-Marie Collin, fondateur de Lavatrans, Matthieu Collin a su s'imposer comme un élément essentiel dans l'évolution et l'expansion de l'entreprise familiale. Passionné par le secteur du transport et du lavage industriel, il a grandi au sein de l'entreprise et en a rapidement assimilé les enjeux stratégiques.\n\nÀ partir de 2003, Matthieu Collin prend un rôle actif dans le développement de Lavatrans, notamment en dirigeant l'expansion du réseau de franchises. Son engagement et sa vision ont permis à l'entreprise de renforcer sa position de leader dans le domaine du lavage de poids lourds en France. Grâce à son expertise, Lavatrans a su moderniser ses équipements et élargir son offre de services, répondant ainsi aux besoins croissants du secteur du transport routier.\n\nSous sa direction, l'entreprise a également mis un accent particulier sur l'innovation et l'optimisation des procédés de lavage, intégrant des solutions toujours plus performantes et respectueuses de l'environnement. Matthieu Collin incarne ainsi une nouvelle génération de dirigeants, alliant savoir-faire familial et modernité pour assurer la pérennité et la croissance de Lavatrans.\n\nGrâce à sa vision stratégique et à son sens du développement, Matthieu Collin continue d'inscrire Lavatrans dans une dynamique de succès, faisant de l'entreprise une référence incontournable du secteur.",
+      },
+      {
+        subtitle: "Premières étapes-clés",
+        text: "Deux ans plus tard, en 1989, Lavatrans inaugure sa première station de lavage dédiée aux poids lourds, située stratégiquement sur le centre routier de Toulouse. L'innovation continue avec l'introduction, en 1990, du forfait lavage à volonté, une révolution dans le secteur.",
+        items: [
+          "Le forfait lavage à volonté : pour un accès illimité aux stations",
+          "Le forfait pack : à prix fixe et forfaitaire, permettant aux camions d'être lavés dans tous les centres Lavatrans",
+        ],
+      },
+      {
+        subtitle: "Des produits de qualité au service du lavage professionnel",
+        text: "Forte de son expérience au contact des professionnels du transport depuis 1987, Lavatrans met également à votre disposition l'essentiel de ses produits et accessoires de lavage poids-lourds au sein de sa boutique en ligne, pour le plus grand plaisir des professionnels et particuliers ! On retrouve ainsi la célèbre marque Vikan, à la pointe de la technologie dans le secteur du matériel de nettoyage, ou encore les bidons, fûts et sprays de lavage de la marque Lavatrans (LAVPL, LAVALU, NETDRIVE, NETLAV…)\n\nDécouvrez la gamme de certains produits professionnels pour le lavage de vos véhicules :",
+        items: [
+          {
+            type: "product",
+            name: "NETLAV",
+            description:
+              "Notre gamme complète de produits de lavage professionnels",
+            images: [
+              "/images/article-lavatrans/netlav-jante.jpg",
+              "/images/article-lavatrans/netlav-plastique.jpg",
+              "/images/article-lavatrans/netlav-tissu.jpg",
+              "/images/article-lavatrans/netlavcuir.jpg",
+              "/images/article-lavatrans/netlavinsect.jpg",
+              "/images/article-lavatrans/netlavlustran.jpg",
+              "/images/article-lavatrans/netlavvitre.jpg",
+            ],
+            link: "https://boutique.lavatrans.com/recherche.php?search=netlav",
+          },
+          {
+            type: "product",
+            name: "Shampooing Carrosserie",
+            description:
+              "Shampooing haute performance pour un nettoyage en profondeur.<br/>Disponible en formats : <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 5L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 20L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 200L</span>",
+            image: "/images/article-lavatrans/netdrive5l.jpg",
+            link: "https://boutique.lavatrans.com/produit/netdrive-shampoing-carrosserie-tous-vehicules-bidon-5l.php",
+          },
+          {
+            type: "product",
+            name: "Dégraissant Jantes",
+            description:
+              "Solution puissante pour des jantes impeccables.<br/>Disponible en formats : <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 5L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 20L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 200L</span>",
+            image: "/images/article-lavatrans/lavalu.jpg",
+            link: "hhttps://boutique.lavatrans.com/produit/lavalu-nettoyant-et-renovateur-alu-bidon-5l.php",
+          },
+          {
+            type: "product",
+            name: "Polish Protection",
+            description:
+              "Protection longue durée pour une brillance exceptionnelle.<br/>Disponible en formats : <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 5L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 20L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 200L</span>",
+            image: "/images/article-lavatrans/lavpl.jpg",
+            link: "https://boutique.lavatrans.com/produit/lavpl-shampoing-carrosserie-poids-lourds-bidon-5l.php",
+          },
+        ],
+      },
+      {
+        subtitle: "Nos packs de nettoyage professionnels",
+        text: "Découvrez notre sélection de packs complets pour l'entretien de votre véhicule :",
+        items: [
+          {
+            type: "product",
+            name: "Pack Complet Camping-Car",
+            description:
+              "Le Pack Camping-Car est idéal pour nettoyer en profondeur son véhicule. Le pack est composé d'un shampoing carrosserie dégraissant, d'une brosse articulée pour la carrosserie, une raclette pour le parebrise et d'un manche adaptable.",
+            image: "/images/article-lavatrans/pack-complet-camping-car.png",
+            link: "https://boutique.lavatrans.com/produit/pack-complet-camping-car.php",
+          },
+          {
+            type: "product",
+            name: "Pack STARTER",
+            description:
+              "Le pack STARTER est idéal pour nettoyer votre voiture, votre utilitaire ou votre camping-car à l'extérieur (carrosserie, vitres, jantes) et à l'intérieur. Les différents produits qui sont proposés vous permettront de réaliser un lavage complet de votre véhicule à un prix préférentiel.",
+            image: "/images/article-lavatrans/pack-starter.png",
+            link: "https://boutique.lavatrans.com/produit/pack-starter.php",
+          },
+        ],
+      },
+      {
+        subtitle: "Boutique en ligne",
+        text: "Retrouvez l'ensemble de nos produits et accessoires de lavage professionnel sur notre boutique en ligne : https://boutique.lavatrans.com/",
+      },
+      {
+        subtitle: "Témoignages de nos clients",
+        text: "Découvrez ce que nos clients disent de nos services",
+        items: [
+          {
+            type: "testimonial",
+            author: "Utilisateur satisfait",
+            role: "Transporteur routier",
+            content:
+              "Les stations de lavage Lavatrans sont modernes et efficaces. Je suis impressionné par la rapidité du service et la qualité du nettoyage de mon camion.",
+            rating: 5,
+          },
+          {
+            type: "testimonial",
+            author: "Client régulier",
+            role: "Entreprise de transport",
+            content:
+              "J'apprécie particulièrement la disponibilité et le professionnalisme des équipes Lavatrans.",
+            rating: 5,
+          },
+          {
+            type: "testimonial",
+            author: "Propriétaire de camping-car",
+            role: "Particulier",
+            content:
+              "Lavatrans se distingue non seulement par la qualité de ses prestations, mais aussi par son engagement pour l'environnement.",
+            rating: 5,
+          },
+          {
+            type: "testimonial",
+            author: "Transporteur professionnel",
+            role: "Société de logistique",
+            content:
+              "De l'entretien à domicile aux stations de lavage, en passant par la boutique en ligne, Lavatrans propose une solution globale et professionnelle.",
+            rating: 5,
+          },
+        ],
+      },
+    ],
+    customStyle: {
+      headerBg: "bg-gradient-to-r from-[#00A0E3] to-[#0080B3]",
+      accentColor: "#FFD700",
+      buttonBg: "bg-[#00A0E3] hover:bg-[#0080B3]",
+      cardBg: "bg-white",
+      textColor: "text-[#333333]",
+    },
+  },
 ];
 
 export default function GuideClient() {
@@ -203,15 +447,31 @@ export default function GuideClient() {
         </h1>
 
         {selectedGuide ? (
-          <div className="bg-[#1a1f37] rounded-lg p-4 sm:p-8">
+          <div
+            className={`rounded-lg p-4 sm:p-8 ${
+              selectedGuide.customStyle
+                ? selectedGuide.customStyle.cardBg
+                : "bg-[#1a1f37]"
+            }`}
+          >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              <h2
+                className={`text-2xl sm:text-3xl font-bold ${
+                  selectedGuide.customStyle
+                    ? selectedGuide.customStyle.textColor
+                    : "text-white"
+                }`}
+              >
                 {selectedGuide.title}
               </h2>
               <Button
                 onClick={() => setSelectedGuide(null)}
                 variant="outline"
-                className="border-gray-700 text-gray-400 hover:text-white w-full sm:w-auto"
+                className={`${
+                  selectedGuide.customStyle
+                    ? selectedGuide.customStyle.buttonBg + " text-white"
+                    : "border-gray-700 text-gray-400 hover:text-white"
+                } w-full sm:w-auto`}
               >
                 Retour aux guides
               </Button>
@@ -239,26 +499,309 @@ export default function GuideClient() {
               </div>
             )}
 
-            <div className="prose prose-invert max-w-none">
+            <div
+              className={`prose max-w-none ${
+                selectedGuide.customStyle ? "" : "prose-invert"
+              }`}
+            >
               {selectedGuide.content.map((section, index) => (
                 <div key={index} className="mb-8">
-                  <h3 className="text-xl font-semibold text-cyan-400 mb-4">
+                  <h3
+                    className={`text-xl font-semibold mb-4 ${
+                      selectedGuide.customStyle
+                        ? `text-[${selectedGuide.customStyle.accentColor}]`
+                        : "text-cyan-400"
+                    }`}
+                  >
                     {section.subtitle}
                   </h3>
-                  <p className="text-gray-300 mb-4 whitespace-pre-line">
-                    {section.text}
-                  </p>
+                  {section.text && (
+                    <p
+                      className={`mb-4 whitespace-pre-line ${
+                        selectedGuide.customStyle
+                          ? selectedGuide.customStyle.textColor
+                          : "text-gray-300"
+                      }`}
+                    >
+                      {section.text}
+                    </p>
+                  )}
                   {section.items && (
-                    <ul className="space-y-2">
-                      {section.items.map((item, itemIndex) => (
-                        <li
-                          key={itemIndex}
-                          className="flex items-start gap-3 text-gray-300"
-                        >
-                          <Check className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
+                    <ul className="space-y-4">
+                      {section.items.some(
+                        (item): item is ImageItem =>
+                          typeof item === "object" && item.type === "image"
+                      ) ? (
+                        <div className="flex justify-center items-center gap-16">
+                          {section.items.map((item, itemIndex) => {
+                            if (
+                              typeof item === "object" &&
+                              item.type === "image"
+                            ) {
+                              return (
+                                <div
+                                  key={itemIndex}
+                                  className="w-1/2 flex flex-col items-center"
+                                >
+                                  <div className="relative w-64 h-64 rounded-full overflow-hidden">
+                                    <Image
+                                      src={item.src}
+                                      alt={item.alt}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                  <p
+                                    className={`text-center italic mt-4 ${
+                                      selectedGuide.customStyle
+                                        ? selectedGuide.customStyle.textColor
+                                        : "text-gray-300"
+                                    }`}
+                                  >
+                                    {item.caption}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {section.items.map((item, itemIndex) => {
+                            if (typeof item === "string") {
+                              return (
+                                <li
+                                  key={itemIndex}
+                                  className={`flex items-start gap-3 ${
+                                    selectedGuide.customStyle
+                                      ? selectedGuide.customStyle.textColor
+                                      : "text-gray-300"
+                                  }`}
+                                >
+                                  <div
+                                    className={`w-2 h-2 mt-2 rounded-full ${
+                                      selectedGuide.customStyle
+                                        ? `bg-[${selectedGuide.customStyle.accentColor}]`
+                                        : "bg-cyan-400"
+                                    }`}
+                                  />
+                                  <span>{item}</span>
+                                </li>
+                              );
+                            } else if (item.type === "video") {
+                              return (
+                                <li
+                                  key={itemIndex}
+                                  className="flex flex-col items-center my-8 mx-auto w-1/2"
+                                >
+                                  <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg">
+                                    <iframe
+                                      src={`https://www.youtube.com/embed/${item.videoId}`}
+                                      title={item.title}
+                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                      allowFullScreen
+                                      className="absolute top-0 left-0 w-full h-full text-black"
+                                    />
+                                  </div>
+                                  <h4 className="text-lg font-semibold mt-4 text-center text-black">
+                                    {item.title}
+                                  </h4>
+                                </li>
+                              );
+                            } else if (item.type === "testimonial") {
+                              return (
+                                <li key={itemIndex} className="w-full ">
+                                  <div
+                                    className={`p-6 rounded-xl shadow-lg  ${
+                                      selectedGuide.customStyle
+                                        ? "bg-white/5 backdrop-blur-sm"
+                                        : "bg-gray-800/50"
+                                    } transition-all duration-300 hover:transform hover:scale-[1.02]`}
+                                  >
+                                    <div className="flex items-start gap-4">
+                                      <div className="flex-shrink-0">
+                                        <div
+                                          className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                                            selectedGuide.customStyle
+                                              ?.buttonBg || "bg-blue-600"
+                                          }`}
+                                        >
+                                          <span className="text-xl font-bold text-white">
+                                            {item.author.charAt(0)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="flex-grow">
+                                        <div className="flex items-center justify-between mb-2">
+                                          <div>
+                                            <h4
+                                              className={`font-semibold ${
+                                                selectedGuide.customStyle
+                                                  ?.textColor || "text-black"
+                                              }`}
+                                            >
+                                              {item.author}
+                                            </h4>
+                                            <p className="text-sm text-black">
+                                              {item.role}
+                                            </p>
+                                          </div>
+
+                                          <div className="flex gap-1">
+                                            {[...Array(item.rating)].map(
+                                              (_, i) => (
+                                                <svg
+                                                  key={i}
+                                                  className={`w-5 h-5 ${
+                                                    selectedGuide.customStyle
+                                                      ? "text-[#FFD700]"
+                                                      : "text-yellow-400"
+                                                  }`}
+                                                  fill="currentColor"
+                                                  viewBox="0 0 20 20"
+                                                >
+                                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                              )
+                                            )}
+                                          </div>
+                                        </div>
+                                        <p
+                                          className={`text-base ${
+                                            selectedGuide.customStyle
+                                              ?.textColor || "text-gray-300"
+                                          }`}
+                                        >
+                                          "{item.content}"
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              );
+                            } else if (item.type === "stats") {
+                              return (
+                                <li key={itemIndex} className="mb-6">
+                                  <ul className="space-y-2">
+                                    {item.items.map((stat, statIndex) => (
+                                      <li
+                                        key={statIndex}
+                                        className={`flex items-start gap-3 ${
+                                          selectedGuide.customStyle
+                                            ? selectedGuide.customStyle
+                                                .textColor
+                                            : "text-gray-300"
+                                        }`}
+                                      >
+                                        <div
+                                          className={`w-2 h-2 mt-2 rounded-full ${
+                                            selectedGuide.customStyle
+                                              ? `bg-[${selectedGuide.customStyle.accentColor}]`
+                                              : "bg-cyan-400"
+                                          }`}
+                                        />
+                                        <span>{stat}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </li>
+                              );
+                            } else if (item.type === "product") {
+                              if (item.images) {
+                                return (
+                                  <li key={itemIndex} className="w-full mt-8">
+                                    <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6">
+                                      <h4 className="text-xl font-semibold mb-4 text-black">
+                                        {item.name}
+                                      </h4>
+                                      <p className="text-sm text-gray-400 mb-4">
+                                        {item.description}
+                                      </p>
+                                      <div className="grid grid-cols-7 gap-2">
+                                        {item.images.map((img, imgIndex) => (
+                                          <div
+                                            key={imgIndex}
+                                            className="relative aspect-square rounded-lg overflow-hidden"
+                                          >
+                                            <Image
+                                              src={img}
+                                              alt={`${item.name} ${
+                                                imgIndex + 1
+                                              }`}
+                                              fill
+                                              className="object-cover hover:scale-105 transition-transform duration-300"
+                                            />
+                                          </div>
+                                        ))}
+                                      </div>
+                                      {item.link && (
+                                        <div className="mt-6 flex justify-center">
+                                          <a
+                                            href={item.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                          >
+                                            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                                              Découvrir toute la gamme
+                                            </Button>
+                                          </a>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </li>
+                                );
+                              } else {
+                                return (
+                                  <li key={itemIndex} className="w-full">
+                                    <a
+                                      href={item.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="block"
+                                    >
+                                      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                                        <div className="flex items-center gap-4">
+                                          <div className="relative w-32 h-32 rounded-lg overflow-hidden">
+                                            <Image
+                                              src={item.image!}
+                                              alt={item.name}
+                                              fill
+                                              className="object-cover"
+                                            />
+                                          </div>
+                                          <div>
+                                            <h4 className="text-xl font-semibold mb-2 text-black">
+                                              {item.name}
+                                            </h4>
+                                            <p
+                                              className="text-sm text-gray-400"
+                                              dangerouslySetInnerHTML={{
+                                                __html: item.description,
+                                              }}
+                                            />
+                                            <Button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white">
+                                              Voir sur la boutique
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </a>
+                                  </li>
+                                );
+                              }
+                            } else if (item.type === "quote") {
+                              return (
+                                <li key={itemIndex} className="my-6">
+                                  <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-700">
+                                    {item.text}
+                                  </blockquote>
+                                </li>
+                              );
+                            }
+                          })}
+                        </div>
+                      )}
                     </ul>
                   )}
                 </div>
@@ -286,6 +829,24 @@ export default function GuideClient() {
                 </Button>
               </div>
             )}
+
+            {selectedGuide.id === 5 && (
+              <div className="mt-8 border-t border-gray-200 pt-8">
+                <div className="flex justify-center">
+                  <a
+                    href="https://boutique.lavatrans.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center px-6 py-3 rounded-lg ${
+                      selectedGuide.customStyle?.buttonBg ||
+                      "bg-blue-600 hover:bg-blue-700"
+                    } text-white font-medium transition-colors`}
+                  >
+                    Visitez la boutique Lavatrans
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -294,7 +855,7 @@ export default function GuideClient() {
                 key={guide.id}
                 className="bg-[#1E2337] border border-gray-700/50 overflow-hidden hover:border-cyan-500/50 transition-all duration-300"
               >
-                <div className="relative h-52">
+                <div className="relative h-80">
                   <Image
                     src={guide.image}
                     alt={guide.title}
