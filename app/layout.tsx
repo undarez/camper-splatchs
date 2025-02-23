@@ -83,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" className={inter.className} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link
@@ -110,7 +110,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
       </head>
-      <body className={inter.className}>
+      <body>
         <Providers>
           <div className="flex flex-col min-h-screen">
             <Header />
