@@ -111,6 +111,8 @@ model ParkingDetails {
   wasteWater         Boolean         @default(false)
   wasteWaterDisposal Boolean         @default(false)
   blackWaterDisposal Boolean         @default(false)
+  hasCctv            Boolean         @default(false)
+  hasBarrier         Boolean         @default(false)
   createdAt          DateTime        @default(now())
   stationId          String          @unique
   station            Station         @relation(fields: [stationId], references: [id], onDelete: Cascade)

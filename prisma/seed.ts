@@ -95,31 +95,26 @@ async function main() {
         author: {
           connect: { id: admin.id },
         },
-        parkingDetails: parking.parkingDetails
-          ? {
-              create: {
-                isPayant: false,
-                tarif: 0,
-                taxeSejour: 0,
-                hasElectricity: "NONE",
-                commercesProches: [
-                  "NOURRITURE",
-                  "CENTRE_VILLE",
-                  "STATION_SERVICE",
-                  "GARAGE",
-                  "BANQUE",
-                ],
-                handicapAccess: parking.parkingDetails.handicapAccess,
-                totalPlaces: parking.parkingDetails.totalPlaces,
-                hasWifi: parking.parkingDetails.hasWifi,
-                hasChargingPoint: parking.parkingDetails.hasChargingPoint,
-                waterPoint: parking.parkingDetails.waterPoint,
-                wasteWater: parking.parkingDetails.wasteWater,
-                wasteWaterDisposal: parking.parkingDetails.wasteWaterDisposal,
-                blackWaterDisposal: parking.parkingDetails.blackWaterDisposal,
-              },
-            }
-          : undefined,
+        parkingDetails: {
+          create: {
+            isPayant: parking.parkingDetails.isPayant,
+            tarif: parking.parkingDetails.tarif,
+            taxeSejour: parking.parkingDetails.taxeSejour,
+            hasElectricity: parking.parkingDetails
+              .hasElectricity as ElectricityType,
+            commercesProches: parking.parkingDetails.commercesProches,
+            handicapAccess: parking.parkingDetails.handicapAccess,
+            totalPlaces: parking.parkingDetails.totalPlaces,
+            hasWifi: parking.parkingDetails.hasWifi,
+            hasChargingPoint: parking.parkingDetails.hasChargingPoint,
+            waterPoint: parking.parkingDetails.waterPoint,
+            wasteWater: parking.parkingDetails.wasteWater,
+            wasteWaterDisposal: parking.parkingDetails.wasteWaterDisposal,
+            blackWaterDisposal: parking.parkingDetails.blackWaterDisposal,
+            hasCctv: parking.parkingDetails.hasCctv,
+            hasBarrier: parking.parkingDetails.hasBarrier,
+          },
+        },
       },
     });
     console.log("Parking créé:", createdParking.name);
