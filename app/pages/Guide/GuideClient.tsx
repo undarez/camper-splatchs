@@ -338,7 +338,7 @@ const guides: Guide[] = [
             description:
               "Solution puissante pour des jantes impeccables.<br/>Disponible en formats : <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 5L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 20L</span> <span class='text-blue-500 font-bold bg-blue-100 px-2 py-1 rounded-md'>✨ 200L</span>",
             image: "/images/article-lavatrans/lavalu.jpg",
-            link: "hhttps://boutique.lavatrans.com/produit/lavalu-nettoyant-et-renovateur-alu-bidon-5l.php",
+            link: "https://boutique.lavatrans.com/produit/lavalu-nettoyant-et-renovateur-alu-bidon-5l.php",
           },
           {
             type: "product",
@@ -532,7 +532,7 @@ export default function GuideClient() {
                         (item): item is ImageItem =>
                           typeof item === "object" && item.type === "image"
                       ) ? (
-                        <div className="flex justify-center items-center gap-16">
+                        <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
                           {section.items.map((item, itemIndex) => {
                             if (
                               typeof item === "object" &&

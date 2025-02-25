@@ -493,13 +493,7 @@
         "tarif": 0.0,
         "taxeSejour": 0.0,
         "hasElectricity": "NONE",
-        "commercesProches": [
-          "NOURRITURE",
-          "CENTRE_VILLE",
-          "STATION_SERVICE",
-          "GARAGE",
-          "BANQUE"
-        ],
+        "commercesProches": ["NOURRITURE", "STATION_SERVICE"],
         "handicapAccess": true,
         "totalPlaces": 25,
         "hasWifi": false,
