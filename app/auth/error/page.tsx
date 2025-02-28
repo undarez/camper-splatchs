@@ -7,7 +7,7 @@ import { Suspense } from "react";
 
 function ErrorContent() {
   const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+  const error = searchParams?.get("error");
 
   const getErrorMessage = () => {
     switch (error) {

@@ -8,7 +8,7 @@ import Link from "next/link";
 function VerifyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get("token");
+  const token = searchParams?.get("token");
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );

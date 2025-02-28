@@ -460,25 +460,35 @@ export default function LocalisationStation2() {
     return <AuthDialog />;
   }
 
-  const getMarkerIcon = (status: StationStatus, type: StationType): Icon => {
+  const getMarkerIcon = (
+    status: StationStatus,
+    type: StationType,
+    station: StationWithOptionalFields
+  ): Icon => {
     let iconUrl = "/images/logo.png";
 
     if (type === StationType.PARKING) {
       iconUrl = "/images/logo.png";
+    } else if (station.isLavaTrans) {
+      iconUrl = "/images/article-lavatrans/lavatransicon-article.webp";
+    } else if (station.isDelisle) {
+      iconUrl = "/images/delisle/logo-delisle.png";
     } else if (type === StationType.STATION_LAVAGE) {
-      iconUrl = "/images/lavatranssplas.png";
+      iconUrl = "/images/logo.png";
     }
 
     return new Icon({
       iconUrl,
       iconRetinaUrl: iconUrl,
       shadowUrl: "/images/marker-shadow.png",
-      iconSize: [25, 25],
-      iconAnchor: [12, 25],
-      popupAnchor: [0, -25],
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40],
       shadowSize: [41, 41],
       className: `station-marker ${status} ${
-        type === StationType.PARKING ? "parking" : "station-lavage"
+        type === StationType.PARKING
+          ? "parking-marker"
+          : "station-marker-normal"
       }`,
     });
   };
@@ -843,95 +853,97 @@ export default function LocalisationStation2() {
 
   return (
     <div className="min-h-screen bg-[#1E2337]">
-      <style>
-        {`
-          ${searchBarStyles}
-          
-          .user-location-marker {
-            animation: pulse 2s infinite;
-          }
-          
-          @keyframes pulse {
-            0% {
-              transform: scale(0.95);
-              box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            }
-            70% {
-              transform: scale(1);
-              box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-            }
-            100% {
-              transform: scale(0.95);
-              box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
-          }
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        ${searchBarStyles}
 
-          .map-blur-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            backdrop-filter: blur(5px);
-            background: rgba(30, 35, 55, 0.85);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            text-align: center;
-            color: white;
-          }
+        .user-location-marker {
+          animation: pulse 2s infinite;
+        }
 
-          /* Ajout du style pour le curseur */
-          .leaflet-container {
-            cursor: grab;
+        @keyframes pulse {
+          0% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
           }
-          .leaflet-container:active {
-            cursor: grabbing;
+          70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
           }
-          .leaflet-dragging .leaflet-container {
-            cursor: grabbing;
+          100% {
+            transform: scale(0.95);
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
           }
-          .leaflet-control-zoom {
-            cursor: pointer;
-          }
+        }
 
-          .station-marker {
-            filter: drop-shadow(0 0 4px var(--glow-color));
-            transition: all 0.3s ease;
-          }
-          .station-marker img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-          }
-          .station-marker.active {
-            --glow-color: #10B981;
-            filter: drop-shadow(0 0 8px var(--glow-color));
-          }
-          .station-marker.en_attente {
-            --glow-color: #F59E0B;
-            filter: drop-shadow(0 0 8px var(--glow-color));
-          }
-          .station-marker.inactive {
-            --glow-color: #EF4444;
-            filter: drop-shadow(0 0 8px var(--glow-color));
-            opacity: 0.7;
-          }
-          .station-marker.parking {
-            --glow-color: #8B00FF;
-          }
-          .station-marker.station-lavage {
-            --glow-color: #40E0D0;
-          }
-          .station-marker:hover {
-            transform: scale(1.1);
-            z-index: 1000 !important;
-          }
-        `}
-      </style>
+        .map-blur-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          backdrop-filter: blur(5px);
+          background: rgba(30, 35, 55, 0.85);
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          text-align: center;
+          color: white;
+        }
+
+        /* Ajout du style pour le curseur */
+        .leaflet-container {
+          cursor: grab;
+        }
+        .leaflet-container:active {
+          cursor: grabbing;
+        }
+        .leaflet-dragging .leaflet-container {
+          cursor: grabbing;
+        }
+        .leaflet-control-zoom {
+          cursor: pointer;
+        }
+
+        .station-marker {
+          transition: all 0.2s ease;
+          z-index: 400;
+        }
+        .station-marker img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+        .station-marker.active {
+          opacity: 1;
+        }
+        .station-marker.en_attente {
+          opacity: 0.9;
+        }
+        .station-marker.inactive {
+          opacity: 0.7;
+        }
+        .station-marker:hover {
+          transform: scale(1.1);
+          z-index: 1000 !important;
+        }
+        
+        /* Styles spécifiques pour les marqueurs de parking */
+        .parking-marker {
+          filter: drop-shadow(0 0 4px #8B00FF);
+        }
+        
+        /* Styles spécifiques pour les marqueurs de station */
+        .station-marker-normal {
+          filter: drop-shadow(0 0 4px #40E0D0);
+        }
+      `,
+        }}
+      />
 
       {/* Barre de navigation sous le header */}
       <div className="fixed top-20 left-0 right-0 bg-[#252B43] border-b border-gray-700/50 p-4 z-[1002]">
@@ -1039,9 +1051,9 @@ export default function LocalisationStation2() {
                 {/* Types de stations */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                    <div className="w-12 h-12 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
                       <Image
-                        src="/images/lavatranssplas.png"
+                        src="/images/article-lavatrans/lavatransicon-article.webp"
                         alt="Station LavaTrans"
                         width={35}
                         height={35}
@@ -1053,26 +1065,40 @@ export default function LocalisationStation2() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                    <div className="w-12 h-12 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
                       <Image
-                        src="/images/logo.png"
-                        alt="Station de lavage standard"
-                        width={35}
-                        height={35}
+                        src="/images/delisle/logo-delisle.png"
+                        alt="Station Delisle"
+                        width={45}
+                        height={45}
                         className="filter drop-shadow-[0_0_4px_#40E0D0]"
                       />
                     </div>
                     <span className="text-gray-300 text-sm">
-                      Station de lavage standard
+                      Station Delisle
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 flex items-center justify-center bg-[#8B00FF]/20 rounded-lg">
+                    <div className="w-12 h-12 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Station de lavage"
+                        width={30}
+                        height={30}
+                        className="object-contain"
+                      />
+                    </div>
+                    <span className="text-gray-300 text-sm">
+                      Station de lavage
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 h-12 flex items-center justify-center bg-[#8B00FF]/20 rounded-lg">
                       <Image
                         src="/images/logo.png"
                         alt="Parking"
-                        width={35}
-                        height={35}
+                        width={45}
+                        height={45}
                         className="filter drop-shadow-[0_0_4px_#8B00FF]"
                       />
                     </div>

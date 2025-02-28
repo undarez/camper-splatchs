@@ -87,6 +87,7 @@ model Station {
   hasParking       Boolean         @default(false)
   userId           String?
   isLavaTrans      Boolean         @default(false)
+  isDelisle        Boolean         @default(false)
   parkingDetails   ParkingDetails?
   reviews          Review[]        @relation("StationReviews")
   services         Service?

@@ -48,6 +48,7 @@ async function main() {
         phoneNumber: station.phoneNumber,
         description: station.description,
         isLavaTrans: station.isLavaTrans,
+        isDelisle: station.isDelisle || false,
         author: {
           connect: { id: admin.id },
         },
@@ -92,6 +93,7 @@ async function main() {
         phoneNumber: parking.phoneNumber,
         description: parking.description,
         isLavaTrans: parking.isLavaTrans,
+        isDelisle: parking.isDelisle || false,
         author: {
           connect: { id: admin.id },
         },

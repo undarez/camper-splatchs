@@ -387,28 +387,80 @@
         "electricity": "Aucun",
         "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
       }
+    },
+    {
+      "id": "station_14",
+      "name": "Delisle Bordeaux",
+      "address": "15 Avenue des Pins",
+      "city": "Bordeaux",
+      "postalCode": "33000",
+      "latitude": 44.8378,
+      "longitude": -0.5792,
+      "images": ["/images/delisle/logo-delisle.png"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "05 56 78 90 12",
+      "description": "Station Delisle de Bordeaux, spécialisée dans le lavage de camping-cars et poids lourds. Ouvert tous les jours de 7h à 21h.",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "electricity": "AMP_15",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"]
+      }
+    },
+    {
+      "id": "station_15",
+      "name": "Delisle Lyon",
+      "address": "42 Rue de la République",
+      "city": "Lyon",
+      "postalCode": "69002",
+      "latitude": 45.7578,
+      "longitude": 4.832,
+      "images": ["/images/delisle/logo-delisle.png"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "04 72 56 78 90",
+      "description": "Station Delisle de Lyon, équipée des dernières technologies pour le lavage de vos véhicules. Ouvert 7j/7 de 6h à 22h.",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "electricity": "AMP_8",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+      }
     }
   ],
   "parkings": [
     {
       "id": "parking_01",
-      "name": "Camping-car ciry-salsogne",
-      "address": "7 Route de Conde 02220 Ciry Salsogne",
-      "city": "Ciry Salsogne",
-      "postalCode": "02220",
-      "latitude": 49.382359,
-      "longitude": 3.475306,
-
-      "images": [
-        "/images/parkings/ciry-11.png",
-        "/images/parkings/ciry-12.png",
-        "/images/parkings/ciry-13.png"
-      ],
+      "name": "Aire de Camping-Car de Dunkerque",
+      "address": "Rue des Mariniers",
+      "city": "Dunkerque",
+      "postalCode": "59140",
+      "latitude": 51.0343,
+      "longitude": 2.3767,
+      "images": ["/images/parkings/dunkerque.jpg"],
       "status": "active",
       "type": "PARKING",
-      "phoneNumber": "0467123456",
-      "description": "Au bord des étangs Aire verdoyante Emplacements au calme  Nichée dans la vallée de la Vesle, faites une halte dans la ville de Ciry-Salsogne ! Avec ses nombreux étangs, la ville vous offre un cadre bucolique pour des escapades reposantes ! Ouvert à la pêche, le domaine des trois étangs permet la pêche de plusieurs espèces au coeur d'un espace naturel remarquable ! Accessible aux petits comme aux plus grands ! Et dans son église Saint Martin, la maquette du Christ rédempteur de Rio de Janeiro de 2,33 mètres. Elle a été donnée à l'Eglise Saint-Martin par le sculpteur Paul Landowski car il était ami avec l'architecte Edouard Monestès qui a reconstruit l'église entre 1924 et 1926. Idéalement située, Ciry-Salsogne vous permettra de facilement visiter la Ville de Soissons et sa cathédrale, mais également de relier deux régions historiques que sont la Picardie et la Champagne ! En effet, à 45 km de Compiègne et de Reims, partez découvrir ces régions riches ! Compiègne et son château vous attendent pour des balades chargées d'histoire ! Pour cause, ce ne sont pas moins de 30 bâtiments qui sont inscrits ou classés en tant que Monument Historique au sein de la ville ayant vu séjourner de nombreuses figures de l'Histoire française. Et vous trouverez également la cité de la langue française à Villers-Cotterêts Une escapade dans l'Aisne, c'est aussi la possibilité de s'intéresser aux théâtres de la Première Guerre Mondiale. Le Chemin des Dames, situé à 20 km de l'aire, en est le parfait exemple avec de nombreux hommages aux soldats de la Grande Guerre tout le long de la route.",
+      "phoneNumber": "03 28 66 79 21",
+      "description": "Aire de camping-car située au cœur de Dunkerque, à proximité du port et du centre-ville.",
       "isLavaTrans": false,
+      "isDelisle": false,
       "parkingDetails": {
         "isPayant": true,
         "tarif": 13.82,
@@ -451,7 +503,7 @@
       "phoneNumber": null,
       "description": "Bienvenue sur l'aire de camping-car de Braine ! Située au cœur de la France, la charmante ville de Braine est une destination idéale pour les amateurs de camping-car en quête d'une escapade authentique. Entourée d'un paysage pittoresque, Braine offre une atmosphère paisible propice à la détente. L'aire de camping-car de Braine offre 6 emplacements spacieux. Elle est équipée d'une barrière levante, propose une centrale de paiement 24h/24, une borne de vidange, une borne de ravitaillement en eau, des bornes électriques (10A) et de l'éclairage nocturne. Idéalement située au cœur de la ville, elle offre tout le confort nécessaire pour une halte agréable. Pour les amateurs d'histoire, Braine abrite des sites culturels captivants tels que son église abbatiale médiévale et les vestiges du château de la Folie, témoins d'un riche passé. Vous profiterez également de la tranquillité des espaces verdoyants et des rives paisibles de la rivière qui traverse la ville. Un peu plus loin vous attendent le fort de Condé et la Cité internationale de la langue française. Chaque vendredi matin, explorez le marché de Braine où vous pourrez vous ravitailler en produits frais sur la place Charles de Gaulle. Que ce soit pour une courte halte ou un séjour prolongé, l'aire de camping-car de Braine promet une expérience mémorable au cœur d'une ville alliant charme, histoire et sérénité.",
       "isLavaTrans": false,
-
+      "isDelisle": false,
       "parkingDetails": {
         "isPayant": true,
         "tarif": 9.0,
@@ -488,6 +540,7 @@
       "phoneNumber": "",
       "description": "station qui ce trouve sur l'aire d'autoroute de Villeneuve Vauluisant (A5 - km85, 89190 Villeneuve-l'Archevêque)",
       "isLavaTrans": false,
+      "isDelisle": false,
       "parkingDetails": {
         "isPayant": false,
         "tarif": 0.0,

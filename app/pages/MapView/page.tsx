@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { convertStationsToOptionalFields } from "@/app/components/localisationStation/LocalisationStation2";
 import type { StationWithDetails } from "@/types/station";
-import type { Icon as LeafletIcon } from "leaflet";
+import { Icon, type Icon as LeafletIcon } from "leaflet";
 
 // Import dynamique du composant Map pour éviter les erreurs côté serveur
 const MapViewComponent = dynamic(
@@ -27,14 +27,14 @@ export default function MapViewPage() {
       setIcons({
         borneIcon: new Icon({
           iconUrl: "/markers/borne-marker.png",
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
+          iconSize: [35, 35],
+          iconAnchor: [17, 35],
           popupAnchor: [1, -34],
         }),
         stationIcon: new Icon({
           iconUrl: "/markers/station-marker.png",
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
+          iconSize: [35, 35],
+          iconAnchor: [17, 35],
           popupAnchor: [1, -34],
         }),
       });
@@ -70,6 +70,7 @@ export default function MapViewPage() {
                   0
                 ) / station.reviews.length
               : 0,
+            isDelisle: (station as { isDelisle?: boolean }).isDelisle ?? false,
           })
         ) as StationWithDetails[];
         setStations(convertedStations);
@@ -83,9 +84,26 @@ export default function MapViewPage() {
 
   return (
     <MapViewComponent
-      stations={stations}
+      stations={stations.map((station) => ({
+        ...station,
+        isDelisle: (station as { isDelisle?: boolean }).isDelisle ?? false,
+      }))}
       getMarkerIcon={(station) =>
-        station.type === "STATION_LAVAGE" ? icons.borneIcon : icons.stationIcon
+        station.type === "STATION_LAVAGE"
+          ? station.isDelisle
+            ? new Icon({
+                iconUrl: "/images/delisle/logo-delisle.png",
+                iconSize: [35, 35],
+                iconAnchor: [17, 35],
+                popupAnchor: [1, -34],
+              })
+            : new Icon({
+                iconUrl: "/images/article-lavatrans/lavatrans-logo.png",
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+                popupAnchor: [1, -30],
+              })
+          : icons.stationIcon
       }
       onStationClick={(station) => console.log("Station clicked:", station)}
       selectedStation={null}

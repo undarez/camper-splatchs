@@ -66,6 +66,7 @@ export interface ParkingDetails {
 // Interface de base pour les stations
 export interface ExtendedStation extends Station {
   isLavaTrans: boolean;
+  isDelisle: boolean;
   phoneNumber: string | null;
   description: string | null;
   iconType: "PASSERELLE" | "PORTIQUE" | "ECHAFAUDAGE" | null;
@@ -78,6 +79,7 @@ export interface ExtendedStation extends Station {
 export interface StationWithOptionalFields
   extends Omit<Station, "parkingDetails" | "services" | "isLavaTrans"> {
   isLavaTrans: boolean;
+  isDelisle: boolean;
   iconType: "PASSERELLE" | "PORTIQUE" | "ECHAFAUDAGE" | null;
   status: StationStatus;
   phoneNumber: string | null;

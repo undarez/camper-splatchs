@@ -73,9 +73,23 @@ export default function StationCard({
       </div>
       <CardHeader>
         <div className="flex justify-between items-start">
-          <h3 className="text-xl font-semibold text-white line-clamp-2">
-            {station.name}
-          </h3>
+          <div>
+            <h3 className="text-xl font-semibold text-white line-clamp-2">
+              {station.name}
+            </h3>
+            <div className="flex gap-2 mt-1">
+              {station.isLavaTrans && (
+                <span className="px-2 py-0.5 bg-cyan-500/20 text-cyan-300 rounded-full text-xs">
+                  Lavatrans
+                </span>
+              )}
+              {station.isDelisle && (
+                <span className="px-2 py-0.5 bg-orange-500/20 text-orange-300 rounded-full text-xs">
+                  Delisle
+                </span>
+              )}
+            </div>
+          </div>
           <div className="flex items-center space-x-1">
             <StarIcon className="h-5 w-5 text-yellow-400" />
             <span className="text-white">

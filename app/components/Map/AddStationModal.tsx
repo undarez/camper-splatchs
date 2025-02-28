@@ -430,7 +430,20 @@ export default function AddPointModal({
                   })
                 }
               >
-                Station de lavage
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                    <Image
+                      src="/images/article-lavatrans/lavatransicon-article.webp"
+                      alt="Station de lavage"
+                      width={25}
+                      height={25}
+                      className="object-contain"
+                    />
+                  </div>
+                  <span className="text-gray-300 text-sm">
+                    Station de lavage
+                  </span>
+                </div>
               </button>
               <button
                 type="button"
@@ -523,9 +536,14 @@ export default function AddPointModal({
               <div className="space-y-2">
                 <Label>Type d'icône</Label>
                 <div className="flex items-center gap-4 p-2 bg-[#252B43] rounded-lg">
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label
+                    className="flex items-center gap-2 cursor-pointer"
+                    htmlFor="iconType-standard"
+                    aria-labelledby="standard-label"
+                  >
                     <input
                       type="radio"
+                      id="iconType-standard"
                       name="iconType"
                       checked={!formData.isLavaTrans}
                       onChange={() => onFormDataChange({ isLavaTrans: false })}
@@ -539,26 +557,40 @@ export default function AddPointModal({
                         height={30}
                         className="filter drop-shadow-[0_0_4px_#40E0D0] p-1 bg-[#40E0D0]/20 rounded-lg"
                       />
-                      <span className="text-sm">Standard</span>
+                      <span id="standard-label" className="text-sm">
+                        Standard
+                      </span>
                     </div>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label
+                    className="flex items-center gap-2 cursor-pointer"
+                    htmlFor="iconType-lavatrans"
+                    aria-labelledby="lavatrans-label"
+                  >
                     <input
                       type="radio"
+                      id="iconType-lavatrans"
                       name="iconType"
                       checked={formData.isLavaTrans}
                       onChange={() => onFormDataChange({ isLavaTrans: true })}
                       className="text-blue-500 focus:ring-blue-500"
                     />
                     <div className="flex items-center gap-2">
-                      <Image
-                        src="/images/lavatranssplas.png"
-                        alt="LavaTrans"
-                        width={30}
-                        height={30}
-                        className="filter drop-shadow-[0_0_4px_#40E0D0] p-1 bg-[#40E0D0]/20 rounded-lg"
-                      />
-                      <span className="text-sm">LavaTrans</span>
+                      <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                        <Image
+                          src="/images/article-lavatrans/lavatransicon-article.webp"
+                          alt="Station LavaTrans"
+                          width={25}
+                          height={25}
+                          className="filter drop-shadow-[0_0_4px_#40E0D0]"
+                        />
+                      </div>
+                      <span
+                        id="lavatrans-label"
+                        className="text-gray-300 text-sm"
+                      >
+                        Station LavaTrans
+                      </span>
                     </div>
                   </label>
                 </div>

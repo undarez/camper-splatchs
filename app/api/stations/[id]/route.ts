@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { Review, Station } from "@prisma/client";
 
 interface StationWithRelations extends Station {
+  isDelisle: boolean;
   services: {
     id: string;
     highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
@@ -129,7 +130,10 @@ export async function GET(
     }
 
     // Transformer les données pour le front-end
-    const stationWithRelations = station as StationWithRelations;
+    const stationWithRelations = {
+      ...station,
+      isDelisle: (station as { isDelisle?: boolean }).isDelisle ?? false,
+    } as StationWithRelations;
 
     // Ajouter les versions snake_case des propriétés et transformer les services
     const response = {

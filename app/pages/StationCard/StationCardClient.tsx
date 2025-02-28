@@ -27,7 +27,8 @@ import {
   Circle as LeafletCircle,
   Marker as LeafletMarker,
 } from "leaflet";
-import { StationWithDetails, StationType } from "@/app/types/station";
+import { StationWithDetails } from "@/app/types/station";
+import Image from "next/image";
 
 const StationCard = dynamic(
   () => import("@/app/components/StationCard").then((mod) => mod.default),
@@ -68,7 +69,25 @@ export function StationCardClient() {
   const [isMapReady, setIsMapReady] = useState(false);
   const [selectedStation, setSelectedStation] =
     useState<StationWithDetails | null>(null);
-  const [isMapView, setIsMapView] = useState(true);
+  const [isMapView, setIsMapView] = useState(viewMode === "map");
+  const isUpdatingRef = useRef(false);
+
+  useEffect(() => {
+    if (!isUpdatingRef.current) {
+      isUpdatingRef.current = true;
+      if (viewMode === "map" && !isMapView) {
+        setIsMapView(true);
+      } else if (viewMode === "cards" && isMapView) {
+        setIsMapView(false);
+      }
+      isUpdatingRef.current = false;
+    }
+  }, [viewMode, isMapView]);
+
+  const updateViewMode = useCallback((mode: "cards" | "map") => {
+    setViewMode(mode);
+    setIsMapView(mode === "map");
+  }, []);
 
   const hasFullAccess = useCallback(() => {
     return !!sessionData?.user;
@@ -263,24 +282,35 @@ export function StationCardClient() {
 
   const getMarkerIcon = (station: StationWithDetails): Icon => {
     let iconUrl = "/images/logo.png";
+    let iconSize: [number, number] = [35, 35];
+    let iconAnchor: [number, number] = [17, 35];
 
-    if (station.type === StationType.PARKING) {
+    if (station.type === "PARKING") {
       iconUrl = "/images/logo.png";
-    } else if (station.type === StationType.STATION_LAVAGE) {
-      iconUrl = "/images/lavatranssplas.png";
+      iconSize = [35, 35];
+      iconAnchor = [17, 35];
+    } else if (station.isLavaTrans) {
+      iconUrl = "/images/article-lavatrans/lavatransicon-article.webp";
+      iconSize = [30, 30];
+      iconAnchor = [15, 30];
+    } else if (station.isDelisle) {
+      iconUrl = "/images/delisle/logo-delisle.png";
+      iconSize = [35, 35];
+      iconAnchor = [17, 35];
+    } else if (station.type === "STATION_LAVAGE") {
+      iconUrl = "/images/logo.png";
+      iconSize = [35, 35];
+      iconAnchor = [17, 35];
     }
 
     return new Icon({
       iconUrl,
-      iconRetinaUrl: iconUrl,
-      shadowUrl: "/images/marker-shadow.png",
-      iconSize: [25, 25],
-      iconAnchor: [12, 25],
-      popupAnchor: [0, -25],
-      shadowSize: [41, 41],
-      className: `station-marker ${station.status} ${
-        station.type === StationType.PARKING ? "parking" : "station-lavage"
-      }`,
+      iconSize,
+      iconAnchor,
+      popupAnchor: [1, -34],
+      className: `station-marker ${
+        station.type === "PARKING" ? "parking" : "station-lavage"
+      } ${station.isDelisle ? "delisle" : ""}`,
     });
   };
 
@@ -315,6 +345,9 @@ export function StationCardClient() {
           }
           .station-marker.station-lavage {
             --glow-color: #40E0D0;
+          }
+          .station-marker.delisle {
+            --glow-color: #FF6B00;
           }
           .station-marker:hover {
             transform: scale(1.1);
@@ -464,7 +497,7 @@ export function StationCardClient() {
                 </h3>
                 <div className="flex flex-col gap-2">
                   <Button
-                    onClick={() => setViewMode("cards")}
+                    onClick={() => updateViewMode("cards")}
                     variant={viewMode === "cards" ? "default" : "ghost"}
                     className={`justify-start w-full ${
                       viewMode === "cards"
@@ -479,7 +512,7 @@ export function StationCardClient() {
                   {hasFullAccess() ? (
                     <>
                       <Button
-                        onClick={() => setViewMode("map")}
+                        onClick={() => updateViewMode("map")}
                         variant={viewMode === "map" ? "default" : "ghost"}
                         className={`justify-start w-full ${
                           viewMode === "map"
@@ -556,6 +589,62 @@ export function StationCardClient() {
                   </div>
                 </div>
               </div>
+
+              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700/50 mt-4">
+                <h3 className="text-lg font-semibold text-white mb-4">
+                  Types de stations
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                      <Image
+                        src="/images/article-lavatrans/lavatransicon-article.webp"
+                        alt="Station LavaTrans"
+                        className="w-6 h-6 filter drop-shadow-[0_0_4px_#40E0D0]"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-white">Station LavaTrans</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                      <Image
+                        src="/images/delisle/logo-delisle.png"
+                        alt="Station Delisle"
+                        className="w-6 h-6 filter drop-shadow-[0_0_4px_#40E0D0] rounded-none"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-white">Station Delisle</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Station de lavage"
+                        className="w-6 h-6"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-white">Station de lavage</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[#8B00FF]/20 rounded-lg">
+                      <Image
+                        src="/images/logo.png"
+                        alt="Parking"
+                        className="w-6 h-6 filter drop-shadow-[0_0_4px_#8B00FF]"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-white">Parking</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -574,7 +663,7 @@ export function StationCardClient() {
           <div className="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
             <div className="flex justify-end mb-4 space-x-2">
               <button
-                onClick={() => setIsMapView(true)}
+                onClick={() => updateViewMode("map")}
                 className={`px-4 py-2 rounded-lg ${
                   isMapView
                     ? "bg-[#40E0D0] text-[#1E2337]"
@@ -584,7 +673,7 @@ export function StationCardClient() {
                 Vue carte
               </button>
               <button
-                onClick={() => setIsMapView(false)}
+                onClick={() => updateViewMode("cards")}
                 className={`px-4 py-2 rounded-lg ${
                   !isMapView
                     ? "bg-[#40E0D0] text-[#1E2337]"
@@ -683,10 +772,64 @@ export function StationCardClient() {
             </div>
           </div>
 
+          {/* Types de stations en version mobile */}
+          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700/50 mb-2">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                  <Image
+                    src="/images/article-lavatrans/lavatransicon-article.webp"
+                    alt="Station LavaTrans"
+                    className="w-4 h-4 filter drop-shadow-[0_0_4px_#40E0D0]"
+                    width={16}
+                    height={16}
+                  />
+                </div>
+                <span className="text-white text-sm">LavaTrans</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                  <Image
+                    src="/images/delisle/logo-delisle.png"
+                    alt="Station Delisle"
+                    className="w-4 h-4 filter drop-shadow-[0_0_4px_#40E0D0] rounded-none"
+                    width={16}
+                    height={16}
+                  />
+                </div>
+                <span className="text-white text-sm">Delisle</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+                  <Image
+                    src="/images/logo.png"
+                    alt="Station de lavage"
+                    className="w-4 h-4"
+                    width={16}
+                    height={16}
+                  />
+                </div>
+                <span className="text-white text-sm">Station</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 flex items-center justify-center bg-[#8B00FF]/20 rounded-lg">
+                  <Image
+                    src="/images/logo.png"
+                    alt="Parking"
+                    className="w-4 h-4 filter drop-shadow-[0_0_4px_#8B00FF]"
+                    width={16}
+                    height={16}
+                  />
+                </div>
+                <span className="text-white text-sm">Parking</span>
+              </div>
+            </div>
+          </div>
+
           {/* Boutons de navigation */}
           <div className="grid grid-cols-2 gap-2">
             <Button
-              onClick={() => setViewMode("cards")}
+              onClick={() => updateViewMode("cards")}
               variant={viewMode === "cards" ? "default" : "ghost"}
               className={`${
                 viewMode === "cards"
@@ -700,7 +843,7 @@ export function StationCardClient() {
 
             {hasFullAccess() ? (
               <Button
-                onClick={() => setViewMode("map")}
+                onClick={() => updateViewMode("map")}
                 variant={viewMode === "map" ? "default" : "ghost"}
                 className={`${
                   viewMode === "map"

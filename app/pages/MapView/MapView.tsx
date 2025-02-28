@@ -19,6 +19,7 @@ type Station = Omit<PrismaStation, "iconType" | "userId"> & {
   createdAt: Date;
   updatedAt: Date;
   userId: string;
+  isDelisle?: boolean;
   services: {
     id: string;
     highPressure: HighPressureType;
@@ -103,54 +104,84 @@ export default function MapView({
   }
 
   const borneIcon = new Icon({
-    iconUrl: "/markers/borne-marker.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
+    iconUrl: "/images/article-lavatrans/lavatrans-logo.png",
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
     popupAnchor: [1, -34],
+    className: "station-marker station-lavage",
   });
 
   const stationIcon = new Icon({
     iconUrl: "/markers/station-marker.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
     popupAnchor: [1, -34],
+    className: "station-marker",
   });
 
   return (
-    <MapViewComponent
-      stations={
-        convertStationsToOptionalFields(stations).map((station) => ({
-          ...station,
-          services: station.services || null,
-          parkingDetails: station.parkingDetails
-            ? {
-                ...station.parkingDetails,
-                tarif: station.parkingDetails.tarif?.toString() || null,
-              }
-            : null,
-          reviews:
-            station.reviews?.map((review) => ({
-              ...review,
-              content: review.comment || "",
-              encryptedContent: "",
-              userId: review.authorId,
-            })) || [],
-          averageRating: station.reviews
-            ? station.reviews.reduce((acc, review) => acc + review.rating, 0) /
-              station.reviews.length
-            : 0,
-        })) as StationWithDetails[]
-      }
-      onInit={onInit}
-      getMarkerIcon={(station) => {
-        return station.type === StationType.STATION_LAVAGE
-          ? borneIcon
-          : stationIcon;
-      }}
-      onStationClick={(station) => {
-        console.log("Station clicked:", station);
-      }}
-      selectedStation={null}
-    />
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+        .station-marker {
+          filter: drop-shadow(0 0 6px var(--glow-color, #40e0d0));
+          transition: all 0.3s ease;
+          background-color: rgba(30, 35, 55, 0.7);
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          box-shadow: 0 0 15px rgba(64, 224, 208, 0.6);
+        }
+        .station-marker.station-lavage {
+          --glow-color: #40e0d0;
+        }
+        .station-marker:hover {
+          transform: scale(1.1);
+          z-index: 1000 !important;
+          background-color: rgba(30, 35, 55, 0.9);
+          border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+      `,
+        }}
+      />
+      <MapViewComponent
+        stations={
+          convertStationsToOptionalFields(stations).map((station) => ({
+            ...station,
+            isDelisle: station.isDelisle ?? false,
+            services: station.services || null,
+            parkingDetails: station.parkingDetails
+              ? {
+                  ...station.parkingDetails,
+                  tarif: station.parkingDetails.tarif?.toString() || null,
+                }
+              : null,
+            reviews:
+              station.reviews?.map((review) => ({
+                ...review,
+                content: review.comment || "",
+                encryptedContent: "",
+                userId: review.authorId,
+              })) || [],
+            averageRating: station.reviews
+              ? station.reviews.reduce(
+                  (acc, review) => acc + review.rating,
+                  0
+                ) / station.reviews.length
+              : 0,
+          })) as StationWithDetails[]
+        }
+        onInit={onInit}
+        getMarkerIcon={(station) => {
+          return station.type === StationType.STATION_LAVAGE
+            ? borneIcon
+            : stationIcon;
+        }}
+        onStationClick={(station) => {
+          console.log("Station clicked:", station);
+        }}
+        selectedStation={null}
+      />
+    </>
   );
 }

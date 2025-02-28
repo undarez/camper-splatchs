@@ -242,10 +242,10 @@ const guides: Guide[] = [
     title: "Lavatrans : L'histoire d'une entreprise innovante depuis 1987",
     description:
       "Découvrez l'histoire et les services de Lavatrans, leader du lavage poids lourds et camping-cars en France depuis 1987.",
-    image: "/images/article-lavatrans/lavatransicon-article.webp",
+    image: "/images/article-lavatrans/lavatrans-boutique.svg",
     link: "/guide/lavatrans-histoire",
     date: "2024-02-05",
-    category: "Entreprise",
+    category: "Entreprise Partenaire",
     content: [
       {
         subtitle: "Une présence nationale",
@@ -416,11 +416,236 @@ const guides: Guide[] = [
       },
     ],
     customStyle: {
-      headerBg: "bg-gradient-to-r from-[#00A0E3] to-[#0080B3]",
-      accentColor: "#FFD700",
-      buttonBg: "bg-[#00A0E3] hover:bg-[#0080B3]",
-      cardBg: "bg-white",
-      textColor: "text-[#333333]",
+      headerBg: "bg-gradient-to-r from-purple-600 to-indigo-700",
+      accentColor: "text-purple-600",
+      buttonBg: "bg-purple-600 hover:bg-purple-700",
+      cardBg: "bg-purple-50",
+      textColor: "text-gray-800",
+    },
+  },
+  {
+    id: 8,
+    title: "Groupe Delisle : Une Référence en Transport, Logistique et Lavage",
+    category: "Entreprise Partenaire",
+    image: "/images/delisle-article/delisle-logo.png",
+    description:
+      "Découvrez Delisle Transport, un leader dans le domaine de la logistique et du lavage de véhicules professionnels.",
+    content: [
+      {
+        subtitle: "Une Histoire de Croissance et d'Engagement",
+        text: "",
+        items: [
+          {
+            type: "image",
+            src: "/images/delisle-article/delisle-logo.png",
+            alt: "Logo Delisle Lavage",
+            caption:
+              "Delisle Transport, une référence dans le secteur du transport et du lavage",
+            className:
+              "w-1/3 h-auto max-w-xs mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+        ],
+      },
+      {
+        subtitle: "La Naissance d'un Leader",
+        text: "Fondée le 1er janvier 1979, le groupe <strong>Delisle</strong> s&#39;est imposée comme un acteur majeur du transport routier de fret interurbain. Dotée du statut de <strong>SAS (Société par Actions Simplifiée)</strong>, elle a su évoluer et s&#39;adapter aux exigences du secteur. En 2022, le groupe Delisle a atteint le statut <strong>d&#39;Entreprise de Taille Intermédiaire</strong>, confirmant ainsi sa croissance \n\n.Depuis 1994, le groupe a obtenu plusieurs certifications attestant de son engagement enmatière de qualité et de satisfaction client. Ces distinctions lui ont permis de <strong>fidéliser sa clientèle</strong> et d&#39;attirer de nouveaux partenaires.",
+        items: [
+          {
+            type: "image",
+            src: "/images/delisle-article/certificat.png",
+            alt: "Certificat Delisle",
+            caption: "Certification qualité obtenue par Delisle Logistique",
+            className:
+              "w-auto h-auto max-w-full mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+          {
+            type: "image",
+            src: "/images/delisle-article/label.png",
+            alt: "Label Delisle",
+            caption: "Label de qualité attestant de l'engagement de Delisle",
+            className:
+              "w-auto h-auto max-w-full mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+        ],
+      },
+      {
+        subtitle: "Une Direction Dynamique",
+        text: "Le 1er juillet 2017, <strong>Jonathan Delisle</strong> a repris les rênes de l'entreprise en tant que Directeur et actionnaire principal.\n\nSous sa direction, le groupe a <strong>doublé son activité</strong> et a réalisé <strong>35 opérations de croissance externe en 40 ans d'existence</strong>. Parmi ces acquisitions, on note notamment celle du transport <strong>Antoine en 2021</strong>. Plus récemment, en <strong>2024, Delisle a obtenue la deuxieme place de transporteur de l'année,</strong> une distinction qui récompense son engagement et son professionnalisme.",
+        items: [
+          {
+            type: "image",
+            src: "/images/delisle-article/jonathan-delisle.webp",
+            alt: "Jonathan Delisle",
+            caption: "Jonathan Delisle, Directeur et actionnaire principal",
+            className:
+              "w-1/3 max-w-xs mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+        ],
+      },
+
+      {
+        subtitle: "Un Réseau de Stations en Pleine Expansion",
+        text: "Au sein du groupe, la division <strong>Delisle Lavage</strong> possède actuellement <strong>23 stations de lavage</strong>, <strong>dont 19 habilitées pour le lavage de camping-car notament,</strong> réparties sur l'ensemble du territoire français. <strong>Une carte interactive</strong> est mise à disposition des utilisateurs pour localiser facilement les stations disponibles.",
+        items: [
+          {
+            type: "quote",
+            text: "Consultez la carte des stations sur : https://delisle-lavage.com/#mapid",
+          },
+        ],
+      },
+      {
+        subtitle: "Des Services de Lavage Adaptés aux Professionnels",
+        text: "",
+      },
+      {
+        subtitle: "Un Large Éventail de Prestations",
+        text: "Les services de lavage proposés par Delisle incluent :",
+        items: [
+          "Lavage intérieur : citernes, bennes, frigos",
+          "Lavage extérieur : poids-lourds, utilitaires, camping-cars",
+          "Lavage de GRV : notamment pour le secteur alimentaire",
+          "Réchauffage de citerne pour les besoins spécifiques",
+          {
+            type: "image",
+            src: "/images/delisle-article/lavageint-fil.jpeg",
+            alt: "Lavage intérieur",
+            caption: "Service de lavage intérieur pour citernes et bennes",
+            className: "inline-block w-1/5 mx-2",
+          },
+          {
+            type: "image",
+            src: "/images/delisle-article/Lav_ext-fil.jpg",
+            alt: "Lavage extérieur",
+            caption: "Service de lavage extérieur pour tous types de véhicules",
+            className: "inline-block w-1/5 mx-2",
+          },
+          {
+            type: "image",
+            src: "/images/delisle-article/nofood-fil.jpg",
+            alt: "Lavage GRV",
+            caption: "Service de lavage de GRV pour le secteur alimentaire",
+            className: "inline-block w-1/5 mx-2",
+          },
+          {
+            type: "image",
+            src: "/images/delisle-article/rechauffage-fil.jpg",
+            alt: "Réchauffage de citerne",
+            caption:
+              "Service de réchauffage de citerne pour besoins spécifiques",
+            className: "inline-block w-1/5 mx-2",
+          },
+        ],
+      },
+      {
+        subtitle: "Un Programme de Fidélité Attractif",
+        text: "Delisle Lavage récompense ses clients fidèles avec un système de <strong>points cumulable</strong> :\n\n<strong>1 lavage = 3 points</strong>\n\nUne fois un certain seuil atteint, les clients peuvent <strong>réserver des cadeaux</strong>.\n\nLes cadeaux peuvent être récupérés dans plusieurs stations, notamment :\n\n- La Ferté-Gaucher (77)\n- Claye-Souilly (77)\n- Saran (45)\n- Lillebonne (76)\n- Bollène (84)\n- Verdun (55)\n- Torcy-Le-Grand (10) \n- Tilloy-Lès-Mofflaines (62) \n- Breny (02) \n- Fagnières (51)",
+        items: [
+          {
+            type: "image",
+            src: "/images/delisle-article/cadeau-fidelite.png",
+            alt: "Programme de fidélité",
+            caption: "Programme de fidélité avec cadeaux à la clé",
+            className:
+              "w-full max-w-lg mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+          {
+            type: "quote",
+            text: "Consultez la liste complète des stations et cadeaux sur : https://delisle-lavage.com/loyalty.html",
+          },
+        ],
+      },
+      {
+        subtitle: "Découvrez notre programme de fidélité",
+        text: "Accumulez des points à chaque lavage et échangez-les contre des cadeaux exclusifs Delisle Lavage.",
+        items: [
+          {
+            type: "quote",
+            text: `<div class="flex justify-center">
+              <a
+                href="https://delisle-lavage.com/loyalty.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors"
+              >
+                Découvrir le programme de fidélité
+              </a>
+            </div>`,
+          },
+        ],
+      },
+      {
+        subtitle: "Une Priorité : L'Hygiène et l'Environnement",
+        text: "<strong>Engagement en matière d'Hygiène</strong>\n\n L'hygiène est une <strong>priorité absolue</strong> pour Delisle. Chaque conducteur et opérateur est formé aux <strong>bonnes pratiques d'entretien des véhicules</strong> afin d'assurer la <strong>sécurité alimentaire</strong> des produits transportés.\n\nSur chaque station de lavage, <strong>un indicateur de CO²</strong> est disponible pour informer les clients sur leur impact environnemental.",
+        items: [
+          {
+            type: "image",
+            src: "/images/delisle-article/emissionc02.png",
+            alt: "Indicateur CO2",
+            caption: "Indicateur de CO² pour mesurer l'impact environnemental",
+            className:
+              "w-full max-w-md mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+          {
+            type: "quote",
+            text: "Découvrez ces informations sur : https://delisle-lavage.com/",
+          },
+        ],
+      },
+      {
+        subtitle: "Un Traitement des Eaux Innovant",
+        text: "Depuis <strong>2023</strong>, Delisle a installé une <strong>station de traitement des effluents industriels sur differents site,</strong>notamment à Connantre.\n\nCette station permet le lavage de citernes et cuves contenant des produits sensibles tout en respectant les règles de <strong>non-pollution</strong>.",
+        items: [
+          {
+            type: "image",
+            src: "/images/delisle-article/station-traitement.png",
+            alt: "Station de traitement",
+            caption:
+              "Station de traitement des effluents industriels à Connantre",
+            className:
+              "w-full max-w-lg mx-auto rounded-none shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200",
+          },
+          {
+            type: "quote",
+            text: "Pour en savoir plus : https://cohin-environnement.com/station-de-traitement-des-effluents-industrielles/",
+          },
+        ],
+      },
+      {
+        subtitle: "La Sécurité Avant Tout",
+        text: "Le groupe Delisle met un point d'honneur à garantir la <strong>sécurité</strong> de ses opérateurs et de ses clients :\n\n- <strong>Renouvellement régulier du matériel</strong> pour respecter les normes\n- <strong>Maintenance assurée</strong> directement par les constructeurs\n- <strong>Formation continue des conducteurs</strong> à une conduite souple et sécurisée\n- <strong>Contrôle rigoureux</strong> du respect des procédures de sécurité",
+        items: [
+          {
+            type: "quote",
+            text: "« <strong>La sécurité n'est pas une option, c'est un engagement au quotidien.</strong> » - Jonathan Delisle",
+          },
+        ],
+      },
+      {
+        subtitle: "Conclusion",
+        text: "Delisle Logistique continue de se développer tout en maintenant des standards de <strong>qualité, de sécurité et de respect environnemental</strong> exemplaires.\n\n <strong>Un modèle de référence dans le monde du transport et du lavage !</strong>",
+        items: [
+          {
+            type: "quote",
+            text: `<div class="mt-6 flex justify-center">
+              <a
+                href="https://delisle-lavage.com/index.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors"
+              >
+                Visiter le site officiel de Delisle Lavage
+              </a>
+            </div>`,
+          },
+        ],
+      },
+    ],
+    customStyle: {
+      headerBg: "bg-gradient-to-r from-purple-600 to-indigo-700",
+      accentColor: "text-purple-600",
+      buttonBg: "bg-purple-600 hover:bg-purple-700",
+      cardBg: "bg-purple-50",
+      textColor: "text-gray-800",
     },
   },
 ];
@@ -523,7 +748,13 @@ export default function GuideClient() {
                           : "text-gray-300"
                       }`}
                     >
-                      {section.text}
+                      {section.text.includes("<strong") ? (
+                        <span
+                          dangerouslySetInnerHTML={{ __html: section.text }}
+                        />
+                      ) : (
+                        section.text
+                      )}
                     </p>
                   )}
                   {section.items && (
@@ -532,7 +763,7 @@ export default function GuideClient() {
                         (item): item is ImageItem =>
                           typeof item === "object" && item.type === "image"
                       ) ? (
-                        <div className="flex flex-col sm:flex-row justify-center items-center gap-8 sm:gap-16">
+                        <div className="flex flex-row flex-wrap justify-center items-center gap-4 py-6">
                           {section.items.map((item, itemIndex) => {
                             if (
                               typeof item === "object" &&
@@ -541,16 +772,26 @@ export default function GuideClient() {
                               return (
                                 <div
                                   key={itemIndex}
-                                  className="w-1/2 flex flex-col items-center"
+                                  className={
+                                    item.className ||
+                                    "w-1/2 flex flex-col items-center"
+                                  }
                                 >
-                                  <div className="relative w-64 h-64 rounded-full overflow-hidden">
-                                    <Image
-                                      src={item.src}
-                                      alt={item.alt}
-                                      fill
-                                      className="object-cover"
-                                    />
-                                  </div>
+                                  <Image
+                                    src={item.src}
+                                    alt={item.alt}
+                                    width={800}
+                                    height={600}
+                                    className={`object-contain p-0 max-w-full h-auto ${
+                                      item.src.includes("-fil.")
+                                        ? "rounded-full"
+                                        : ""
+                                    }`}
+                                    style={{
+                                      objectPosition: "center center",
+                                    }}
+                                    unoptimized={true}
+                                  />
                                   <p
                                     className={`text-center italic mt-4 ${
                                       selectedGuide.customStyle
@@ -794,7 +1035,17 @@ export default function GuideClient() {
                               return (
                                 <li key={itemIndex} className="my-6">
                                   <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-700">
-                                    {item.text}
+                                    {item.text.includes("<div") ||
+                                    item.text.includes("<a") ||
+                                    item.text.includes("<strong") ? (
+                                      <div
+                                        dangerouslySetInnerHTML={{
+                                          __html: item.text,
+                                        }}
+                                      />
+                                    ) : (
+                                      item.text
+                                    )}
                                   </blockquote>
                                 </li>
                               );
@@ -860,7 +1111,11 @@ export default function GuideClient() {
                     src={guide.image}
                     alt={guide.title}
                     fill
-                    className="object-cover hover:scale-105 transition-transform duration-300"
+                    className={`${
+                      guide.id === 5
+                        ? "object-contain bg-white p-4"
+                        : "object-cover hover:scale-105"
+                    } transition-transform duration-300`}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     priority={guide.id === 1}
                     style={{ objectPosition: "center 30%" }}

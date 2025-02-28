@@ -25,6 +25,7 @@ interface Station {
   createdAt: Date;
   updatedAt: Date;
   isLavaTrans: boolean;
+  isDelisle: boolean;
   authorId: string;
   encryptedName: string | null;
   encryptedAddress: string | null;
@@ -93,6 +94,7 @@ export function convertStationsToOptionalFields(
     createdAt: station.createdAt,
     updatedAt: station.updatedAt,
     isLavaTrans: station.isLavaTrans,
+    isDelisle: station.isDelisle ?? false,
     authorId: station.authorId,
     encryptedName: station.encryptedName,
     encryptedAddress: station.encryptedAddress,

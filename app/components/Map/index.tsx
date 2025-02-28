@@ -34,7 +34,8 @@ export interface MapProps {
   stations: StationWithOptionalFields[];
   getMarkerIcon: (
     status: StationStatus,
-    type: StationType
+    type: StationType,
+    station: StationWithOptionalFields
   ) => Icon<IconOptions>;
   center: LatLngExpression;
   zoom: number;
@@ -48,7 +49,8 @@ export interface MapViewComponentProps {
   stations: StationWithOptionalFields[];
   getMarkerIcon: (
     status: StationStatus,
-    type: StationType
+    type: StationType,
+    station: StationWithOptionalFields
   ) => Icon<IconOptions>;
   center?: LatLngExpression;
   zoom?: number;
@@ -116,7 +118,7 @@ export const MapComponent = ({
     markers.current = [];
 
     stations.forEach((station) => {
-      const markerIcon = getMarkerIcon(station.status, station.type);
+      const markerIcon = getMarkerIcon(station.status, station.type, station);
       const newMarker = marker([station.latitude, station.longitude], {
         icon: markerIcon,
         riseOnHover: true, // L'icône s'élève au survol
@@ -222,7 +224,7 @@ export const MapComponent = ({
           <Marker
             key={station.id}
             position={[station.latitude, station.longitude]}
-            icon={getMarkerIcon(station.status, station.type)}
+            icon={getMarkerIcon(station.status, station.type, station)}
           >
             <Popup className="custom-popup">
               <div
