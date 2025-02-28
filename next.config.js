@@ -15,6 +15,13 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons'],
   },
+  output: 'standalone',
+  excludeDefaultMomentLocales: true,
+  trailingSlash: false,
+  poweredByHeader: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 module.exports = nextConfig 

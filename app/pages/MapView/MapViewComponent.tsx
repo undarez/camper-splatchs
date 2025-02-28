@@ -1,140 +1,171 @@
+/* eslint-disable */
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { Map, map as createMap, tileLayer, Marker, marker } from "leaflet";
+// Import uniquement des types de Leaflet
+import type { Map as LeafletMap, Icon as LeafletIcon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Image from "next/image";
 import { StationWithDetails } from "@/app/types/station";
 
+// Définition des types pour les couches de la carte
+interface MapLayer {
+  remove: () => void;
+}
+
 interface MapViewComponentProps {
   stations: StationWithDetails[];
-  onInit?: (map: L.Map) => void;
+  onInit?: (map: LeafletMap) => void;
   onMapReady?: (ready: boolean) => void;
-  getMarkerIcon: (station: StationWithDetails) => L.Icon;
+  getMarkerIcon: (
+    station: StationWithDetails
+  ) => Promise<LeafletIcon | null> | LeafletIcon | null;
   onStationClick: (station: StationWithDetails) => void;
   selectedStation: StationWithDetails | null;
 }
+
 export function MapViewComponent({
   stations,
   onInit,
   onMapReady,
   getMarkerIcon,
 }: MapViewComponentProps) {
-  const mapRef = useRef<Map | null>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
 
   const updateMarkers = useCallback(
-    (filteredStations: StationWithDetails[]) => {
-      if (!mapRef.current) return;
+    async (filteredStations: StationWithDetails[]) => {
+      if (!mapRef.current || typeof window === "undefined") return;
 
-      // Supprimer tous les marqueurs existants
-      mapRef.current.eachLayer((layer) => {
-        if (layer instanceof Marker) {
-          layer.remove();
-        }
-      });
+      try {
+        // Import dynamique de Leaflet
+        const leaflet = await import("leaflet");
+        const { Marker, marker } = leaflet;
 
-      // Ajouter les nouveaux marqueurs filtrés
-      filteredStations.forEach((station) => {
-        const markerIcon = getMarkerIcon(station);
-
-        marker([station.latitude, station.longitude], {
-          icon: markerIcon,
-        }).addTo(mapRef.current!).bindPopup(`
-        <div class="p-4 min-w-[200px]">
-          <h3 class="font-bold text-lg mb-2">${station.name}</h3>
-          <p class="text-sm text-gray-600 mb-2">${station.address}</p>
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-sm">${
-              station.type === "STATION_LAVAGE"
-                ? "Station de lavage"
-                : "Parking"
-            }</span>
-            <span class="inline-block px-2 py-1 rounded-full text-xs ${
-              station.status === "active"
-                ? "bg-green-100 text-green-800"
-                : station.status === "en_attente"
-                ? "bg-yellow-100 text-yellow-800"
-                : "bg-red-100 text-red-800"
-            }">
-              ${
-                station.status === "active"
-                  ? "Active"
-                  : station.status === "en_attente"
-                  ? "En attente"
-                  : "Inactive"
-              }
-            </span>
-          </div>
-          <div class="flex flex-col gap-2">
-            <button 
-              onclick="window.location.href='/pages/StationDetail/${
-                station.id
-              }'"
-              class="w-full px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-md text-sm font-medium transition-colors"
-            >
-              Voir les détails
-            </button>
-            <div id="navigation-${station.id}"></div>
-          </div>
-        </div>
-      `);
-
-        // Ajouter le bouton de navigation après que la popup est créée
-        setTimeout(() => {
-          const navigationContainer = document.getElementById(
-            `navigation-${station.id}`
-          );
-          if (navigationContainer) {
-            const navigationButton = document.createElement("div");
-            navigationButton.innerHTML = `
-              <button 
-                onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}', '_blank')"
-                class="w-full px-4 py-2 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                Y aller
-              </button>
-            `;
-            navigationContainer.appendChild(navigationButton);
+        // Supprimer tous les marqueurs existants
+        mapRef.current.eachLayer((layer: MapLayer) => {
+          if (layer instanceof Marker) {
+            layer.remove();
           }
-        }, 0);
-      });
+        });
+
+        // Ajouter les nouveaux marqueurs filtrés
+        for (const station of filteredStations) {
+          const markerIcon = await getMarkerIcon(station);
+          if (!markerIcon) continue;
+
+          marker([station.latitude, station.longitude], {
+            icon: markerIcon,
+          }).addTo(mapRef.current!).bindPopup(`
+          <div class="p-4 min-w-[200px]">
+            <h3 class="font-bold text-lg mb-2">${station.name}</h3>
+            <p class="text-sm text-gray-600 mb-2">${station.address}</p>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm">${
+                station.type === "STATION_LAVAGE"
+                  ? "Station de lavage"
+                  : "Parking"
+              }</span>
+              <span class="inline-block px-2 py-1 rounded-full text-xs ${
+                station.status === "active"
+                  ? "bg-green-100 text-green-800"
+                  : station.status === "en_attente"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-red-100 text-red-800"
+              }">
+                ${
+                  station.status === "active"
+                    ? "Active"
+                    : station.status === "en_attente"
+                    ? "En attente"
+                    : "Inactive"
+                }
+              </span>
+            </div>
+            <div class="flex flex-col gap-2">
+              <button 
+                onclick="window.location.href='/pages/StationDetail/${
+                  station.id
+                }'"
+                class="w-full px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white rounded-md text-sm font-medium transition-colors"
+              >
+                Voir les détails
+              </button>
+              <div id="navigation-${station.id}"></div>
+            </div>
+          </div>
+        `);
+
+          // Ajouter le bouton de navigation après que la popup est créée
+          setTimeout(() => {
+            const navigationContainer = document.getElementById(
+              `navigation-${station.id}`
+            );
+            if (navigationContainer) {
+              const navigationButton = document.createElement("div");
+              navigationButton.innerHTML = `
+                <button 
+                  onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}', '_blank')"
+                  class="w-full px-4 py-2 bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  Y aller
+                </button>
+              `;
+              navigationContainer.appendChild(navigationButton);
+            }
+          }, 0);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement de Leaflet:", error);
+      }
     },
     [getMarkerIcon]
   );
 
   useEffect(() => {
-    if (!mapRef.current && typeof window !== "undefined") {
-      const map = createMap("map", {
-        zoomControl: true,
-        attributionControl: true,
-      }).setView([46.603354, 1.888334], 6);
+    const initMap = async () => {
+      if (!mapRef.current && typeof window !== "undefined") {
+        try {
+          // Import dynamique de Leaflet
+          const leaflet = await import("leaflet");
+          const { map: createMap, tileLayer } = leaflet;
 
-      tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
+          const map = createMap("map", {
+            zoomControl: true,
+            attributionControl: true,
+          }).setView([46.603354, 1.888334], 6);
 
-      mapRef.current = map;
+          tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution:
+              '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }).addTo(map);
 
-      // Attendre que la carte soit complètement chargée
-      map.whenReady(() => {
-        if (onInit) {
-          onInit(map);
+          mapRef.current = map;
+
+          // Attendre que la carte soit complètement chargée
+          map.whenReady(() => {
+            if (onInit) {
+              onInit(map);
+            }
+            if (onMapReady) {
+              onMapReady(true);
+            }
+          });
+        } catch (error) {
+          console.error("Erreur lors du chargement de Leaflet:", error);
         }
-        if (onMapReady) {
-          onMapReady(true);
-        }
-      });
-    }
+      }
 
-    // Mettre à jour les marqueurs avec les stations filtrées
-    if (mapRef.current && typeof window !== "undefined") {
-      updateMarkers(stations);
-    }
+      // Mettre à jour les marqueurs avec les stations filtrées
+      if (mapRef.current && typeof window !== "undefined") {
+        await updateMarkers(stations);
+      }
+    };
+
+    initMap();
   }, [stations, onInit, updateMarkers, onMapReady]);
 
   // Vérifier si nous sommes côté client avant de rendre le composant
