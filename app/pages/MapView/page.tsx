@@ -22,27 +22,32 @@ export default function MapViewPage() {
   } | null>(null);
 
   useEffect(() => {
+    // S'assurer que ce code ne s'exécute que côté client
     setIsMounted(true);
-    import("leaflet").then(({ Icon }) => {
-      setIcons({
-        borneIcon: new Icon({
-          iconUrl: "/markers/borne-marker.png",
-          iconSize: [35, 35],
-          iconAnchor: [17, 35],
-          popupAnchor: [1, -34],
-        }),
-        stationIcon: new Icon({
-          iconUrl: "/markers/station-marker.png",
-          iconSize: [35, 35],
-          iconAnchor: [17, 35],
-          popupAnchor: [1, -34],
-        }),
+
+    // Importer Leaflet uniquement côté client
+    if (typeof window !== "undefined") {
+      import("leaflet").then(({ Icon }) => {
+        setIcons({
+          borneIcon: new Icon({
+            iconUrl: "/markers/borne-marker.png",
+            iconSize: [35, 35],
+            iconAnchor: [17, 35],
+            popupAnchor: [1, -34],
+          }),
+          stationIcon: new Icon({
+            iconUrl: "/markers/station-marker.png",
+            iconSize: [35, 35],
+            iconAnchor: [17, 35],
+            popupAnchor: [1, -34],
+          }),
+        });
       });
-    });
+    }
   }, []);
 
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || typeof window === "undefined") return;
 
     fetch("/api/stations")
       .then((res) => res.json())

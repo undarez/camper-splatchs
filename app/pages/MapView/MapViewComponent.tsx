@@ -107,7 +107,7 @@ export function MapViewComponent({
   );
 
   useEffect(() => {
-    if (!mapRef.current) {
+    if (!mapRef.current && typeof window !== "undefined") {
       const map = createMap("map", {
         zoomControl: true,
         attributionControl: true,
@@ -132,8 +132,15 @@ export function MapViewComponent({
     }
 
     // Mettre à jour les marqueurs avec les stations filtrées
-    updateMarkers(stations);
+    if (mapRef.current && typeof window !== "undefined") {
+      updateMarkers(stations);
+    }
   }, [stations, onInit, updateMarkers, onMapReady]);
+
+  // Vérifier si nous sommes côté client avant de rendre le composant
+  if (typeof window === "undefined") {
+    return null;
+  }
 
   return (
     <>
