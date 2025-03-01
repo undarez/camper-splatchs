@@ -1,15 +1,10 @@
 /* eslint-disable */
-"use client";
+import { default as dynamicImport } from "next/dynamic";
 
-import { Suspense, lazy } from "react";
-
-// Configuration pour indiquer que cette page ne doit pas être pré-rendue
-export const config = {
-  runtime: "client",
-};
-
-// Import lazy du composant client
-const MapViewClientComponent = lazy(() => import("./MapViewClient"));
+// Configuration pour empêcher explicitement le prérendu
+export const dynamic = "force-dynamic";
+export const dynamicParams = false;
+export const revalidate = 0;
 
 // Composant de chargement simple
 function LoadingComponent() {
@@ -20,10 +15,12 @@ function LoadingComponent() {
   );
 }
 
+// Import dynamique du composant client avec ssr: false
+const MapViewClientComponent = dynamicImport(() => import("./MapViewClient"), {
+  ssr: false,
+  loading: () => <LoadingComponent />,
+});
+
 export default function MapViewPage() {
-  return (
-    <Suspense fallback={<LoadingComponent />}>
-      <MapViewClientComponent />
-    </Suspense>
-  );
+  return <MapViewClientComponent />;
 }

@@ -7,6 +7,11 @@ import { convertStationsToOptionalFields } from "@/app/components/localisationSt
 import type { StationWithDetails } from "@/types/station";
 import type { Icon as LeafletIcon } from "leaflet";
 
+// Vérification immédiate pour éviter toute exécution côté serveur
+if (typeof window === "undefined") {
+  throw new Error("Ce composant ne peut être rendu que côté client");
+}
+
 // Définition des types pour les icônes
 interface MarkerIcon {
   iconUrl: string;

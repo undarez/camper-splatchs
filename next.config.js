@@ -22,6 +22,21 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Configurer les routes pour que MapView soit toujours rendu côté client
+  async rewrites() {
+    return [
+      {
+        source: '/pages/MapView',
+        destination: '/pages/MapView',
+        has: [
+          {
+            type: 'header',
+            key: 'x-nextjs-data',
+          },
+        ],
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig 

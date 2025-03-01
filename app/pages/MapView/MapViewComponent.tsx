@@ -8,6 +8,11 @@ import "leaflet/dist/leaflet.css";
 import Image from "next/image";
 import { StationWithDetails } from "@/app/types/station";
 
+// Vérification immédiate pour éviter toute exécution côté serveur
+if (typeof window === "undefined") {
+  throw new Error("Ce composant ne peut être rendu que côté client");
+}
+
 // Définition des types pour les couches de la carte
 interface MapLayer {
   remove: () => void;
