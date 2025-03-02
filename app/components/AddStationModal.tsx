@@ -7,6 +7,13 @@ import { HighPressureType, ElectricityType } from "@prisma/client";
 
 type StationType = "STATION_LAVAGE" | "PARKING";
 
+interface WashLane {
+  laneNumber: number;
+  hasHighPressure: boolean;
+  hasBusesPortique: boolean;
+  hasRollerPortique: boolean;
+}
+
 interface StationData {
   name: string;
   address: string;
@@ -29,6 +36,11 @@ interface StationData {
   isPayant: boolean;
   tarif: string;
   commercesProches: string[];
+  // Nouveaux champs pour Delisle
+  isDelisle: boolean;
+  portiquePrice: string;
+  manualWashPrice: string;
+  washLanes: WashLane[];
 }
 
 interface AddStationModalProps {
@@ -46,6 +58,7 @@ export default function AddStationModal({
 }: AddStationModalProps) {
   const [showAd, setShowAd] = useState(false);
   const [formData, setFormData] = useState<StationData>(initialData);
+  const [laneCount, setLaneCount] = useState(1);
 
   if (!isOpen && !showAd) {
     return null;
@@ -60,6 +73,48 @@ export default function AddStationModal({
 
     onSubmit(stationData);
     setShowAd(true);
+  };
+
+  const handleLaneCountChange = (count: number) => {
+    setLaneCount(count);
+
+    // Mettre à jour les pistes de lavage
+    const newLanes: WashLane[] = [];
+    for (let i = 0; i < count; i++) {
+      // Conserver les données existantes si disponibles
+      if (formData.washLanes && formData.washLanes[i]) {
+        newLanes.push(formData.washLanes[i]);
+      } else {
+        newLanes.push({
+          laneNumber: i + 1,
+          hasHighPressure: false,
+          hasBusesPortique: false,
+          hasRollerPortique: false,
+        });
+      }
+    }
+
+    setFormData({
+      ...formData,
+      washLanes: newLanes,
+    });
+  };
+
+  const handleLaneChange = (
+    index: number,
+    field: keyof WashLane,
+    value: boolean
+  ) => {
+    const updatedLanes = [...formData.washLanes];
+    updatedLanes[index] = {
+      ...updatedLanes[index],
+      [field]: value,
+    };
+
+    setFormData({
+      ...formData,
+      washLanes: updatedLanes,
+    });
   };
 
   if (showAd) {
@@ -93,7 +148,7 @@ export default function AddStationModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999]">
-      <div className="bg-[#1E2337] rounded-xl border border-gray-700/50 p-6 max-w-2xl w-full mx-4 shadow-xl relative">
+      <div className="bg-[#1E2337] rounded-xl border border-gray-700/50 p-6 max-w-2xl w-full mx-4 shadow-xl relative overflow-y-auto max-h-[90vh]">
         <h2 className="text-2xl font-bold text-white mb-6">
           Ajouter une station
         </h2>
@@ -201,6 +256,189 @@ export default function AddStationModal({
               />
             </div>
           </div>
+
+          {/* Option Delisle */}
+          {formData.type === "STATION_LAVAGE" && (
+            <div className="mt-4">
+              <div className="flex items-center mb-2">
+                <input
+                  id="is-delisle"
+                  type="checkbox"
+                  checked={formData.isDelisle}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isDelisle: e.target.checked })
+                  }
+                  className="mr-2 h-4 w-4"
+                />
+                <label htmlFor="is-delisle" className="text-gray-300 text-sm">
+                  Station Delisle
+                </label>
+              </div>
+
+              {formData.isDelisle && (
+                <div className="space-y-4 mt-4 p-4 bg-[#252B43] rounded-lg border border-gray-700/50">
+                  <h3 className="text-white font-semibold">
+                    Configuration Delisle
+                  </h3>
+
+                  {/* Tarifs */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor="portique-price"
+                        className="text-gray-300 text-sm mb-1 block"
+                      >
+                        Prix portique (€ HT)
+                      </label>
+                      <input
+                        id="portique-price"
+                        type="number"
+                        value={formData.portiquePrice}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            portiquePrice: e.target.value,
+                          })
+                        }
+                        placeholder="40"
+                        className="w-full p-3 bg-[#1E2337] border border-gray-700/50 rounded-lg text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="manual-wash-price"
+                        className="text-gray-300 text-sm mb-1 block"
+                      >
+                        Prix 10min lavage manuel (€ HT)
+                      </label>
+                      <input
+                        id="manual-wash-price"
+                        type="number"
+                        value={formData.manualWashPrice}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            manualWashPrice: e.target.value,
+                          })
+                        }
+                        placeholder="10"
+                        className="w-full p-3 bg-[#1E2337] border border-gray-700/50 rounded-lg text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Nombre de pistes */}
+                  <div>
+                    <label
+                      htmlFor="lane-count"
+                      className="text-gray-300 text-sm mb-1 block"
+                    >
+                      Nombre de pistes de lavage
+                    </label>
+                    <select
+                      id="lane-count"
+                      value={laneCount}
+                      onChange={(e) =>
+                        handleLaneCountChange(parseInt(e.target.value))
+                      }
+                      className="w-full p-3 bg-[#1E2337] border border-gray-700/50 rounded-lg text-white focus:border-blue-500/50 focus:outline-none transition-colors"
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+                        <option key={num} value={num}>
+                          {num}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Configuration des pistes */}
+                  <div className="space-y-4">
+                    <h4 className="text-gray-300 font-medium">
+                      Configuration des pistes
+                    </h4>
+
+                    {formData.washLanes.map((lane, index) => (
+                      <div
+                        key={index}
+                        className="p-3 bg-[#1E2337] rounded-lg border border-gray-700/50"
+                      >
+                        <h5 className="text-white font-medium mb-2">
+                          Piste {lane.laneNumber}
+                        </h5>
+                        <div className="space-y-2">
+                          <div className="flex items-center">
+                            <input
+                              id={`high-pressure-${index}`}
+                              type="checkbox"
+                              checked={lane.hasHighPressure}
+                              onChange={(e) =>
+                                handleLaneChange(
+                                  index,
+                                  "hasHighPressure",
+                                  e.target.checked
+                                )
+                              }
+                              className="mr-2 h-4 w-4"
+                            />
+                            <label
+                              htmlFor={`high-pressure-${index}`}
+                              className="text-gray-300 text-sm"
+                            >
+                              Lances HP + Canon à Mousse
+                            </label>
+                          </div>
+
+                          <div className="flex items-center">
+                            <input
+                              id={`buses-portique-${index}`}
+                              type="checkbox"
+                              checked={lane.hasBusesPortique}
+                              onChange={(e) =>
+                                handleLaneChange(
+                                  index,
+                                  "hasBusesPortique",
+                                  e.target.checked
+                                )
+                              }
+                              className="mr-2 h-4 w-4"
+                            />
+                            <label
+                              htmlFor={`buses-portique-${index}`}
+                              className="text-gray-300 text-sm"
+                            >
+                              Portique à BUSES
+                            </label>
+                          </div>
+
+                          <div className="flex items-center">
+                            <input
+                              id={`roller-portique-${index}`}
+                              type="checkbox"
+                              checked={lane.hasRollerPortique}
+                              onChange={(e) =>
+                                handleLaneChange(
+                                  index,
+                                  "hasRollerPortique",
+                                  e.target.checked
+                                )
+                              }
+                              className="mr-2 h-4 w-4"
+                            />
+                            <label
+                              htmlFor={`roller-portique-${index}`}
+                              className="text-gray-300 text-sm"
+                            >
+                              Portique ROULEAUX
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 flex justify-end space-x-4">

@@ -91,6 +91,7 @@ model Station {
   parkingDetails   ParkingDetails?
   reviews          Review[]        @relation("StationReviews")
   services         Service?
+  washLanes        WashLane[] // Relation avec les pistes de lavage
   author           User            @relation("StationAuthor", fields: [authorId], references: [id])
   user             User?           @relation(fields: [userId], references: [id])
   visits           Visit[]
@@ -151,6 +152,9 @@ model Service {
   maxVehicleLength   Float?
   stationId          String           @unique
   createdAt          DateTime         @default(now())
+  // Tarifs spécifiques pour Delisle
+  portiquePrice      Float? // Prix pour le lavage au portique (40€ HT pour Delisle)
+  manualWashPrice    Float? // Prix pour 10 minutes de lavage manuel (10€ HT pour Delisle)
   station            Station          @relation(fields: [stationId], references: [id], onDelete: Cascade)
 }
 
@@ -220,6 +224,21 @@ model WashHistory {
   station     Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([stationId])
+}
+
+// Nouveau modèle pour les pistes de lavage
+model WashLane {
+  id                String   @id @default(cuid())
+  laneNumber        Int // Numéro de la piste
+  hasHighPressure   Boolean  @default(false) // Lances HP + Canon à Mousse
+  hasBusesPortique  Boolean  @default(false) // Portique à BUSES
+  hasRollerPortique Boolean  @default(false) // Portique ROULEAUX
+  stationId         String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  station           Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
   @@index([stationId])
 }
 

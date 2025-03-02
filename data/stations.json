@@ -441,8 +441,204 @@
         "wasteWaterDisposal": true,
         "blackWaterDisposal": true,
         "electricity": "AMP_8",
-        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"]
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": 35,
+        "manualWashPrice": 12
       }
+    },
+    {
+      "id": "station_16",
+      "name": "Delisle Paris",
+      "address": "123 Avenue des Champs-Élysées",
+      "city": "Paris",
+      "postalCode": "75008",
+      "latitude": 48.8738,
+      "longitude": 2.295,
+      "images": ["/images/delisle/logo-delisle.png"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "01 45 67 89 10",
+      "description": "Station Delisle de Paris, idéalement située au cœur de la capitale. Équipée de 3 pistes de lavage avec portique et haute pression. Ouvert tous les jours de 6h à 23h.",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "electricity": "AMP_15",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 15
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": true,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": true,
+          "hasRollerPortique": true
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_17",
+      "name": "Delisle la ferté-Gaucher",
+      "address": "Route de Provins - BP25",
+      "city": "La Ferté-Gaucher",
+      "postalCode": "77320",
+      "latitude": 48.770172119140625,
+      "longitude": 3.2923166751861572,
+      "images": ["/images/delisle/delisle-laferte-gaucher.jpeg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "01 64 75 85 93",
+      "description": "Station Delisle de la Ferté gaucher, ouvert tous les jours de 6h00 à 20h00 aisni que le samedi de 7h00 à 12h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": false,
+          "hasBusesPortique": true,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 4,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_18",
+      "name": "Delisle Lille",
+      "address": "78 Rue Nationale",
+      "city": "Lille",
+      "postalCode": "59000",
+      "latitude": 50.6365,
+      "longitude": 3.0635,
+      "images": ["/images/delisle/logo-delisle.png"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 20 56 78 90",
+      "description": "Station Delisle de Lille, située à proximité de l'autoroute A1. Accès facile pour tous types de véhicules. Nos 2 pistes de lavage sont équipées des dernières technologies.",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "electricity": "AMP_8",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 36,
+        "manualWashPrice": 13
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": true,
+          "hasRollerPortique": true
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_19",
+      "name": "Delisle Lillebonne",
+      "address": "ZA Les Herbages, ZI Port Jerôme",
+      "city": "Lillebonne",
+      "postalCode": "76170",
+      "latitude": 49.55,
+      "longitude": 0.5833,
+      "images": ["/images/delisle/delisle-lillebonne.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 32 84 66 50",
+      "description": "Station Delisle de Lillebonne",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
     }
   ],
   "parkings": [

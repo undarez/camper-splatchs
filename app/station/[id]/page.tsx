@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { Station } from "@prisma/client";
 import Image from "next/image";
+import WashLanesCorrected from "@/app/components/WashLanesCorrected";
 
 export default function StationDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -99,6 +100,11 @@ export default function StationDetail({ params }: { params: { id: string } }) {
               {/* ... services existants ... */}
             </div>
           </div>
+        </div>
+
+        {/* Pistes de lavage */}
+        <div className="mt-8">
+          <WashLanesCorrected stationId={params.id} />
         </div>
 
         {/* Images */}
