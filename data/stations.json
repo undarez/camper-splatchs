@@ -915,6 +915,370 @@
           "hasRollerPortique": false
         }
       ]
+    },
+    {
+      "id": "station_25",
+      "name": "Delisle Guilberville",
+      "address": "Parc d'activité de Guilberville",
+      "city": "Guilberville",
+      "postalCode": "50160",
+      "latitude": 49.0233627,
+      "longitude": -0.961788,
+      "images": ["/images/delisle/delisle-guilberville.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 33 06 55 90",
+      "description": "Station Delisle de Guilberville, ouvert du Lundi au Jeudi de 6h00 à 20h00 Vendredi de 6h00 à 19h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_26",
+      "name": "Delisle Lisieux",
+      "address": "ZA Nord-Est, route de Corneilles",
+      "city": "Lisieux",
+      "postalCode": "14100",
+      "latitude": 49.1433627,
+      "longitude": 0.861788,
+      "images": ["/images/delisle/delisle-lisieu.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 31 62 26 44",
+      "description": "Station Delisle de Lisieux, ouvert du Lundi au Vendredi de 8h00 à 18h00 Samedi sur demande",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_27",
+      "name": "Delisle Rosières-aux-Salines",
+      "address": "ZAC des Sables",
+      "city": "Rosières-aux-Salines",
+      "postalCode": "54110",
+      "latitude": 48.5944191,
+      "longitude": 6.3325266,
+      "images": ["/images/delisle/delisle-ros.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 83 48 83 83",
+      "description": "Station Delisle de Rosières-aux-Salines, ouvert du Lundi au Vendredi de 6h00 à 20h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_28",
+      "name": "Delisle Saint-Soupplets",
+      "address": "1 Rue de Saint-Quirin",
+      "city": "Saint-Soupplets",
+      "postalCode": "77165",
+      "latitude": 49.031131744384766,
+      "longitude": 2.8033041954040527,
+      "images": ["/images/delisle/delisle-saintsoupplet.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "01 60 01 58 50",
+      "description": "Station Delisle de Saint-Soupplets, ouvert du Lundi au Jeudi de 7h00 à 18h00 Vendredi 7h00 à 17h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": false,
+          "hasBusesPortique": false,
+          "hasRollerPortique": true
+        }
+      ]
+    },
+    {
+      "id": "station_29",
+      "name": "Delisle Saran",
+      "address": "1771 Rue de Montaran",
+      "city": "Saran",
+      "postalCode": "45770",
+      "latitude": 47.9451142,
+      "longitude": 1.914354,
+      "images": ["/images/delisle/delisle-saran.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 18 21 16 50",
+      "description": "Station Delisle de Saran, ouvert du Lundi au Vendredi de 6h00 à 20h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": false,
+          "hasBusesPortique": false,
+          "hasRollerPortique": true
+        }
+      ]
+    },
+    {
+      "id": "station_30",
+      "name": "Delisle Tilloy-lès-Mofflaines ",
+      "address": "ZI Rue Niepce",
+      "city": "Tilloy-lès-Mofflaines",
+      "postalCode": "62217",
+      "latitude": 50.2872122,
+      "longitude": 2.8129218,
+      "images": ["/images/delisle/delisle-tiloi.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 21 22 75 74",
+      "description": "Station Delisle de Tilloy-lès-Mofflaines, ouvert du Lundi au Vendredi de 6h00 à 20h00 Samedi et Dimanche sur demande",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_31",
+      "name": "Delisle Torcy-le-Grand ",
+      "address": "ZI Rue Niepce",
+      "city": "Torcy-le-Grand",
+      "postalCode": "10700",
+      "latitude": 48.531551361083984,
+      "longitude": 4.167662620544434,
+      "images": ["/images/delisle/delisle-torcy.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 25 47 30 83",
+      "description": "Station Delisle de Torcy-le-Grand, ouvert du Lundi au Vendredi de 6h00 à 20h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_32",
+      "name": "Delisle Verdun ",
+      "address": "9 Rue de l'avenir",
+      "city": "Verdun",
+      "postalCode": "55100",
+      "latitude": 49.16581344604492,
+      "longitude": 5.377630233764648,
+      "images": ["/images/delisle/delisle-verdun.png"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 29 86 44 52 ou 06 17 34 92 66",
+      "description": "Station Delisle de Verdun, ouvert du Lundi au Vendredi de 6h00 à 20h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
     }
   ],
   "parkings": [
