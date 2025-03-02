@@ -164,12 +164,22 @@ export default function HomePage() {
           {/* Section Google AdSense 1 */}
           <div
             id="google-ads-1"
-            className="w-full h-[250px] bg-[#252b43] mb-12 flex items-center justify-center rounded-lg"
+            className="w-full mb-12 flex items-center justify-center rounded-lg overflow-hidden"
           >
-            <div className="text-center">
-              <p className="text-gray-400">Espace publicitaire</p>
-              <p className="text-xs text-gray-500">Advertisement</p>
-            </div>
+            <Link
+              href="https://boutique.lavatrans.com/"
+              target="_blank"
+              className="w-full"
+            >
+              <Image
+                src="/images/article-lavatrans/banniere-lavatrans-promo.png"
+                alt="Boutique Lavatrans - Produits de lavage pour véhicules"
+                width={1200}
+                height={250}
+                className="w-full h-auto object-cover rounded-lg hover:opacity-95 transition-opacity"
+                priority
+              />
+            </Link>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
