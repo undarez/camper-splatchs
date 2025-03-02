@@ -290,7 +290,7 @@ export function StationCardClient() {
       iconSize = [35, 35];
       iconAnchor = [17, 35];
     } else if (station.isLavaTrans) {
-      iconUrl = "/images/article-lavatrans/lavatransicon-article.webp";
+      iconUrl = "/images/article-lavatrans/lavatrans-mascotte.png";
       iconSize = [30, 30];
       iconAnchor = [15, 30];
     } else if (station.isDelisle) {
@@ -598,7 +598,7 @@ export function StationCardClient() {
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
                       <Image
-                        src="/images/article-lavatrans/lavatransicon-article.webp"
+                        src="/images/article-lavatrans/lavatrans-mascotte.png"
                         alt="Station LavaTrans"
                         className="w-6 h-6 filter drop-shadow-[0_0_4px_#40E0D0]"
                         width={24}

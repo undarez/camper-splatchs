@@ -470,7 +470,7 @@ export default function LocalisationStation2() {
     if (type === StationType.PARKING) {
       iconUrl = "/images/logo.png";
     } else if (station.isLavaTrans) {
-      iconUrl = "/images/article-lavatrans/lavatransicon-article.webp";
+      iconUrl = "/images/article-lavatrans/lavatrans-mascotte.png";
     } else if (station.isDelisle) {
       iconUrl = "/images/delisle/logo-delisle.png";
     } else if (type === StationType.STATION_LAVAGE) {
@@ -1053,7 +1053,7 @@ export default function LocalisationStation2() {
                   <div className="flex items-center gap-2">
                     <div className="w-12 h-12 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
                       <Image
-                        src="/images/article-lavatrans/lavatransicon-article.webp"
+                        src="/images/article-lavatrans/lavatrans-mascotte.png"
                         alt="Station LavaTrans"
                         width={35}
                         height={35}

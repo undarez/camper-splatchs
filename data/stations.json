@@ -390,115 +390,135 @@
     },
     {
       "id": "station_14",
-      "name": "Delisle Bordeaux",
-      "address": "15 Avenue des Pins",
-      "city": "Bordeaux",
-      "postalCode": "33000",
-      "latitude": 44.8378,
-      "longitude": -0.5792,
-      "images": ["/images/delisle/logo-delisle.png"],
+      "name": "Delisle Claye-Souilly",
+      "address": "CD 34 - Route de Chelles",
+      "city": "Claye-Souilly",
+      "postalCode": "77410",
+      "latitude": 48.9322535,
+      "longitude": 2.6651813,
+      "images": ["/images/delisle/delisle-claye-souilly.jpg"],
       "status": "active",
       "type": "STATION_LAVAGE",
-      "phoneNumber": "05 56 78 90 12",
-      "description": "Station Delisle de Bordeaux, spécialisée dans le lavage de camping-cars et poids lourds. Ouvert tous les jours de 7h à 21h.",
+      "phoneNumber": "01 60 26 59 80",
+      "description": "Station Delisle de Claye-Souilly, Ouvert du lundi au Jeudi de 6h à 21h et le Vendredi de 6h à 20h.",
       "isLavaTrans": false,
       "isDelisle": true,
       "services": {
         "highPressure": "PORTIQUE",
-        "tirePressure": true,
-        "vacuum": true,
+        "tirePressure": false,
+        "vacuum": false,
         "handicapAccess": true,
-        "wasteWater": true,
-        "waterPoint": true,
-        "wasteWaterDisposal": true,
-        "blackWaterDisposal": true,
-        "electricity": "AMP_15",
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
         "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"]
       }
     },
     {
       "id": "station_15",
-      "name": "Delisle Lyon",
-      "address": "42 Rue de la République",
-      "city": "Lyon",
-      "postalCode": "69002",
-      "latitude": 45.7578,
-      "longitude": 4.832,
-      "images": ["/images/delisle/logo-delisle.png"],
+      "name": "Delisle Chateau-Thierry",
+      "address": "3 avenue de l'Europe",
+      "city": "Château-Thierry",
+      "postalCode": "02400",
+      "latitude": 49.037225,
+      "longitude": 3.399493,
+      "images": ["/images/delisle/delisle-breny"],
       "status": "active",
       "type": "STATION_LAVAGE",
-      "phoneNumber": "04 72 56 78 90",
-      "description": "Station Delisle de Lyon, équipée des dernières technologies pour le lavage de vos véhicules. Ouvert 7j/7 de 6h à 22h.",
+      "phoneNumber": "06 17 34 92 66",
+      "description": "Station Delisle de Château-Thierry, Ouvert du lundi au vendredi de 8h à 19h.",
       "isLavaTrans": false,
       "isDelisle": true,
       "services": {
         "highPressure": "PASSERELLE",
-        "tirePressure": true,
-        "vacuum": true,
+        "tirePressure": false,
+        "vacuum": false,
         "handicapAccess": true,
-        "wasteWater": true,
-        "waterPoint": true,
-        "wasteWaterDisposal": true,
-        "blackWaterDisposal": true,
-        "electricity": "AMP_8",
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
         "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
-        "portiquePrice": 35,
-        "manualWashPrice": 12
-      }
-    },
-    {
-      "id": "station_16",
-      "name": "Delisle Paris",
-      "address": "123 Avenue des Champs-Élysées",
-      "city": "Paris",
-      "postalCode": "75008",
-      "latitude": 48.8738,
-      "longitude": 2.295,
-      "images": ["/images/delisle/logo-delisle.png"],
-      "status": "active",
-      "type": "STATION_LAVAGE",
-      "phoneNumber": "01 45 67 89 10",
-      "description": "Station Delisle de Paris, idéalement située au cœur de la capitale. Équipée de 3 pistes de lavage avec portique et haute pression. Ouvert tous les jours de 6h à 23h.",
-      "isLavaTrans": false,
-      "isDelisle": true,
-      "services": {
-        "highPressure": "PORTIQUE",
-        "tirePressure": true,
-        "vacuum": true,
-        "handicapAccess": true,
-        "wasteWater": true,
-        "waterPoint": true,
-        "wasteWaterDisposal": true,
-        "blackWaterDisposal": true,
-        "electricity": "AMP_15",
-        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
         "portiquePrice": 40,
-        "manualWashPrice": 15
+        "manualWashPrice": 10
       },
       "washLanes": [
         {
           "laneNumber": 1,
           "hasHighPressure": true,
-          "hasBusesPortique": true,
+          "hasBusesPortique": false,
           "hasRollerPortique": false
         },
         {
           "laneNumber": 2,
           "hasHighPressure": true,
-          "hasBusesPortique": true,
-          "hasRollerPortique": true
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
         },
         {
           "laneNumber": 3,
+          "hasHighPressure": false,
+          "hasBusesPortique": false,
+          "hasRollerPortique": true
+        }
+      ]
+    },
+    {
+      "id": "station_16",
+      "name": "Delisle Breny",
+      "address": "1 Bis route de Château-Thierry",
+      "city": "Breny",
+      "postalCode": "02210",
+      "latitude": 49.18344497680664,
+      "longitude": 3.3554868698120117,
+      "images": ["/images/delisle/delisle-breny.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "01 45 67 89 10",
+      "description": "Station Delisle de Breny, ouvert tous les jours de 6h00 à 20h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
           "hasHighPressure": true,
           "hasBusesPortique": false,
           "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": false,
+          "hasBusesPortique": true,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": false,
+          "hasBusesPortique": false,
+          "hasRollerPortique": true
         }
       ]
     },
     {
       "id": "station_17",
-      "name": "Delisle la ferté-Gaucher",
+      "name": "Delisle la Ferté-Gaucher",
       "address": "Route de Provins - BP25",
       "city": "La Ferté-Gaucher",
       "postalCode": "77320",
@@ -554,44 +574,50 @@
     },
     {
       "id": "station_18",
-      "name": "Delisle Lille",
-      "address": "78 Rue Nationale",
-      "city": "Lille",
-      "postalCode": "59000",
-      "latitude": 50.6365,
-      "longitude": 3.0635,
-      "images": ["/images/delisle/logo-delisle.png"],
+      "name": "Delisle Bollene",
+      "address": "ZA de la Préférence",
+      "city": "Bollene",
+      "postalCode": "84500",
+      "latitude": 44.2848,
+      "longitude": 4.753,
+      "images": ["/images/delisle/delisle-bollene.jpg"],
       "status": "active",
       "type": "STATION_LAVAGE",
-      "phoneNumber": "03 20 56 78 90",
-      "description": "Station Delisle de Lille, située à proximité de l'autoroute A1. Accès facile pour tous types de véhicules. Nos 2 pistes de lavage sont équipées des dernières technologies.",
+      "phoneNumber": "04 13 07 31 11",
+      "description": "Station Delisle de Bollene, ouvert tous les jours de 6h00 à 20h00",
       "isLavaTrans": false,
       "isDelisle": true,
       "services": {
         "highPressure": "PORTIQUE",
-        "tirePressure": true,
-        "vacuum": true,
+        "tirePressure": false,
+        "vacuum": false,
         "handicapAccess": true,
-        "wasteWater": true,
-        "waterPoint": true,
-        "wasteWaterDisposal": true,
-        "blackWaterDisposal": true,
-        "electricity": "AMP_8",
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
         "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
-        "portiquePrice": 36,
-        "manualWashPrice": 13
+        "portiquePrice": 40,
+        "manualWashPrice": 10
       },
       "washLanes": [
         {
           "laneNumber": 1,
           "hasHighPressure": true,
-          "hasBusesPortique": true,
-          "hasRollerPortique": true
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
         },
         {
           "laneNumber": 2,
           "hasHighPressure": true,
           "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": false,
+          "hasBusesPortique": true,
           "hasRollerPortique": false
         }
       ]
@@ -614,6 +640,256 @@
       "services": {
         "highPressure": "PORTIQUE",
         "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_20",
+      "name": "Delisle Connantre",
+      "address": "Rue de l'Hermitage ZI Le Carreau",
+      "city": "Connantre",
+      "postalCode": "51230",
+      "latitude": 48.6994,
+      "longitude": 3.9057,
+      "images": ["/images/delisle/delisle-connantre.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 52 50 00 01",
+      "description": "Station Delisle de Connantre, ouvert du Lundi au Vendredi de 6h00 à 20h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": false,
+          "hasBusesPortique": false,
+          "hasRollerPortique": true
+        }
+      ]
+    },
+    {
+      "id": "station_21",
+      "name": "Delisle Courlaoux",
+      "address": "113 Chemin Champ Poly, ZAC La Levanchée",
+      "city": "Courlaoux",
+      "postalCode": "39570",
+      "latitude": 46.6682367,
+      "longitude": 5.4208099,
+      "images": ["/images/delisle/delisle-courlaoux.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 52 50 00 01",
+      "description": "Station Delisle de Courlaoux, ouvert du Lundi au Vendredi de 8h30 -12h30 et 14h00 - 18h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_22",
+      "name": "Delisle Dissay",
+      "address": "ZI de la Belardière",
+      "city": "Dissay",
+      "postalCode": "86130",
+      "latitude": 46.7193,
+      "longitude": 0.443,
+      "images": ["/images/delisle/delisle-dissay.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "05 49 37 00 49",
+      "description": "Station Delisle de Dissay, ouvert du Lundi au Vendredi de 8h00 à 18h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_23",
+      "name": "Delisle Fagnieres",
+      "address": "4 Chemin des Ajaux",
+      "city": "Fagnieres",
+      "postalCode": "51510",
+      "latitude": 48.96204376220703,
+      "longitude": 4.323122978210449,
+      "images": ["/images/delisle/delisle-fagniere.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "03 26 95 00 01",
+      "description": "Station Delisle de Fagnieres, ouvert du Lundi au Vendredi de 8h00 à 18h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 3,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 4,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 5,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 6,
+          "hasHighPressure": false,
+          "hasBusesPortique": true,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_24",
+      "name": "Delisle Guer",
+      "address": "5 Rue du Clos de Breil - ZA Val Coric Est",
+      "city": "Guer",
+      "postalCode": "56380",
+      "latitude": 48.96204376220703,
+      "longitude": 4.323122978210449,
+      "images": ["/images/delisle/delisle-guer.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 97 22 00 10 ou 06 08 73 89 37",
+      "description": "Station Delisle de Guer, ouvert du Lundi au Jeudi de 6h00 à 20h00 Vendredi de 6h00 à 19h00 samedi de 8h00 à 12h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
         "vacuum": false,
         "handicapAccess": true,
         "wasteWater": false,
