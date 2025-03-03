@@ -1279,6 +1279,50 @@
           "hasRollerPortique": false
         }
       ]
+    },
+    {
+      "id": "station_33",
+      "name": "Delisle Pont-de-Buis ",
+      "address": "ZI Ouest",
+      "city": "Pont-de-Buis",
+      "postalCode": "55100",
+      "latitude": 48.2556905,
+      "longitude": -4.0859125,
+      "images": ["/images/delisle/delisl-pontdepuis.jpeg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06 46 89 53 71",
+      "description": "Station Delisle de Pont-de-Buis, ouvert du Lundi au Vendredi de 8h00 à 18h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
     }
   ],
   "parkings": [
