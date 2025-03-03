@@ -1323,6 +1323,50 @@
           "hasRollerPortique": false
         }
       ]
+    },
+    {
+      "id": "station_34",
+      "name": "Delisle Guer",
+      "address": "5 Rue du Clos de Breil - ZA Val Coric Est",
+      "city": "Guer",
+      "postalCode": "56380",
+      "latitude": 48.96204376220703,
+      "longitude": 4.323122978210449,
+      "images": ["/images/delisle/delisle-guer.jpg"],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "02 97 22 00 10 ou 06 08 73 89 37",
+      "description": "Station Delisle de Guer, ouvert du Lundi au Jeudi de 6h00 à 20h00 Vendredi de 6h00 à 19h00 samedi de 8h00 à 12h00",
+      "isLavaTrans": false,
+      "isDelisle": true,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": false,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": false,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 40,
+        "manualWashPrice": 10
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        },
+        {
+          "laneNumber": 2,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
     }
   ],
   "parkings": [
