@@ -237,7 +237,7 @@ export default function LocalisationStation2() {
   // Dialog d'authentification
   const AuthDialog = () => (
     <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-      <DialogContent className="sm:max-w-[425px] bg-[#1E2337] text-white">
+      <DialogContent className="sm:max-w-[425px] bg-[#1E2337] text-white max-w-[90vw] mx-auto">
         <DialogHeader>
           <DialogTitle>Authentification requise</DialogTitle>
           <DialogDescription className="text-gray-400">
@@ -443,6 +443,58 @@ export default function LocalisationStation2() {
       options
     );
   }, [toast]);
+
+  useEffect(() => {
+    if (isMapReady && mapRef.current) {
+      // Fonction pour invalider la taille de la carte lors du redimensionnement
+      const handleResize = () => {
+        if (mapRef.current) {
+          mapRef.current.invalidateSize();
+        }
+      };
+
+      // Fonction pour invalider la taille de la carte lors du défilement sur mobile
+      const handleScroll = () => {
+        if (mapRef.current && window.innerWidth < 768) {
+          mapRef.current.invalidateSize();
+        }
+      };
+
+      // Fonction pour gérer les problèmes de touch sur mobile
+      const handleTouchMove = () => {
+        if (mapRef.current && window.innerWidth < 768) {
+          // Empêcher le défilement de la page pendant l'interaction avec la carte
+          const mapContainer = document.querySelector(".leaflet-container");
+          if (mapContainer) {
+            mapContainer.addEventListener(
+              "touchstart",
+              (e) => {
+                e.preventDefault();
+              },
+              { passive: false }
+            );
+          }
+        }
+      };
+
+      window.addEventListener("resize", handleResize);
+      window.addEventListener("scroll", handleScroll);
+      window.addEventListener("touchmove", handleTouchMove);
+
+      // Invalider la taille de la carte après un court délai pour s'assurer qu'elle est correctement rendue
+      setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.invalidateSize();
+        }
+      }, 300);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        window.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("touchmove", handleTouchMove);
+      };
+    }
+  }, [isMapReady]);
 
   if (loading) {
     return <LoadingScreen />;
@@ -852,7 +904,7 @@ export default function LocalisationStation2() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1E2337]">
+    <div className="min-h-screen bg-[#1E2337] overflow-x-hidden">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -898,6 +950,8 @@ export default function LocalisationStation2() {
         /* Ajout du style pour le curseur */
         .leaflet-container {
           cursor: grab;
+          height: 100% !important;
+          width: 100% !important;
         }
         .leaflet-container:active {
           cursor: grabbing;
@@ -941,12 +995,66 @@ export default function LocalisationStation2() {
         .station-marker-normal {
           filter: drop-shadow(0 0 4px #40E0D0);
         }
+        
+        .leaflet-popup-content {
+          margin: 0 !important;
+          padding: 0 !important;
+          max-width: 100%;
+          width: 100% !important;
+        }
+        
+        .leaflet-popup-content-wrapper {
+          background: #252B43 !important;
+          color: white !important;
+          border-radius: 0.5rem !important;
+          padding: 0 !important;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        }
+        
+        .leaflet-popup-tip {
+          background: #252B43 !important;
+        }
+        
+        .service-card {
+          background: #1E2337;
+          border: 1px solid rgba(75, 85, 99, 0.5);
+        }
+
+        /* Styles pour mobile */
+        @media (max-width: 768px) {
+          .mobile-nav-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1002;
+          }
+          
+          .mobile-filter-bar {
+            position: sticky;
+            bottom: 0;
+            z-index: 1000;
+          }
+          
+          .map-container {
+            height: calc(100vh - 11rem) !important;
+            position: relative;
+            z-index: 1;
+          }
+          
+          .leaflet-popup {
+            max-width: 90vw !important;
+          }
+          
+          .leaflet-popup-content {
+            max-width: 90vw !important;
+            font-size: 0.9rem !important;
+          }
+        }
       `,
         }}
       />
 
       {/* Barre de navigation sous le header */}
-      <div className="fixed top-20 left-0 right-0 bg-[#252B43] border-b border-gray-700/50 p-4 z-[1002]">
+      <div className="md:fixed md:top-20 top-0 left-0 right-0 bg-[#252B43] border-b border-gray-700/50 p-4 z-[1002] mobile-nav-bar">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           {/* Logo et titre */}
           <div className="flex items-center gap-2">
@@ -1000,7 +1108,7 @@ export default function LocalisationStation2() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row relative pt-36">
+      <div className="flex flex-col md:flex-row relative md:pt-36">
         {/* Sidebar pour desktop */}
         <div className="hidden md:block w-80 bg-[#1E2337] border-r border-gray-700/50 p-4 h-[calc(100vh-5rem)] fixed left-0 z-50 overflow-y-auto">
           <div className="space-y-4">
@@ -1198,7 +1306,7 @@ export default function LocalisationStation2() {
 
         {/* Contenu principal avec la carte */}
         <div className="flex-1 md:ml-80">
-          <div className="h-[calc(100vh-5rem)] bg-[#1E2337]">
+          <div className="h-[calc(100vh-5rem)] md:h-[calc(100vh-5rem)] map-container bg-[#1E2337]">
             <div className="w-full h-full rounded-xl overflow-hidden border border-gray-700/50 shadow-xl relative">
               <DynamicMap
                 stations={convertedStations.filter(
@@ -1211,6 +1319,12 @@ export default function LocalisationStation2() {
                 onMapReady={(map: L.Map) => {
                   mapRef.current = map;
                   setIsMapReady(true);
+                  // Invalider la taille de la carte après un court délai
+                  setTimeout(() => {
+                    if (map) {
+                      map.invalidateSize();
+                    }
+                  }, 100);
                 }}
                 createPopupContent={createPopupContent}
                 onGeolocation={handleGeolocation}
@@ -1244,7 +1358,7 @@ export default function LocalisationStation2() {
         </div>
 
         {/* Version mobile simplifiée */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#252B43] border-t border-gray-700/50 p-4 z-[1000]">
+        <div className="md:hidden sticky bottom-0 left-0 right-0 bg-[#252B43] border-t border-gray-700/50 p-4 z-[1000] mobile-filter-bar">
           <div className="flex flex-col gap-4">
             <div className="flex gap-2">
               <button
