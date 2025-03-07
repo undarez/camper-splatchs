@@ -192,7 +192,10 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error:
-            "Erreur lors de la création du compte: " + supabaseError.message,
+            "Erreur lors de la création du compte: " +
+            (supabaseError instanceof Error
+              ? supabaseError.message
+              : String(supabaseError)),
         },
         { status: 500 }
       );
@@ -263,7 +266,9 @@ export async function POST(request: Request) {
         {
           error:
             "Erreur lors de la création du compte dans la base de données: " +
-            prismaError.message,
+            (prismaError instanceof Error
+              ? prismaError.message
+              : String(prismaError)),
         },
         { status: 500 }
       );
