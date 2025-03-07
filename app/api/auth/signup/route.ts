@@ -3,9 +3,43 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// Fonction pour vérifier le captcha
+async function verifyCaptcha(token: string) {
+  try {
+    const response = await fetch(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      {
+        method: "POST",
+      }
+    );
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error("Erreur lors de la vérification du captcha:", error);
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
   try {
-    const { email, password, name } = await request.json();
+    const { email, password, name, captchaToken } = await request.json();
+
+    // Vérification du captcha
+    if (!captchaToken) {
+      return NextResponse.json(
+        { error: "Validation du captcha requise" },
+        { status: 400 }
+      );
+    }
+
+    const isCaptchaValid = await verifyCaptcha(captchaToken);
+    if (!isCaptchaValid) {
+      return NextResponse.json(
+        { error: "Validation du captcha échouée" },
+        { status: 400 }
+      );
+    }
+
     const supabase = createRouteHandlerClient({ cookies });
 
     // Créer l'utilisateur dans Supabase
