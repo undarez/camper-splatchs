@@ -141,27 +141,67 @@ export async function POST(request: Request) {
       );
     }
 
+    // Vérifier la connexion à la base de données
+    try {
+      console.log("Vérification de la connexion à la base de données...");
+      console.log(
+        "URL de la base de données:",
+        process.env.DATABASE_URL?.substring(0, 20) + "..."
+      );
+
+      // Vérifier si Prisma peut se connecter
+      await prisma.$connect();
+      console.log("Connexion à la base de données réussie");
+    } catch (dbConnectError) {
+      console.error(
+        "Erreur de connexion à la base de données:",
+        dbConnectError
+      );
+      return NextResponse.json(
+        { error: "Erreur de connexion à la base de données" },
+        { status: 500 }
+      );
+    }
+
     // Créer le client Supabase
     console.log("Création du client Supabase...");
+    console.log("URL Supabase:", process.env.NEXT_PUBLIC_SUPABASE_URL);
     const supabase = createRouteHandlerClient({ cookies });
 
     // Créer l'utilisateur dans Supabase
     console.log("Tentative de création de l'utilisateur dans Supabase...");
+    let signUpResult;
+    try {
+      signUpResult = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            role: "USER",
+            isActive: true,
+          },
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        },
+      });
+    } catch (supabaseError) {
+      console.error(
+        "Exception lors de la création de l'utilisateur dans Supabase:",
+        supabaseError
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Erreur lors de la création du compte: " + supabaseError.message,
+        },
+        { status: 500 }
+      );
+    }
+
     const {
       data: { user },
       error,
-    } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          role: "USER",
-          isActive: true,
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-      },
-    });
+    } = signUpResult;
 
     // Gérer les erreurs de Supabase
     if (error) {
@@ -221,7 +261,9 @@ export async function POST(request: Request) {
 
       return NextResponse.json(
         {
-          error: "Erreur lors de la création du compte dans la base de données",
+          error:
+            "Erreur lors de la création du compte dans la base de données: " +
+            prismaError.message,
         },
         { status: 500 }
       );
@@ -236,7 +278,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Exception non gérée lors de la création du compte:", error);
     return NextResponse.json(
-      { error: "Erreur serveur interne" },
+      {
+        error:
+          "Erreur serveur interne: " +
+          (error instanceof Error ? error.message : String(error)),
+      },
       { status: 500 }
     );
   }
