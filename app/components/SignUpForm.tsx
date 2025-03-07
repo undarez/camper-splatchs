@@ -68,6 +68,8 @@ export function SignUpForm() {
     }
 
     setIsLoading(true);
+    console.log("Envoi du formulaire avec les valeurs:", values);
+    console.log("Token captcha:", captchaToken);
 
     try {
       const response = await fetch("/api/auth/signup", {
@@ -83,13 +85,28 @@ export function SignUpForm() {
         }),
       });
 
-      const data = await response.json();
+      console.log("Statut de la réponse:", response.status);
+      let data;
+
+      try {
+        data = await response.json();
+        console.log("Données de la réponse:", data);
+      } catch (jsonError) {
+        console.error(
+          "Erreur lors de la lecture de la réponse JSON:",
+          jsonError
+        );
+        throw new Error("Erreur lors de la lecture de la réponse du serveur");
+      }
 
       if (!response.ok) {
-        if (data.emailTaken) {
+        if (data && data.emailTaken) {
           throw new Error("Cette adresse email est déjà utilisée");
         }
-        throw new Error(data.error || "Erreur lors de l'inscription");
+        throw new Error(
+          (data && data.error) ||
+            `Erreur lors de l'inscription (${response.status})`
+        );
       }
 
       toast({
