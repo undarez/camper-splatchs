@@ -4,17 +4,24 @@ import { authOptions } from "@/lib/AuthOptions";
 
 export async function GET() {
   try {
+    console.log("API admin/debug: Début de la requête GET");
     const session = await getServerSession(authOptions);
+    console.log("Session récupérée:", JSON.stringify(session, null, 2));
 
     if (!session?.user) {
+      console.log("API admin/debug: Utilisateur non authentifié");
       return new NextResponse("Non authentifié", { status: 401 });
     }
 
-    // Vérifier si l'utilisateur est un administrateur
-    if (
-      session.user.role !== "ADMIN" &&
-      session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    ) {
+    // Vérifier si l'utilisateur est un administrateur en utilisant l'email
+    // IMPORTANT: Cette vérification est temporaire et devrait être remplacée par une vérification de rôle
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    console.log(
+      `API admin/debug: Email utilisateur: ${session.user.email}, Email admin: ${adminEmail}`
+    );
+
+    if (session.user.email !== adminEmail) {
+      console.log("API admin/debug: L'email ne correspond pas à l'email admin");
       return new NextResponse("Non autorisé", { status: 403 });
     }
 

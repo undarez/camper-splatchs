@@ -72,8 +72,19 @@ export default function AdminUsers() {
       if (data.success) {
         console.log("Correction du rôle administrateur:", data);
         toast.success(data.message);
-        // Rafraîchir la session pour refléter les changements
-        window.location.reload();
+
+        // Si une déconnexion est requise, rediriger vers la page de déconnexion
+        if (data.action === "logout_required") {
+          toast.info(
+            "Vous allez être déconnecté pour appliquer les changements..."
+          );
+          setTimeout(() => {
+            window.location.href = "/api/auth/signout";
+          }, 2000);
+        } else {
+          // Sinon, simplement rafraîchir la page
+          window.location.reload();
+        }
       } else {
         console.error("Erreur de correction:", data);
         toast.error(data.message);

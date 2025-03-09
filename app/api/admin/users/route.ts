@@ -14,42 +14,34 @@ export async function GET() {
       return new NextResponse("Non authentifié", { status: 401 });
     }
 
-    // Vérifier si l'utilisateur est un administrateur en utilisant le rôle
+    // Vérifier si l'utilisateur est un administrateur en utilisant l'email
+    // IMPORTANT: Cette vérification est temporaire et devrait être remplacée par une vérification de rôle
+    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
     console.log(
-      `API admin/users: Vérification du rôle - Rôle actuel: ${session.user.role}, Email: ${session.user.email}`
-    );
-    console.log(
-      `API admin/users: Email admin attendu: ${process.env.NEXT_PUBLIC_ADMIN_EMAIL}`
+      `API admin/users: Email utilisateur: ${session.user.email}, Email admin: ${adminEmail}`
     );
 
+    if (session.user.email !== adminEmail) {
+      console.log("API admin/users: L'email ne correspond pas à l'email admin");
+      return new NextResponse("Non autorisé", { status: 403 });
+    }
+
+    // Si l'utilisateur a le bon email mais pas le rôle ADMIN, mettre à jour son rôle
     if (session.user.role !== "ADMIN") {
-      console.log("API admin/users: L'utilisateur n'a pas le rôle ADMIN");
-
-      // Vérification de secours basée sur l'email
-      if (session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-        console.log(
-          "API admin/users: L'email correspond à l'email admin, mise à jour du rôle"
+      console.log(
+        "API admin/users: L'utilisateur a le bon email mais pas le rôle ADMIN, mise à jour du rôle"
+      );
+      try {
+        await prisma.user.update({
+          where: { email: session.user.email },
+          data: { role: "ADMIN" },
+        });
+        console.log("API admin/users: Rôle utilisateur mis à jour vers ADMIN");
+      } catch (updateError) {
+        console.error(
+          "API admin/users: Erreur lors de la mise à jour du rôle:",
+          updateError
         );
-        // Si l'email correspond mais que le rôle n'est pas ADMIN, mettre à jour le rôle
-        try {
-          await prisma.user.update({
-            where: { email: session.user.email },
-            data: { role: "ADMIN" },
-          });
-          console.log(
-            "API admin/users: Rôle utilisateur mis à jour vers ADMIN"
-          );
-        } catch (updateError) {
-          console.error(
-            "API admin/users: Erreur lors de la mise à jour du rôle:",
-            updateError
-          );
-        }
-      } else {
-        console.log(
-          "API admin/users: L'email ne correspond pas à l'email admin"
-        );
-        return new NextResponse("Non autorisé", { status: 403 });
       }
     }
 
