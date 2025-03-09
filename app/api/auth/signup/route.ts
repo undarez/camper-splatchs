@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createUser, AuthError } from "@/lib/prismaAuth";
 import prisma from "@/lib/prisma";
+import { sendSignupConfirmationEmail } from "@/app/lib/emailService";
 
 // Fonction pour vérifier le captcha
 async function verifyCaptcha(token: string): Promise<boolean> {
@@ -90,6 +91,18 @@ export async function POST(request: Request) {
     // 4. Créer l'utilisateur avec notre fonction utilitaire
     try {
       const user = await createUser({ email, password, name });
+
+      // Envoyer l'email de confirmation d'inscription
+      try {
+        await sendSignupConfirmationEmail(email, name);
+        console.log("Email de confirmation d'inscription envoyé avec succès");
+      } catch (emailError) {
+        console.error(
+          "Erreur lors de l'envoi de l'email de confirmation:",
+          emailError
+        );
+        // On continue même si l'email échoue, l'utilisateur est déjà créé
+      }
 
       // 5. Retourner une réponse de succès
       return NextResponse.json({

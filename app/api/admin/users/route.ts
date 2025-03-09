@@ -7,12 +7,31 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.email) {
-      return new NextResponse("Non autorisé", { status: 401 });
+    if (!session?.user) {
+      return new NextResponse("Non authentifié", { status: 401 });
     }
 
-    if (session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
-      return new NextResponse("Non autorisé", { status: 403 });
+    // Vérifier si l'utilisateur est un administrateur en utilisant le rôle
+    if (session.user.role !== "ADMIN") {
+      console.log("Accès refusé - Rôle utilisateur:", session.user.role);
+      console.log("Email utilisateur:", session.user.email);
+      console.log("Email admin attendu:", process.env.NEXT_PUBLIC_ADMIN_EMAIL);
+
+      // Vérification de secours basée sur l'email
+      if (session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+        // Si l'email correspond mais que le rôle n'est pas ADMIN, mettre à jour le rôle
+        try {
+          await prisma.user.update({
+            where: { email: session.user.email },
+            data: { role: "ADMIN" },
+          });
+          console.log("Rôle utilisateur mis à jour vers ADMIN");
+        } catch (updateError) {
+          console.error("Erreur lors de la mise à jour du rôle:", updateError);
+        }
+      } else {
+        return new NextResponse("Non autorisé", { status: 403 });
+      }
     }
 
     const users = await prisma.user.findMany({
@@ -46,13 +65,18 @@ export async function PATCH(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
+    if (!session?.user) {
+      return new NextResponse("Non authentifié", { status: 401 });
+    }
+
+    // Vérifier si l'utilisateur est un administrateur
     if (
-      !session?.user?.email ||
+      session.user.role !== "ADMIN" &&
       session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
     ) {
-      return new NextResponse("Non autorisé", { status: 401 });
+      return new NextResponse("Non autorisé", { status: 403 });
     }
 
     const body = await request.json();
@@ -75,13 +99,18 @@ export async function DELETE(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
+    if (!session?.user) {
+      return new NextResponse("Non authentifié", { status: 401 });
+    }
+
+    // Vérifier si l'utilisateur est un administrateur
     if (
-      !session?.user?.email ||
+      session.user.role !== "ADMIN" &&
       session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
     ) {
-      return new NextResponse("Non autorisé", { status: 401 });
+      return new NextResponse("Non autorisé", { status: 403 });
     }
 
     await prisma.user.delete({

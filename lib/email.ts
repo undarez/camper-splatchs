@@ -59,6 +59,27 @@ const createTransporter = async () => {
   }
 };
 
+// Template d'email commun
+const emailTemplate = (content: string) => `
+  <div style="background-color: #f8fafc; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
+      <div style="background: linear-gradient(to right, #2ABED9, #1B4B82); padding: 30px; text-align: center;">
+        <img src="${
+          process.env.NEXT_PUBLIC_APP_URL
+        }/images/logo.png" alt="SplashCamper Logo" style="height: 80px; margin: 0 auto;" />
+      </div>
+      <div style="padding: 30px;">
+        ${content}
+      </div>
+      <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 14px;">
+        <p>Pour avoir accès à toutes les fonctionnalités, n'oubliez pas de vous connecter à votre compte.</p>
+        <p>Pour toute demande, nous restons à votre disposition sur notre <a href="https://www.splashcamper.fr/pages/Contact" style="color: #2ABED9; text-decoration: none;">formulaire de contact</a>.</p>
+        <p>© ${new Date().getFullYear()} SplashCamper. Tous droits réservés.</p>
+      </div>
+    </div>
+  </div>
+`;
+
 export const sendNewStationNotification = async (
   stationName: string,
   address: string,
@@ -68,32 +89,28 @@ export const sendNewStationNotification = async (
     const transporter = await createTransporter();
 
     await transporter.sendMail({
-      from: `"CamperWash" <${process.env.EMAIL_USER}>`,
+      from: `"SplashCamper" <${process.env.EMAIL_USER}>`,
       to: adminEmail,
       subject: "Nouvelle station ajoutée",
-      html: `
-        <div style="background-color: #f9fafb; padding: 20px;">
-          <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <img src="${process.env.NEXT_PUBLIC_APP_URL}/logo.png" alt="CamperWash Logo" style="width: 200px; margin-bottom: 20px;" />
-            <h1 style="color: #1f2937;">Nouvelle station ajoutée</h1>
-            <p>Une nouvelle station a été ajoutée et nécessite votre validation :</p>
-            <ul>
-              <li>Nom: ${stationName}</li>
-              <li>Adresse: ${address}</li>
-            </ul>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/stations" 
-               style="background: linear-gradient(to right, #2ABED9, #1B4B82);
-                      color: white;
-                      padding: 10px 20px;
-                      text-decoration: none;
-                      border-radius: 5px;
-                      display: inline-block;
-                      margin-top: 20px;">
-              Voir la station
-            </a>
-          </div>
+      html: emailTemplate(`
+        <h1 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">Nouvelle station ajoutée</h1>
+        <p style="color: #4b5563; margin-bottom: 20px; font-size: 16px;">Une nouvelle station a été ajoutée et nécessite votre validation :</p>
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+          <p style="margin: 0 0 10px 0;"><strong>Nom:</strong> ${stationName}</p>
+          <p style="margin: 0;"><strong>Adresse:</strong> ${address}</p>
         </div>
-      `,
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/stations" 
+           style="background: linear-gradient(to right, #2ABED9, #1B4B82);
+                  color: white;
+                  padding: 12px 24px;
+                  text-decoration: none;
+                  border-radius: 5px;
+                  display: inline-block;
+                  margin-top: 20px;
+                  font-weight: bold;">
+          Voir la station
+        </a>
+      `),
     });
     console.log("Email de notification envoyé avec succès");
   } catch (error) {
@@ -111,97 +128,122 @@ export const sendContactEmail = async (
   try {
     const transporter = await createTransporter();
 
-    const emailTemplate = (content: string) => `
-      <div style="background-color: #f8fafc; padding: 20px; font-family: Arial, sans-serif;">
-        <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
-          <div style="background: linear-gradient(to right, #2ABED9, #1B4B82); padding: 20px; text-align: center;">
-            <img src="${
-              process.env.NEXT_PUBLIC_APP_URL
-            }/images/logo.png" alt="CamperWash Logo" style="height: 60px; margin: 0 auto;" />
-          </div>
-          <div style="padding: 30px;">
-            ${content}
-          </div>
-          <div style="background-color: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 14px;">
-            <p>© ${new Date().getFullYear()} CamperWash. Tous droits réservés.</p>
-          </div>
-        </div>
-      </div>
-    `;
-
+    // Email à l'administrateur
     await transporter.sendMail({
-      from: `"CamperWash Contact" <${process.env.EMAIL_USER}>`,
+      from: `"SplashCamper Contact" <${process.env.EMAIL_USER}>`,
       to: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
       subject: `Nouveau message: ${subject}`,
       html: emailTemplate(`
-        <h1 style="color: #1e293b; margin-bottom: 20px;">Nouveau message de contact</h1>
+        <h1 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">Nouveau message de contact</h1>
         <div style="background-color: #f8fafc; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-          <p><strong>De:</strong> ${name} (${email})</p>
-          <p><strong>Sujet:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <p style="white-space: pre-wrap; color: #334155;">${message}</p>
+          <p style="margin: 0 0 10px 0;"><strong>De:</strong> ${name} (${email})</p>
+          <p style="margin: 0 0 10px 0;"><strong>Sujet:</strong> ${subject}</p>
+          <p style="margin: 0 0 10px 0;"><strong>Message:</strong></p>
+          <p style="white-space: pre-wrap; color: #4b5563; margin: 0;">${message}</p>
         </div>
       `),
     });
     console.log("Email admin envoyé avec succès");
 
+    // Email de confirmation à l'utilisateur
     await transporter.sendMail({
-      from: `"CamperWash" <${process.env.EMAIL_USER}>`,
+      from: `"SplashCamper" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Nous avons bien reçu votre message",
       html: emailTemplate(`
-        <h1 style="color: #1e293b; margin-bottom: 20px;">Merci de nous avoir contacté</h1>
-        <p>Bonjour ${name},</p>
-        <p>Nous avons bien reçu votre message concernant "${subject}".</p>
-        <p>Notre équipe vous répondra dans les plus brefs délais.</p>
+        <h1 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">Merci de nous avoir contacté</h1>
+        <p style="color: #4b5563; margin-bottom: 10px; font-size: 16px;">Bonjour ${name},</p>
+        <p style="color: #4b5563; margin-bottom: 10px; font-size: 16px;">Nous avons bien reçu votre message concernant "${subject}".</p>
+        <p style="color: #4b5563; margin-bottom: 20px; font-size: 16px;">Notre équipe vous répondra dans les plus brefs délais.</p>
         <div style="margin-top: 20px; color: #64748b;">
-          <p>Cordialement,</p>
-          <p>L'équipe CamperWash</p>
+          <p style="margin: 0 0 5px 0;">Cordialement,</p>
+          <p style="margin: 0; font-weight: bold;">L'équipe SplashCamper</p>
         </div>
       `),
     });
+    console.log("Email de confirmation envoyé avec succès");
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
     throw error;
   }
 };
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
-
 export async function sendVerificationEmail(email: string, token: string) {
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
-
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Vérifiez votre adresse email - CamperWash",
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #2ABED9;">Bienvenue sur CamperWash!</h1>
-        <p>Merci de vous être inscrit. Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
-        <a href="${verificationUrl}" 
-           style="display: inline-block; padding: 12px 24px; background-color: #2ABED9; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-          Vérifier mon email
-        </a>
-        <p>Si le bouton ne fonctionne pas, vous pouvez copier et coller ce lien dans votre navigateur :</p>
-        <p style="color: #666;">${verificationUrl}</p>
-        <p>Ce lien expirera dans 24 heures.</p>
-        <p>Si vous n'avez pas créé de compte sur CamperWash, vous pouvez ignorer cet email.</p>
-      </div>
-    `,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    const transporter = await createTransporter();
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+
+    await transporter.sendMail({
+      from: `"SplashCamper" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Vérifiez votre adresse email - SplashCamper",
+      html: emailTemplate(`
+        <h1 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">Bienvenue sur SplashCamper!</h1>
+        <p style="color: #4b5563; margin-bottom: 20px; font-size: 16px;">Merci de vous être inscrit. Pour activer votre compte, veuillez cliquer sur le bouton ci-dessous :</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verificationUrl}" 
+             style="background: linear-gradient(to right, #2ABED9, #1B4B82);
+                    color: white;
+                    padding: 12px 24px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    display: inline-block;
+                    font-weight: bold;">
+            Vérifier mon email
+          </a>
+        </div>
+        <p style="color: #64748b; margin-top: 20px; font-size: 14px;">
+          Si le bouton ne fonctionne pas, vous pouvez copier et coller ce lien dans votre navigateur :
+          <br>
+          <a href="${verificationUrl}" style="color: #2ABED9; word-break: break-all;">${verificationUrl}</a>
+        </p>
+        <p style="color: #64748b; margin-top: 20px; font-size: 14px;">Ce lien expirera dans 24 heures.</p>
+      `),
+    });
     return true;
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
+    return false;
+  }
+}
+
+// Nouvelle fonction pour envoyer un email de confirmation d'inscription
+export async function sendSignupConfirmationEmail(email: string, name: string) {
+  try {
+    const transporter = await createTransporter();
+    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/signin`;
+
+    await transporter.sendMail({
+      from: `"SplashCamper" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Bienvenue sur SplashCamper!",
+      html: emailTemplate(`
+        <h1 style="color: #1f2937; margin-bottom: 20px; font-size: 24px;">Bienvenue sur SplashCamper, ${name}!</h1>
+        <p style="color: #4b5563; margin-bottom: 15px; font-size: 16px;">Votre compte a été créé avec succès. Nous sommes ravis de vous compter parmi notre communauté de camping-caristes!</p>
+        <p style="color: #4b5563; margin-bottom: 20px; font-size: 16px;">Avec SplashCamper, vous pouvez facilement trouver des stations de lavage pour votre camping-car partout en France.</p>
+        <div style="background-color: #f0f9ff; border-left: 4px solid #2ABED9; padding: 15px; margin-bottom: 20px;">
+          <p style="color: #0369a1; margin: 0; font-size: 16px;">Pour profiter pleinement de toutes nos fonctionnalités, n'oubliez pas de vous connecter à votre compte.</p>
+        </div>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${loginUrl}" 
+             style="background: linear-gradient(to right, #2ABED9, #1B4B82);
+                    color: white;
+                    padding: 12px 24px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    display: inline-block;
+                    font-weight: bold;">
+            Se connecter
+          </a>
+        </div>
+      `),
+    });
+    return true;
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'envoi de l'email de confirmation d'inscription:",
+      error
+    );
     return false;
   }
 }
