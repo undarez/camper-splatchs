@@ -1,5 +1,8 @@
 import { Dialog, DialogContent } from "@/app/components/ui/dialog";
-import { signOut } from "next-auth/react";
+import { useState } from "react";
+import { Checkbox } from "@/app/components/ui/checkbox";
+import { Label } from "@/app/components/ui/label";
+import { useLogout } from "@/hooks/useLogout";
 
 interface LogoutDialogProps {
   isOpen: boolean;
@@ -7,6 +10,13 @@ interface LogoutDialogProps {
 }
 
 export default function LogoutDialog({ isOpen, onClose }: LogoutDialogProps) {
+  const [preventAutoLogin, setPreventAutoLogin] = useState(false);
+  const { logout } = useLogout();
+
+  const handleLogout = async () => {
+    await logout(preventAutoLogin, "/signin");
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="p-0 bg-transparent border-none shadow-none max-w-sm">
@@ -43,9 +53,26 @@ export default function LogoutDialog({ isOpen, onClose }: LogoutDialogProps) {
               accès aux fonctionnalités avancées.
             </p>
 
+            <div className="flex items-center space-x-2 mb-4">
+              <Checkbox
+                id="preventAutoLogin"
+                checked={preventAutoLogin}
+                onCheckedChange={(checked) =>
+                  setPreventAutoLogin(checked as boolean)
+                }
+                className="data-[state=checked]:bg-blue-600"
+              />
+              <Label
+                htmlFor="preventAutoLogin"
+                className="text-sm text-gray-300 cursor-pointer"
+              >
+                Empêcher la reconnexion automatique
+              </Label>
+            </div>
+
             <div className="space-y-3">
               <button
-                onClick={() => signOut()}
+                onClick={handleLogout}
                 className="w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
               >
                 Se déconnecter

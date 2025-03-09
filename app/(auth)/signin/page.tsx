@@ -19,6 +19,13 @@ export default function SignIn() {
   const router = useRouter();
 
   useEffect(() => {
+    // Vérifier si l'utilisateur a choisi de ne pas être reconnecté automatiquement
+    const preventAutoLogin = localStorage.getItem("prevent-auto-login");
+    if (preventAutoLogin === "true") {
+      // Supprimer le marqueur pour les futures connexions
+      localStorage.removeItem("prevent-auto-login");
+    }
+
     const privacyAccepted = localStorage.getItem("privacyAccepted");
     if (!privacyAccepted) {
       setShowModal(true);
