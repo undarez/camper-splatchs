@@ -1,10 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { Role } from "@prisma/client";
 import prisma from "@/lib/prisma";
+import { compare } from "bcrypt";
 
 const handler = NextAuth({
   providers: [
@@ -24,36 +23,31 @@ const handler = NextAuth({
         }
 
         try {
-          const supabase = createRouteHandlerClient({ cookies });
-
-          // Vérifier d'abord si l'utilisateur existe dans Prisma
-          const prismaUser = await prisma.user.findUnique({
+          // Rechercher l'utilisateur dans Prisma
+          const user = await prisma.user.findUnique({
             where: { email: credentials.email },
           });
 
-          if (!prismaUser) {
+          if (!user || !user.hashedPassword) {
             throw new Error("Compte non trouvé");
           }
 
-          // Ensuite vérifier les credentials avec Supabase
-          const {
-            data: { user },
-            error,
-          } = await supabase.auth.signInWithPassword({
-            email: credentials.email,
-            password: credentials.password,
-          });
+          // Vérifier le mot de passe
+          const passwordMatch = await compare(
+            credentials.password,
+            user.hashedPassword
+          );
 
-          if (error || !user) {
-            console.error("Erreur Supabase:", error);
-            throw new Error("Identifiants invalides");
+          if (!passwordMatch) {
+            throw new Error("Mot de passe incorrect");
           }
 
+          // Retourner les informations de l'utilisateur
           return {
-            id: prismaUser.id,
-            email: prismaUser.email,
-            name: prismaUser.name,
-            role: prismaUser.role,
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
           };
         } catch (error) {
           console.error("Erreur d'authentification:", error);
@@ -106,6 +100,7 @@ const handler = NextAuth({
     signIn: "/(auth)/signin",
     error: "/(auth)/error",
   },
+  debug: process.env.NODE_ENV === "development",
 });
 
 export { handler as GET, handler as POST };
