@@ -129,9 +129,9 @@ export default function AdminUsers() {
   const handleSave = async (user: User) => {
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user),
+        body: JSON.stringify({ role: user.role }),
       });
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour");

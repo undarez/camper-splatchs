@@ -5,9 +5,10 @@ import GoogleAdsense from "./GoogleAdsense";
 
 interface LoginAdProps {
   onContinue: () => void;
+  onStayHere?: () => void;
 }
 
-export default function LoginAd({ onContinue }: LoginAdProps) {
+export default function LoginAd({ onContinue, onStayHere }: LoginAdProps) {
   const [showAd, setShowAd] = useState(false);
 
   useEffect(() => {
@@ -19,6 +20,14 @@ export default function LoginAd({ onContinue }: LoginAdProps) {
   }, []);
 
   if (!showAd) return null;
+
+  const handleStayHere = () => {
+    if (onStayHere) {
+      onStayHere();
+    } else {
+      setShowAd(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -37,12 +46,20 @@ export default function LoginAd({ onContinue }: LoginAdProps) {
             responsive={true}
           />
         </div>
-        <button
-          onClick={onContinue}
-          className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Continuer vers le site
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={onContinue}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          >
+            Continuer vers le site
+          </button>
+          <button
+            onClick={handleStayHere}
+            className="w-full bg-gray-200 text-gray-800 py-2 rounded hover:bg-gray-300"
+          >
+            Rester ici
+          </button>
+        </div>
       </div>
     </div>
   );
