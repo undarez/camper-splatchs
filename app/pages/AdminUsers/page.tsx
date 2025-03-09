@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import {
@@ -34,9 +34,94 @@ export default function AdminUsers() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    fetchUsers();
+  // Utiliser useCallback pour la fonction fetchUsers
+  const fetchUsers = useCallback(async () => {
+    try {
+      console.log("AdminUsers: Début de la récupération des utilisateurs");
+      setLoading(true);
+
+      const response = await fetch("/api/admin/users", {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+
+      console.log("AdminUsers: Statut de la réponse:", response.status);
+
+      if (!response.ok) {
+        let errorText;
+        try {
+          errorText = await response.text();
+        } catch {
+          errorText = "Impossible de lire le message d'erreur";
+        }
+
+        console.error(
+          "AdminUsers: Erreur de réponse:",
+          response.status,
+          errorText
+        );
+
+        // Vérifier le statut de l'utilisateur actuel
+        await checkUserStatus();
+
+        throw new Error("Erreur lors de la récupération des utilisateurs");
+      }
+
+      const data = await response.json();
+      console.log("AdminUsers: Données reçues:", data.length, "utilisateurs");
+      setUsers(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("AdminUsers: Erreur complète:", error);
+      toast.error("Impossible de charger les utilisateurs");
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    checkUserStatus();
+    fetchUsers();
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    const interval = setInterval(fetchUsers, 30000);
+    return () => clearInterval(interval);
+  }, [fetchUsers]);
+
+  // Fonction pour vérifier le statut de l'utilisateur actuel
+  const checkUserStatus = async () => {
+    try {
+      const response = await fetch("/api/auth/user");
+
+      if (!response.ok) {
+        console.error(
+          "Erreur lors de la vérification du statut utilisateur:",
+          response.status
+        );
+        toast.error("Erreur lors de la vérification du statut utilisateur");
+        return;
+      }
+
+      const userData = await response.json();
+      console.log("Statut utilisateur actuel:", userData);
+
+      // Vérifier si l'utilisateur est administrateur
+      if (userData.role !== "ADMIN") {
+        toast.error("Vous n'avez pas les droits d'administrateur");
+        console.error("L'utilisateur n'a pas le rôle ADMIN:", userData);
+      } else {
+        toast.success("Connecté en tant qu'administrateur");
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la vérification du statut utilisateur:",
+        error
+      );
+      toast.error("Erreur lors de la vérification du statut utilisateur");
+    }
+  };
 
   // Fonction de débogage pour vérifier les variables d'environnement
   const checkEnvVars = async () => {
@@ -95,33 +180,6 @@ export default function AdminUsers() {
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      console.log("AdminUsers: Début de la récupération des utilisateurs");
-      const response = await fetch("/api/admin/users");
-      console.log("AdminUsers: Statut de la réponse:", response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(
-          "AdminUsers: Erreur de réponse:",
-          response.status,
-          errorText
-        );
-        throw new Error("Erreur lors de la récupération des utilisateurs");
-      }
-
-      const data = await response.json();
-      console.log("AdminUsers: Données reçues:", data.length, "utilisateurs");
-      setUsers(data);
-      setLoading(false);
-    } catch (error) {
-      console.error("AdminUsers: Erreur complète:", error);
-      toast.error("Impossible de charger les utilisateurs");
-      setLoading(false);
-    }
-  };
-
   const handleEdit = (user: User) => {
     setEditingUser(user);
   };
@@ -171,11 +229,6 @@ export default function AdminUsers() {
       String(value).toLowerCase().includes(searchTerm.toLowerCase())
     )
   );
-
-  useEffect(() => {
-    const interval = setInterval(fetchUsers, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Vérification d'autorisation améliorée
   if (
@@ -249,6 +302,13 @@ export default function AdminUsers() {
                 className="bg-gray-700 text-white hover:bg-gray-600"
               >
                 Rafraîchir
+              </Button>
+              <Button
+                onClick={checkUserStatus}
+                variant="outline"
+                className="bg-green-900 text-white hover:bg-green-800"
+              >
+                Vérifier mon statut
               </Button>
               <Button
                 onClick={checkEnvVars}
