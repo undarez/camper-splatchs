@@ -5,24 +5,19 @@ import { authOptions } from "@/lib/AuthOptions";
 
 export async function GET() {
   try {
-    console.log("API admin/fix-admin: Début de la requête GET");
-
     // Récupérer la session
     const session = await getServerSession(authOptions);
-    console.log("Session récupérée:", JSON.stringify(session, null, 2));
 
     // Récupérer l'email administrateur depuis les variables d'environnement
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    const adminEmail =
+      process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
 
     if (!adminEmail) {
-      console.log(
-        "API admin/fix-admin: Variable d'environnement NEXT_PUBLIC_ADMIN_EMAIL non définie"
-      );
       return NextResponse.json(
         {
           success: false,
           message:
-            "Variable d'environnement NEXT_PUBLIC_ADMIN_EMAIL non définie",
+            "Variable d'environnement d'email administrateur non définie",
         },
         { status: 500 }
       );
@@ -30,7 +25,6 @@ export async function GET() {
 
     // Vérifier si l'utilisateur est connecté
     if (!session?.user) {
-      console.log("API admin/fix-admin: Utilisateur non authentifié");
       return NextResponse.json(
         {
           success: false,
@@ -42,9 +36,6 @@ export async function GET() {
 
     // Vérifier si l'utilisateur connecté est l'administrateur
     if (session.user.email !== adminEmail) {
-      console.log(
-        "API admin/fix-admin: L'utilisateur n'est pas l'administrateur"
-      );
       return NextResponse.json(
         {
           success: false,
@@ -61,9 +52,6 @@ export async function GET() {
     });
 
     if (!user) {
-      console.log(
-        "API admin/fix-admin: Utilisateur administrateur non trouvé dans la base de données"
-      );
       return NextResponse.json(
         {
           success: false,
@@ -76,7 +64,6 @@ export async function GET() {
 
     // Mettre à jour le rôle si nécessaire
     if (user.role !== "ADMIN") {
-      console.log("API admin/fix-admin: Mise à jour du rôle administrateur");
       const updatedUser = await prisma.user.update({
         where: { email: adminEmail },
         data: { role: "ADMIN" },
@@ -88,9 +75,6 @@ export async function GET() {
         where: { userId: user.id },
       });
 
-      console.log(
-        "API admin/fix-admin: Rôle mis à jour et sessions supprimées"
-      );
       return NextResponse.json({
         success: true,
         message:
@@ -100,9 +84,6 @@ export async function GET() {
       });
     }
 
-    console.log(
-      "API admin/fix-admin: L'utilisateur a déjà le rôle administrateur"
-    );
     return NextResponse.json({
       success: true,
       message: "L'utilisateur a déjà le rôle administrateur",

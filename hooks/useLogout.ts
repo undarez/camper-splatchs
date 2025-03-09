@@ -1,9 +1,12 @@
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 /**
  * Hook personnalisé pour gérer la déconnexion
  */
 export function useLogout() {
+  const router = useRouter();
+
   /**
    * Fonction pour se déconnecter
    * @param preventAutoLogin Si true, supprime également les cookies et les données de session
@@ -14,30 +17,12 @@ export function useLogout() {
     callbackUrl: string = "/signin"
   ) => {
     if (preventAutoLogin) {
-      // Supprimer les données de session du localStorage
-      try {
-        localStorage.removeItem("next-auth.session-token");
-        localStorage.removeItem("next-auth.callback-url");
-        localStorage.removeItem("next-auth.csrf-token");
-        localStorage.removeItem("next-auth.state");
-
-        // Marquer que l'utilisateur a choisi de ne pas être reconnecté automatiquement
-        localStorage.setItem("prevent-auto-login", "true");
-
-        // Supprimer les cookies liés à l'authentification
-        document.cookie.split(";").forEach((cookie) => {
-          const [name] = cookie.trim().split("=");
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-        });
-      } catch (error) {
-        console.error(
-          "Erreur lors de la suppression des données de session:",
-          error
-        );
-      }
+      // Rediriger vers la page de déconnexion forcée qui supprimera tous les cookies et tokens
+      router.push("/logout");
+      return;
     }
 
-    // Déconnexion via NextAuth
+    // Déconnexion standard via NextAuth
     return signOut({ callbackUrl, redirect: true });
   };
 

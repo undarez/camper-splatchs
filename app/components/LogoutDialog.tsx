@@ -10,11 +10,11 @@ interface LogoutDialogProps {
 }
 
 export default function LogoutDialog({ isOpen, onClose }: LogoutDialogProps) {
-  const [preventAutoLogin, setPreventAutoLogin] = useState(false);
+  const [preventAutoLogin, setPreventAutoLogin] = useState(true);
   const { logout } = useLogout();
 
   const handleLogout = async () => {
-    await logout(preventAutoLogin, "/signin");
+    await logout(preventAutoLogin);
   };
 
   return (
@@ -23,7 +23,7 @@ export default function LogoutDialog({ isOpen, onClose }: LogoutDialogProps) {
         <div className="bg-[#252B43] rounded-xl shadow-2xl border border-gray-700/50 overflow-hidden">
           {/* En-tête avec logo */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 relative">
-            <div className="absolute inset-0 bg-[url('/logo.png')] opacity-5 bg-center bg-no-repeat bg-contain"></div>
+            <div className="absolute inset-0 bg-[url('/images/logo.png')] opacity-5 bg-center bg-no-repeat bg-contain"></div>
             <div className="relative">
               <div className="w-16 h-16 bg-white/10 backdrop-blur rounded-full mx-auto mb-4 flex items-center justify-center">
                 <svg
@@ -66,7 +66,7 @@ export default function LogoutDialog({ isOpen, onClose }: LogoutDialogProps) {
                 htmlFor="preventAutoLogin"
                 className="text-sm text-gray-300 cursor-pointer"
               >
-                Empêcher la reconnexion automatique
+                Empêcher la reconnexion automatique (recommandé)
               </Label>
             </div>
 

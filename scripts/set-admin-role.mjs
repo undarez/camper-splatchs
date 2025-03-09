@@ -7,8 +7,12 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-// Email de l'administrateur
-const adminEmail = 'fortuna77320@gmail.com';
+// Email de l'administrateur (utiliser la variable d'environnement ou une valeur par défaut)
+const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL || 'fortuna77320@gmail.com';
+
+console.log(`Email administrateur configuré: ${adminEmail}`);
+console.log(`NEXT_PUBLIC_ADMIN_EMAIL: ${process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'Non défini'}`);
+console.log(`ADMIN_EMAIL: ${process.env.ADMIN_EMAIL || 'Non défini'}`);
 
 async function main() {
   try {
