@@ -38,16 +38,74 @@ export default function AdminUsers() {
     fetchUsers();
   }, []);
 
+  // Fonction de débogage pour vérifier les variables d'environnement
+  const checkEnvVars = async () => {
+    try {
+      const response = await fetch("/api/admin/debug");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erreur de débogage:", response.status, errorText);
+        toast.error(
+          "Erreur lors de la vérification des variables d'environnement"
+        );
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Variables d'environnement:", data);
+      toast.success("Variables d'environnement vérifiées (voir console)");
+    } catch (error) {
+      console.error("Erreur de débogage:", error);
+      toast.error(
+        "Erreur lors de la vérification des variables d'environnement"
+      );
+    }
+  };
+
+  // Fonction pour corriger le rôle administrateur
+  const fixAdminRole = async () => {
+    try {
+      toast.info("Tentative de correction du rôle administrateur...");
+      const response = await fetch("/api/admin/fix-admin");
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("Correction du rôle administrateur:", data);
+        toast.success(data.message);
+        // Rafraîchir la session pour refléter les changements
+        window.location.reload();
+      } else {
+        console.error("Erreur de correction:", data);
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la correction du rôle:", error);
+      toast.error("Erreur lors de la correction du rôle administrateur");
+    }
+  };
+
   const fetchUsers = async () => {
     try {
+      console.log("AdminUsers: Début de la récupération des utilisateurs");
       const response = await fetch("/api/admin/users");
-      if (!response.ok)
+      console.log("AdminUsers: Statut de la réponse:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          "AdminUsers: Erreur de réponse:",
+          response.status,
+          errorText
+        );
         throw new Error("Erreur lors de la récupération des utilisateurs");
+      }
+
       const data = await response.json();
+      console.log("AdminUsers: Données reçues:", data.length, "utilisateurs");
       setUsers(data);
       setLoading(false);
     } catch (error) {
-      console.error("Erreur:", error);
+      console.error("AdminUsers: Erreur complète:", error);
       toast.error("Impossible de charger les utilisateurs");
       setLoading(false);
     }
@@ -108,9 +166,43 @@ export default function AdminUsers() {
     return () => clearInterval(interval);
   }, []);
 
-  if (session?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+  // Vérification d'autorisation améliorée
+  if (
+    !session?.user ||
+    (session.user.role !== "ADMIN" &&
+      session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL)
+  ) {
     return (
-      <div className="text-center p-8 text-red-500">Accès non autorisé</div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8">
+        <div className="max-w-md mx-auto bg-gray-800 rounded-lg border border-gray-700 p-6 text-center">
+          <h2 className="text-xl font-bold text-red-500 mb-4">
+            Accès non autorisé
+          </h2>
+          <p className="text-gray-300 mb-4">
+            Vous n'avez pas les droits nécessaires pour accéder à cette page.
+          </p>
+          <div className="text-gray-400 text-sm">
+            <p>Email: {session?.user?.email || "Non connecté"}</p>
+            <p>Rôle: {session?.user?.role || "Aucun"}</p>
+          </div>
+          <div className="flex flex-col gap-2 mt-4">
+            <Button
+              onClick={checkEnvVars}
+              variant="outline"
+              className="bg-blue-900 text-white hover:bg-blue-800"
+            >
+              Vérifier les variables d'environnement
+            </Button>
+            <Button
+              onClick={fixAdminRole}
+              variant="outline"
+              className="bg-green-900 text-white hover:bg-green-800"
+            >
+              Corriger le rôle administrateur
+            </Button>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -139,8 +231,31 @@ export default function AdminUsers() {
                 className="w-full sm:w-80 bg-gray-800 text-white border-gray-700"
               />
             </div>
-            <div className="text-gray-300 text-sm sm:text-base">
-              {filteredUsers.length} utilisateur(s) trouvé(s)
+            <div className="flex gap-2">
+              <Button
+                onClick={fetchUsers}
+                variant="outline"
+                className="bg-gray-700 text-white hover:bg-gray-600"
+              >
+                Rafraîchir
+              </Button>
+              <Button
+                onClick={checkEnvVars}
+                variant="outline"
+                className="bg-blue-900 text-white hover:bg-blue-800"
+              >
+                Déboguer
+              </Button>
+              <Button
+                onClick={fixAdminRole}
+                variant="outline"
+                className="bg-green-900 text-white hover:bg-green-800"
+              >
+                Corriger le rôle administrateur
+              </Button>
+              <div className="text-gray-300 text-sm sm:text-base ml-4">
+                {filteredUsers.length} utilisateur(s) trouvé(s)
+              </div>
             </div>
           </div>
         </div>
