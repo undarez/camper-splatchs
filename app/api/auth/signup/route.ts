@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createUser, AuthError } from "@/lib/supabaseUtils";
+import { createUser, AuthError } from "@/lib/prismaAuth";
+import prisma from "@/lib/prisma";
 
 // Fonction pour vérifier le captcha
 async function verifyCaptcha(token: string): Promise<boolean> {
@@ -39,9 +40,28 @@ async function verifyCaptcha(token: string): Promise<boolean> {
 
 export async function POST(request: Request) {
   try {
+    // Vérifier la connexion à la base de données
+    console.log("Vérification de la connexion à la base de données...");
+    try {
+      await prisma.$connect();
+      console.log("Connexion à la base de données réussie");
+    } catch (dbError) {
+      console.error("Erreur de connexion à la base de données:", dbError);
+      return NextResponse.json(
+        { error: "Erreur de connexion à la base de données" },
+        { status: 500 }
+      );
+    }
+
     // 1. Extraire les données de la requête
     const body = await request.json();
     const { name, email, password, captchaToken } = body;
+
+    console.log("Données reçues:", {
+      name,
+      email,
+      captchaToken: !!captchaToken,
+    });
 
     // 2. Valider les données requises
     if (!name || !email || !password) {
@@ -94,6 +114,10 @@ export async function POST(request: Request) {
       }
 
       // Erreur générique
+      console.error(
+        "Erreur non gérée lors de la création de l'utilisateur:",
+        error
+      );
       return NextResponse.json(
         { error: "Erreur lors de la création du compte" },
         { status: 400 }
@@ -105,5 +129,8 @@ export async function POST(request: Request) {
       { error: "Erreur serveur interne" },
       { status: 500 }
     );
+  } finally {
+    // Déconnecter Prisma pour éviter les fuites de connexion
+    await prisma.$disconnect();
   }
 }

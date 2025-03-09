@@ -1,8 +1,22 @@
 import { NextResponse } from "next/server";
-import { signInUser, AuthError } from "@/lib/supabaseUtils";
+import { signInUser, AuthError } from "@/lib/prismaAuth";
+import prisma from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
+    // Vérifier la connexion à la base de données
+    console.log("Vérification de la connexion à la base de données...");
+    try {
+      await prisma.$connect();
+      console.log("Connexion à la base de données réussie");
+    } catch (dbError) {
+      console.error("Erreur de connexion à la base de données:", dbError);
+      return NextResponse.json(
+        { error: "Erreur de connexion à la base de données" },
+        { status: 500 }
+      );
+    }
+
     // 1. Extraire les données de la requête
     const body = await request.json();
     const { email, password } = body;
@@ -17,13 +31,12 @@ export async function POST(request: Request) {
 
     // 3. Connecter l'utilisateur
     try {
-      const data = await signInUser({ email, password });
+      const user = await signInUser({ email, password });
 
       // 4. Retourner une réponse de succès
       return NextResponse.json({
         message: "Connexion réussie",
-        session: data.session,
-        user: data.user,
+        user,
       });
     } catch (error) {
       if (error instanceof AuthError) {
@@ -41,5 +54,8 @@ export async function POST(request: Request) {
       { error: "Erreur serveur interne" },
       { status: 500 }
     );
+  } finally {
+    // Déconnecter Prisma pour éviter les fuites de connexion
+    await prisma.$disconnect();
   }
 }
