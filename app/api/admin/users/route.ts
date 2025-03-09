@@ -16,7 +16,7 @@ export async function GET() {
 
     // Vérifier si l'utilisateur est un administrateur en utilisant l'email
     // IMPORTANT: Cette vérification est temporaire et devrait être remplacée par une vérification de rôle
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+    const adminEmail = process.env.ADMIN_EMAIL;
     console.log(
       `API admin/users: Email utilisateur: ${session.user.email}, Email admin: ${adminEmail}`
     );
