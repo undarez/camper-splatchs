@@ -72,7 +72,11 @@ export function SignUpForm() {
     console.log("Token captcha:", captchaToken);
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      // Utiliser l'URL complète du site
+      const apiUrl = window.location.origin;
+      console.log("URL de base de l'API:", apiUrl);
+
+      const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
