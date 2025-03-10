@@ -2,7 +2,6 @@ import { Dialog, DialogContent } from "@/app/components/ui/dialog";
 import { useState } from "react";
 import { Checkbox } from "@/app/components/ui/checkbox";
 import { Label } from "@/app/components/ui/label";
-import { useLogout } from "@/hooks/useLogout";
 
 interface LogoutDialogProps {
   isOpen: boolean;
@@ -11,10 +10,46 @@ interface LogoutDialogProps {
 
 export default function LogoutDialog({ isOpen, onClose }: LogoutDialogProps) {
   const [preventAutoLogin, setPreventAutoLogin] = useState(true);
-  const { logout } = useLogout();
 
-  const handleLogout = async () => {
-    await logout(preventAutoLogin);
+  const handleLogout = () => {
+    // Marquer que l'utilisateur vient de se déconnecter
+    sessionStorage.setItem("just-logged-out", "true");
+
+    // Activer le mode invité lors de la déconnexion
+    localStorage.setItem("guest-mode", "true");
+
+    // Si l'utilisateur a choisi de ne pas être reconnecté automatiquement
+    if (preventAutoLogin) {
+      localStorage.setItem("prevent-auto-login", "true");
+    }
+
+    // Faire une requête pour synchroniser le localStorage avec les cookies
+    fetch("/api/auth/sync-cookies", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        preventAutoLogin: preventAutoLogin,
+        guestMode: true,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("LogoutDialog: Réponse de sync-cookies:", data);
+
+        // Rediriger vers la page de déconnexion forcée
+        window.location.href = "/logout";
+      })
+      .catch((error) => {
+        console.error(
+          "LogoutDialog: Erreur lors de la synchronisation des cookies:",
+          error
+        );
+
+        // Rediriger vers la page de déconnexion forcée même en cas d'erreur
+        window.location.href = "/logout";
+      });
   };
 
   return (

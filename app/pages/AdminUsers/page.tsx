@@ -93,19 +93,36 @@ export default function AdminUsers() {
   // Fonction pour vérifier le statut de l'utilisateur actuel
   const checkUserStatus = async () => {
     try {
-      const response = await fetch("/api/auth/user");
-
-      if (!response.ok) {
-        console.error(
-          "Erreur lors de la vérification du statut utilisateur:",
-          response.status
-        );
-        toast.error("Erreur lors de la vérification du statut utilisateur");
-        return;
-      }
+      console.log("AdminUsers: Vérification du statut utilisateur");
+      const response = await fetch("/api/auth/user", {
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
 
       const userData = await response.json();
-      console.log("Statut utilisateur actuel:", userData);
+      console.log("AdminUsers: Statut utilisateur actuel:", userData);
+
+      if (!userData.authenticated) {
+        toast.error("Vous n'êtes pas connecté");
+        console.error("L'utilisateur n'est pas authentifié:", userData);
+
+        // Afficher un message avec un bouton pour se reconnecter
+        toast.error(
+          <div>
+            <p>Session expirée ou invalide</p>
+            <button
+              onClick={() => (window.location.href = "/signin")}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Se reconnecter
+            </button>
+          </div>,
+          { duration: 10000 }
+        );
+        return;
+      }
 
       // Vérifier si l'utilisateur est administrateur
       if (userData.role !== "ADMIN") {
@@ -113,6 +130,11 @@ export default function AdminUsers() {
         console.error("L'utilisateur n'a pas le rôle ADMIN:", userData);
       } else {
         toast.success("Connecté en tant qu'administrateur");
+
+        // Afficher les informations de l'utilisateur
+        console.log("Email utilisateur:", userData.email);
+        console.log("Email administrateur configuré:", userData.adminEmail);
+        console.log("Environnement:", userData.env);
       }
     } catch (error) {
       console.error(

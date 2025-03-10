@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -68,9 +68,11 @@ export default function HomeClient() {
     return () => clearTimeout(timer);
   }, []);
 
-  const hasFullAccess = () => {
-    return !!sessionData?.user;
-  };
+  const hasFullAccess = useCallback(() => {
+    // L'utilisateur a un accès complet s'il est connecté ET n'est pas en mode invité
+    const guestMode = localStorage.getItem("guest-mode") === "true";
+    return !!sessionData?.user && !guestMode;
+  }, [sessionData]);
 
   const handleLogin = async () => {
     setIsLoggingIn(true);

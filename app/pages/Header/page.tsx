@@ -1,5 +1,5 @@
 "use client";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
@@ -194,7 +194,16 @@ const Header = () => {
                     )}
                     <MenubarSeparator className="my-1 bg-slate-50" />
                     <MenubarItem
-                      onClick={() => signOut({ callbackUrl: "/signin" })}
+                      onClick={() => {
+                        // Marquer que l'utilisateur vient de se déconnecter
+                        sessionStorage.setItem("just-logged-out", "true");
+
+                        // Activer le mode invité lors de la déconnexion
+                        localStorage.setItem("guest-mode", "true");
+
+                        // Rediriger vers la page de déconnexion forcée
+                        window.location.href = "/logout";
+                      }}
                       className="font-sans text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors rounded-lg m-1 p-2.5 w-full text-base font-medium"
                     >
                       Se déconnecter

@@ -29,6 +29,8 @@ export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  console.log("AuthForm: Rendu du composant");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,32 +40,49 @@ export function AuthForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("AuthForm: Soumission du formulaire");
     setIsLoading(true);
     try {
+      // Désactiver le mode invité avant la connexion
+      console.log("AuthForm: Désactivation du mode invité");
+      localStorage.removeItem("guest-mode");
+
+      console.log("AuthForm: Tentative de connexion avec credentials");
       const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
       });
 
+      console.log("AuthForm: Résultat de la connexion:", result);
+
       if (result?.error) {
+        console.log("AuthForm: Erreur de connexion:", result.error);
         toast({
           title: "Erreur",
           description: "Email ou mot de passe incorrect",
           variant: "destructive",
         });
       } else if (result?.ok) {
+        // Désactiver explicitement le mode invité après une connexion réussie
+        console.log(
+          "AuthForm: Connexion réussie, désactivation du mode invité"
+        );
+        localStorage.removeItem("guest-mode");
+
         toast({
           title: "Succès",
           description: "Connexion réussie",
         });
+        console.log("AuthForm: Redirection vers la page d'accueil");
         router.push("/");
+        console.log("AuthForm: Rechargement de la page prévu dans 100ms");
         setTimeout(() => {
           window.location.reload();
         }, 100);
       }
     } catch (error) {
-      console.error("Erreur de connexion:", error);
+      console.error("AuthForm: Erreur de connexion:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la connexion",
@@ -75,11 +94,17 @@ export function AuthForm() {
   }
 
   const handleGoogleSignIn = async () => {
+    console.log("AuthForm: Tentative de connexion avec Google");
     setIsLoading(true);
     try {
+      // Désactiver le mode invité avant la connexion avec Google
+      console.log("AuthForm: Désactivation du mode invité");
+      localStorage.removeItem("guest-mode");
+
+      console.log("AuthForm: Redirection vers l'authentification Google");
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
-      console.error("Erreur de connexion Google:", error);
+      console.error("AuthForm: Erreur de connexion Google:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la connexion avec Google",

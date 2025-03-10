@@ -90,7 +90,9 @@ export function StationCardClient() {
   }, []);
 
   const hasFullAccess = useCallback(() => {
-    return !!sessionData?.user;
+    // L'utilisateur a un accès complet s'il est connecté ET n'est pas en mode invité
+    const guestMode = localStorage.getItem("guest-mode") === "true";
+    return !!sessionData?.user && !guestMode;
   }, [sessionData]);
 
   const handleLogin = useCallback(() => {

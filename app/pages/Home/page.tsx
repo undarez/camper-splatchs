@@ -61,7 +61,9 @@ export default function HomePage() {
   }, []);
 
   const hasFullAccess = () => {
-    return !!sessionData?.user;
+    // L'utilisateur a un accès complet s'il est connecté ET n'est pas en mode invité
+    const guestMode = localStorage.getItem("guest-mode") === "true";
+    return !!sessionData?.user && !guestMode;
   };
 
   const handleLogin = async () => {

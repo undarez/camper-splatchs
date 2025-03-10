@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import GoogleAdsense from "./GoogleAdsense";
 
 interface LoginAdProps {
   onContinue: () => void;
@@ -39,12 +38,6 @@ export default function LoginAd({ onContinue, onStayHere }: LoginAdProps) {
           <p className="text-sm text-gray-600 mb-4">
             Merci de votre connexion.
           </p>
-          <GoogleAdsense
-            slot="3018978839"
-            style={{ display: "block", textAlign: "center" }}
-            format="auto"
-            responsive={true}
-          />
         </div>
         <div className="space-y-2">
           <button
