@@ -13,83 +13,30 @@ import {
 import { Button } from "@/app/components/ui/button";
 import { useRouter } from "next/navigation";
 import { AuthForm } from "@/app/components/AuthForm";
-import { useSession, signOut } from "next-auth/react";
 
 export default function SignIn() {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
-  const { status } = useSession();
-
-  // Log à chaque rendu du composant
-  console.log("SignIn: Rendu avec status =", status);
 
   useEffect(() => {
-    console.log("SignIn: useEffect déclenché, status =", status);
-
-    // Si l'utilisateur est déjà connecté, vérifier s'il doit être déconnecté
-    if (status === "authenticated") {
-      console.log("SignIn: Utilisateur déjà authentifié");
-
-      const preventAutoLogin =
-        localStorage.getItem("prevent-auto-login") === "true";
-      const guestMode = localStorage.getItem("guest-mode") === "true";
-
-      console.log("SignIn: État des flags:", { preventAutoLogin, guestMode });
-
-      // Si l'utilisateur a choisi de ne pas être reconnecté automatiquement
-      // ou s'il est en mode invité, le déconnecter
-      if (preventAutoLogin || guestMode) {
-        console.log("SignIn: Déconnexion forcée depuis la page de connexion");
-        signOut({ redirect: false });
-      } else {
-        // Sinon, rediriger vers la page d'accueil
-        console.log("SignIn: Redirection vers la page d'accueil");
-        router.push("/");
-      }
-    }
-
-    // Vérifier si l'utilisateur a accepté les règles de confidentialité
-    const privacyAccepted = localStorage.getItem("privacyAccepted") === "true";
-    console.log(
-      "SignIn: Règles de confidentialité acceptées =",
-      privacyAccepted
-    );
-
+    const privacyAccepted = localStorage.getItem("privacyAccepted");
     if (!privacyAccepted) {
-      console.log("SignIn: Affichage du modal de confidentialité");
       setShowModal(true);
     }
-  }, [status, router]);
+  }, []);
 
   const handleAccept = () => {
-    console.log("SignIn: Acceptation des règles de confidentialité");
     localStorage.setItem("privacyAccepted", "true");
     setShowModal(false);
   };
 
   const handleViewPrivacy = () => {
-    console.log("SignIn: Redirection vers les règles de confidentialité");
     router.push("/pages/Juridique/regles-de-confidentialite");
   };
 
   const handleGuestMode = () => {
-    console.log("SignIn: Activation du mode invité");
-    // Activer le mode invité
-    localStorage.setItem("guest-mode", "true");
-
-    // Si l'utilisateur est connecté, le déconnecter
-    if (status === "authenticated") {
-      console.log("SignIn: Déconnexion avant activation du mode invité");
-      signOut({ redirect: false }).then(() => {
-        console.log(
-          "SignIn: Redirection vers la page d'accueil après déconnexion"
-        );
-        router.push("/");
-      });
-    } else {
-      console.log("SignIn: Redirection vers la page d'accueil en mode invité");
-      router.push("/");
-    }
+    localStorage.setItem("guestSession", "true");
+    router.push("/");
   };
 
   return (

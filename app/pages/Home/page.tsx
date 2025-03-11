@@ -61,9 +61,7 @@ export default function HomePage() {
   }, []);
 
   const hasFullAccess = () => {
-    // L'utilisateur a un accès complet s'il est connecté ET n'est pas en mode invité
-    const guestMode = localStorage.getItem("guest-mode") === "true";
-    return !!sessionData?.user && !guestMode;
+    return !!sessionData?.user;
   };
 
   const handleLogin = async () => {
@@ -267,45 +265,15 @@ export default function HomePage() {
       {/* Section des dernières stations */}
       <section className="py-16 px-4 bg-[#1E2337]">
         <div className="max-w-7xl mx-auto">
-          {/* Section Google AdSense 2 - Bannière Delisle */}
+          {/* Section Google AdSense 2 */}
           <div
             id="google-ads-2"
-            className="w-full mb-12 flex items-center justify-center rounded-lg overflow-hidden"
+            className="w-full h-[250px] bg-[#252b43] mb-12 flex items-center justify-center rounded-lg"
           >
-            <Link
-              href="https://www.delisle-sa.com"
-              target="_blank"
-              className="w-full transform hover:scale-[1.02] transition-all duration-300"
-            >
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-cyan-500/30 group-hover:opacity-0 transition-opacity duration-300 rounded-lg"></div>
-                <Image
-                  src="/images/delisle-article/Delisle-banniere-partenaire.png"
-                  alt="Delisle - Partenaire officiel pour le lavage de camping-cars"
-                  width={1200}
-                  height={250}
-                  className="w-full h-auto object-cover rounded-lg shadow-lg shadow-blue-900/20"
-                  priority
-                />
-                <div className="absolute top-0 left-0 bg-gradient-to-r from-blue-600/90 to-blue-600/70 px-4 py-3 rounded-tl-lg rounded-br-lg shadow-md transform -translate-y-1 -translate-x-1 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform">
-                  <div className="flex items-center">
-                    <span className="animate-pulse text-yellow-300 mr-2">
-                      🚿
-                    </span>
-                    <p className="text-white font-bold text-sm md:text-base">
-                      19 nouvelles stations disponibles grâce à notre nouveau
-                      partenaire !
-                    </p>
-                    <span className="animate-pulse text-yellow-300 ml-2">
-                      ⭐
-                    </span>
-                  </div>
-                </div>
-                <div className="absolute bottom-3 right-3 bg-white/90 px-3 py-1 rounded-full text-blue-800 font-semibold text-sm shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Découvrir Delisle →
-                </div>
-              </div>
-            </Link>
+            <div className="text-center">
+              <p className="text-gray-400">Espace publicitaire</p>
+              <p className="text-xs text-gray-500">Advertisement</p>
+            </div>
           </div>
 
           <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
@@ -552,7 +520,8 @@ export default function HomePage() {
 
       <style
         dangerouslySetInnerHTML={{
-          __html: `          .animate-gradient {
+          __html: `
+          .animate-gradient {
             background-size: 200% auto;
             animation: gradient 3s linear infinite;
           }

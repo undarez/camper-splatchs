@@ -10,16 +10,11 @@ export async function PATCH(
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return new NextResponse("Non authentifié", { status: 401 });
-    }
-
-    // Vérifier si l'utilisateur est un administrateur
     if (
-      session.user.role !== "ADMIN" &&
+      !session?.user?.email ||
       session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
     ) {
-      return new NextResponse("Non autorisé", { status: 403 });
+      return new NextResponse("Non autorisé", { status: 401 });
     }
 
     const body = await request.json();
@@ -59,16 +54,11 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return new NextResponse("Non authentifié", { status: 401 });
-    }
-
-    // Vérifier si l'utilisateur est un administrateur
     if (
-      session.user.role !== "ADMIN" &&
+      !session?.user?.email ||
       session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL
     ) {
-      return new NextResponse("Non autorisé", { status: 403 });
+      return new NextResponse("Non autorisé", { status: 401 });
     }
 
     await prisma.user.delete({

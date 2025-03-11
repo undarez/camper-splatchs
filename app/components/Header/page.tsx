@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/app/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -31,20 +31,11 @@ export default function Header() {
     refreshSession();
   }, [status, update, router, pathname]);
 
-  // Vérifier si l'utilisateur est en mode invité
-  const isGuestMode =
-    typeof window !== "undefined" &&
-    localStorage.getItem("guest-mode") === "true";
-
   const handleSignOut = async () => {
-    // Marquer que l'utilisateur vient de se déconnecter
-    sessionStorage.setItem("just-logged-out", "true");
-
-    // Activer le mode invité lors de la déconnexion
-    localStorage.setItem("guest-mode", "true");
-
-    // Rediriger vers la page de déconnexion forcée
-    window.location.href = "/logout";
+    await signOut({ redirect: false });
+    await update();
+    router.refresh();
+    router.push("/auth/signin");
   };
 
   if (!isMounted) {
@@ -126,7 +117,7 @@ export default function Header() {
             </nav>
 
             {/* Bouton de connexion/profil */}
-            {status === "authenticated" && session && !isGuestMode ? (
+            {status === "authenticated" && session ? (
               <div className="relative group">
                 <button className="hover:text-blue-100 py-4">
                   {session.user?.name || session.user?.email || "Profil"}

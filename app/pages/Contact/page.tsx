@@ -99,10 +99,10 @@ export default function ContactPage() {
               </svg>
             </div>
             <h3 className="text-xl font-semibold mb-2">Email</h3>
-            <p className="text-gray-300">flobillard02200@gmail.com</p>
+            <p className="text-gray-300">support@splashcamper.com</p>
           </div>
 
-          {/* <div className="bg-gray-800 p-6 rounded-lg text-white text-center">
+          <div className="bg-gray-800 p-6 rounded-lg text-white text-center">
             <div className="h-12 w-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="h-6 w-6 text-white"
@@ -146,7 +146,7 @@ export default function ContactPage() {
             </div>
             <h3 className="text-xl font-semibold mb-2">Adresse</h3>
             <p className="text-gray-300">123 Rue du Camping, 75000 Paris</p>
-          </div> */}
+          </div>
         </div>
 
         {/* Formulaire de contact */}

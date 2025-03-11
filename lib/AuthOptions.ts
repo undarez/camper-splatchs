@@ -112,26 +112,6 @@ export const authOptions: NextAuthOptions = {
       if (!session.user) {
         return session;
       }
-
-      // Vérifier si l'utilisateur est l'administrateur et lui attribuer le rôle ADMIN
-      const adminEmail =
-        process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
-      if (session.user.email === adminEmail) {
-        return {
-          ...session,
-          user: {
-            ...session.user,
-            id: token.id,
-            provider: token.provider,
-            role: "ADMIN", // Forcer le rôle ADMIN pour l'email administrateur
-            department: token.department,
-            age: token.age,
-            camperModel: token.camperModel,
-            usageFrequency: token.usageFrequency,
-          },
-        };
-      }
-
       return {
         ...session,
         user: {
@@ -152,25 +132,7 @@ export const authOptions: NextAuthOptions = {
         return { ...token, ...session.user };
       }
 
-      // Vérifier si l'utilisateur est l'administrateur et lui attribuer le rôle ADMIN
-      const adminEmail =
-        process.env.NEXT_PUBLIC_ADMIN_EMAIL || process.env.ADMIN_EMAIL;
-
       if (user) {
-        // Si l'email correspond à l'email administrateur, forcer le rôle ADMIN
-        if (user.email === adminEmail) {
-          return {
-            ...token,
-            id: user.id,
-            provider: account?.provider || user.provider || "credentials",
-            role: "ADMIN", // Forcer le rôle ADMIN pour l'email administrateur
-            department: user.department,
-            age: user.age,
-            camperModel: user.camperModel,
-            usageFrequency: user.usageFrequency,
-          };
-        }
-
         return {
           ...token,
           id: user.id,
@@ -182,15 +144,6 @@ export const authOptions: NextAuthOptions = {
           usageFrequency: user.usageFrequency,
         };
       }
-
-      // Vérifier également le token existant
-      if (token.email === adminEmail) {
-        return {
-          ...token,
-          role: "ADMIN", // Forcer le rôle ADMIN pour l'email administrateur
-        };
-      }
-
       return token;
     },
   },
@@ -201,7 +154,6 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === "development",
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 heures au lieu de 30 jours (par défaut)
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
