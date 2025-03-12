@@ -40,13 +40,18 @@ export function AuthForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      console.log("Tentative de connexion avec:", values.email);
+
       const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
       });
 
+      console.log("Résultat de la connexion:", result);
+
       if (result?.error) {
+        console.error("Erreur de connexion:", result.error);
         toast({
           title: "Erreur",
           description: "Email ou mot de passe incorrect",
@@ -63,7 +68,7 @@ export function AuthForm() {
         }, 100);
       }
     } catch (error) {
-      console.error("Erreur de connexion:", error);
+      console.error("Exception lors de la connexion:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la connexion",

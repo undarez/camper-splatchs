@@ -1,7 +1,6 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { hash } from "bcryptjs";
 
 // Fonction pour vérifier le captcha
 async function verifyCaptcha(token: string) {
@@ -141,152 +140,65 @@ export async function POST(request: Request) {
       );
     }
 
-    // Vérifier la connexion à la base de données
+    // Vérifier si l'utilisateur existe déjà dans Prisma
     try {
-      console.log("Vérification de la connexion à la base de données...");
-      console.log(
-        "URL de la base de données:",
-        process.env.DATABASE_URL?.substring(0, 20) + "..."
-      );
-
-      // Vérifier si Prisma peut se connecter
-      await prisma.$connect();
-      console.log("Connexion à la base de données réussie");
-    } catch (dbConnectError) {
-      console.error(
-        "Erreur de connexion à la base de données:",
-        dbConnectError
-      );
-      return NextResponse.json(
-        { error: "Erreur de connexion à la base de données" },
-        { status: 500 }
-      );
-    }
-
-    // Créer le client Supabase
-    console.log("Création du client Supabase...");
-    console.log("URL Supabase:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-    const supabase = createRouteHandlerClient({ cookies });
-
-    // Créer l'utilisateur dans Supabase
-    console.log("Tentative de création de l'utilisateur dans Supabase...");
-    let signUpResult;
-    try {
-      signUpResult = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role: "USER",
-            isActive: true,
-          },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-        },
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
       });
-    } catch (supabaseError) {
-      console.error(
-        "Exception lors de la création de l'utilisateur dans Supabase:",
-        supabaseError
-      );
-      return NextResponse.json(
-        {
-          error:
-            "Erreur lors de la création du compte: " +
-            (supabaseError instanceof Error
-              ? supabaseError.message
-              : String(supabaseError)),
-        },
-        { status: 500 }
-      );
-    }
 
-    const {
-      data: { user },
-      error,
-    } = signUpResult;
-
-    // Gérer les erreurs de Supabase
-    if (error) {
-      console.error("Erreur Supabase:", error);
-
-      if (error.message.includes("already registered")) {
+      if (existingUser) {
         return NextResponse.json(
           { error: "Cette adresse email est déjà utilisée", emailTaken: true },
           { status: 400 }
         );
       }
-
-      return NextResponse.json(
-        { error: "Erreur lors de la création du compte: " + error.message },
-        { status: 400 }
-      );
+    } catch (findError) {
+      console.error("Erreur lors de la vérification de l'email:", findError);
+      // Continuer malgré l'erreur, car l'utilisateur pourrait ne pas exister
     }
 
-    // Vérifier que l'utilisateur a été créé
-    if (!user) {
-      console.log("Erreur: Utilisateur non créé dans Supabase");
-      return NextResponse.json(
-        { error: "Erreur lors de la création de l'utilisateur" },
-        { status: 400 }
-      );
-    }
+    // Hacher le mot de passe
+    const hashedPassword = await hash(password, 12);
 
-    console.log("Utilisateur créé dans Supabase avec succès:", user.id);
-
-    // Créer l'utilisateur dans Prisma
+    // Créer l'utilisateur directement dans Prisma
     try {
-      console.log("Tentative de création de l'utilisateur dans Prisma...");
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
-          id: user.id,
-          email: email,
-          name: name,
+          email,
+          name,
+          hashedPassword,
           role: "USER",
         },
       });
-      console.log("Utilisateur créé dans Prisma avec succès");
-    } catch (prismaError) {
-      console.error("Erreur Prisma:", prismaError);
-      // Si erreur avec Prisma, supprimer l'utilisateur de Supabase
-      try {
-        console.log(
-          "Tentative de suppression de l'utilisateur Supabase suite à l'erreur Prisma..."
-        );
-        await supabase.auth.admin.deleteUser(user.id);
-        console.log("Utilisateur Supabase supprimé avec succès");
-      } catch (deleteError) {
-        console.error(
-          "Erreur lors de la suppression de l'utilisateur Supabase:",
-          deleteError
-        );
-      }
 
+      console.log("Utilisateur créé dans Prisma avec succès:", user.id);
+
+      // Succès
+      return NextResponse.json({
+        message: "Compte créé avec succès",
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        },
+      });
+    } catch (prismaError) {
+      console.error(
+        "Erreur Prisma lors de la création de l'utilisateur:",
+        prismaError
+      );
       return NextResponse.json(
         {
-          error:
-            "Erreur lors de la création du compte dans la base de données: " +
-            (prismaError instanceof Error
-              ? prismaError.message
-              : String(prismaError)),
+          error: "Erreur lors de la création du compte dans la base de données",
         },
         { status: 500 }
       );
     }
-
-    // Succès
-    console.log("Inscription réussie pour l'utilisateur:", email);
-    return NextResponse.json({
-      message: "Compte créé avec succès",
-      user,
-    });
   } catch (error) {
     console.error("Exception non gérée lors de la création du compte:", error);
     return NextResponse.json(
       {
-        error:
-          "Erreur serveur interne: " +
-          (error instanceof Error ? error.message : String(error)),
+        error: "Erreur serveur interne lors de la création du compte",
       },
       { status: 500 }
     );
