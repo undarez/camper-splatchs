@@ -268,12 +268,22 @@ export default function HomePage() {
           {/* Section Google AdSense 2 */}
           <div
             id="google-ads-2"
-            className="w-full h-[250px] bg-[#252b43] mb-12 flex items-center justify-center rounded-lg"
+            className="w-full mb-12 flex items-center justify-center rounded-lg overflow-hidden"
           >
-            <div className="text-center">
-              <p className="text-gray-400">Espace publicitaire</p>
-              <p className="text-xs text-gray-500">Advertisement</p>
-            </div>
+            <Link
+              href="https://delisle-lavage.com/"
+              target="_blank"
+              className="w-full"
+            >
+              <Image
+                src="/images/delisle-article/Delisle-banniere-partenaire.png"
+                alt="Delisle Lavage - 19 nouvelles stations disponibles"
+                width={1200}
+                height={250}
+                className="w-full h-auto object-cover rounded-lg hover:opacity-95 shadow-lg transform hover:scale-[1.01] transition-all duration-300"
+                priority
+              />
+            </Link>
           </div>
 
           <h2 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-teal-400 to-cyan-500 text-transparent bg-clip-text">
@@ -520,8 +530,7 @@ export default function HomePage() {
 
       <style
         dangerouslySetInnerHTML={{
-          __html: `
-          .animate-gradient {
+          __html: `          .animate-gradient {
             background-size: 200% auto;
             animation: gradient 3s linear infinite;
           }
