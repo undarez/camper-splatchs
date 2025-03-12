@@ -63,13 +63,49 @@ export default function StationCard({
 
   return (
     <Card className="w-full bg-[#252b43] border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-      <div className="relative h-48 w-full">
-        <Image
-          src={station.images?.[0] || "/images/default-station.jpg"}
-          alt={station.name}
-          fill
-          className="object-cover rounded-t-lg"
-        />
+      <div className="relative h-48 sm:h-56 w-full overflow-hidden">
+        {station.images && station.images.length > 0 ? (
+          <div className="relative h-full w-full">
+            <Image
+              src={station.images[0] || "/images/default-station.jpg"}
+              alt={station.name}
+              fill
+              className="object-cover rounded-t-lg transition-transform duration-300 hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+              priority
+            />
+            {station.images.length > 1 && (
+              <div className="absolute bottom-2 right-2 flex space-x-1">
+                {station.images.slice(0, 3).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full ${
+                      index === 0 ? "bg-white" : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="h-full w-full bg-gray-700 rounded-t-lg flex items-center justify-center">
+            <p className="text-gray-400 text-sm">Aucune image disponible</p>
+          </div>
+        )}
+        {(station.isLavaTrans || station.isDelisle) && (
+          <div className="absolute top-2 left-2 flex gap-1">
+            {station.isLavaTrans && (
+              <div className="bg-cyan-500/80 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                LavaTrans
+              </div>
+            )}
+            {station.isDelisle && (
+              <div className="bg-orange-500/80 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                Delisle
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <CardHeader>
         <div className="flex justify-between items-start">
@@ -102,34 +138,89 @@ export default function StationCard({
       <CardContent>
         <div className="space-y-4">
           {station.services && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {station.services.highPressure !== "NONE" && (
-                <span className="px-2 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
+                <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full text-xs flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
+                  </svg>
                   Haute pression
                 </span>
               )}
               {station.services.waterPoint && (
-                <span className="px-2 py-1 bg-teal-500/20 text-teal-300 rounded-full text-sm">
+                <span className="px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded-full text-xs flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2c-5.33 4-8 8.27-8 12 0 4.42 3.58 8 8 8s8-3.58 8-8c0-3.73-2.67-8-8-12zm0 18c-3.31 0-6-2.69-6-6 0-1.77.79-3.92 2.65-6.15C9.92 6.03 10.85 5 12 5c1.15 0 2.08 1.03 3.35 2.84C17.21 10.08 18 12.23 18 14c0 3.31-2.69 6-6 6z" />
+                  </svg>
                   Point d'eau
+                </span>
+              )}
+              {station.services.wasteWater && (
+                <span className="px-2 py-0.5 bg-red-500/20 text-red-300 rounded-full text-xs flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                  </svg>
+                  Eaux usées
+                </span>
+              )}
+            </div>
+          )}
+
+          {station.parkingDetails && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {station.parkingDetails.totalPlaces > 0 && (
+                <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full text-xs flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M13 3H6v18h4v-6h3c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 8h-3V7h3c1.1 0 2 .9 2 2s-.9 2-2 2z" />
+                  </svg>
+                  {station.parkingDetails.totalPlaces} places
+                </span>
+              )}
+              {station.parkingDetails.hasElectricity !== "NONE" && (
+                <span className="px-2 py-0.5 bg-yellow-500/20 text-yellow-300 rounded-full text-xs flex items-center">
+                  <svg
+                    className="w-3 h-3 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M7 2v11h3v9l7-12h-4l4-8z" />
+                  </svg>
+                  Électricité
                 </span>
               )}
             </div>
           )}
 
           {showActions && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-2">
               <Button
                 onClick={() =>
                   router.push(`/pages/StationDetail/${station.id}`)
                 }
-                className="flex-1 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+                className="flex-1 bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white text-sm py-1 h-auto"
               >
-                Voir les détails
+                Voir détails
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white">
+                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white h-auto py-1">
                     <Navigation className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

@@ -685,7 +685,7 @@ export function StationCardClient() {
             </div>
 
             {isMapView ? (
-              <div className="relative h-[calc(100vh-180px)]">
+              <div className="relative h-[calc(100vh-180px)] md:h-[calc(100vh-180px)] sm:h-[calc(100vh-120px)]">
                 <div className="h-full rounded-lg overflow-hidden shadow-lg">
                   <MapView
                     stations={filteredStations}
@@ -753,75 +753,69 @@ export function StationCardClient() {
 
       {/* Barre de navigation mobile */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#1E2337] border-t border-gray-700/50 z-[1000]">
-        <div className="flex flex-col gap-2 p-4">
-          {/* Légendes en version mobile */}
-          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700/50 mb-2">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-white text-sm">Validée</span>
+        <div className="flex flex-col gap-1 p-2">
+          {/* Légendes et types combinés en version mobile */}
+          <div className="bg-gray-800/50 p-2 rounded-lg border border-gray-700/50 mb-1">
+            <div className="grid grid-cols-4 gap-x-2 gap-y-1">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <span className="text-white text-xs">Validée</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <span className="text-white text-sm">En attente</span>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                <span className="text-white text-xs">En attente</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <span className="text-white text-sm">Non validée</span>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                <span className="text-white text-xs">Non validée</span>
               </div>
-            </div>
-          </div>
-
-          {/* Types de stations en version mobile */}
-          <div className="bg-gray-800/50 p-3 rounded-lg border border-gray-700/50 mb-2">
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 flex items-center justify-center bg-[#40E0D0]/20 rounded-sm">
                   <Image
                     src="/images/article-lavatrans/lavatransicon-article.webp"
                     alt="Station LavaTrans"
-                    className="w-4 h-4 filter drop-shadow-[0_0_4px_#40E0D0]"
-                    width={16}
-                    height={16}
+                    className="w-3 h-3 filter drop-shadow-[0_0_4px_#40E0D0]"
+                    width={12}
+                    height={12}
                   />
                 </div>
-                <span className="text-white text-sm">LavaTrans</span>
+                <span className="text-white text-xs">LavaTrans</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 flex items-center justify-center bg-[#40E0D0]/20 rounded-sm">
                   <Image
                     src="/images/delisle/logo-delisle.png"
                     alt="Station Delisle"
-                    className="w-4 h-4 filter drop-shadow-[0_0_4px_#40E0D0] rounded-none"
-                    width={16}
-                    height={16}
+                    className="w-3 h-3 filter drop-shadow-[0_0_4px_#40E0D0] rounded-none"
+                    width={12}
+                    height={12}
                   />
                 </div>
-                <span className="text-white text-sm">Delisle</span>
+                <span className="text-white text-xs">Delisle</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 flex items-center justify-center bg-[#40E0D0]/20 rounded-sm">
                   <Image
                     src="/images/logo.png"
                     alt="Station de lavage"
-                    className="w-4 h-4"
-                    width={16}
-                    height={16}
+                    className="w-3 h-3"
+                    width={12}
+                    height={12}
                   />
                 </div>
-                <span className="text-white text-sm">Station</span>
+                <span className="text-white text-xs">Station</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 flex items-center justify-center bg-[#8B00FF]/20 rounded-lg">
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 flex items-center justify-center bg-[#8B00FF]/20 rounded-sm">
                   <Image
                     src="/images/logo.png"
                     alt="Parking"
-                    className="w-4 h-4 filter drop-shadow-[0_0_4px_#8B00FF]"
-                    width={16}
-                    height={16}
+                    className="w-3 h-3 filter drop-shadow-[0_0_4px_#8B00FF]"
+                    width={12}
+                    height={12}
                   />
                 </div>
-                <span className="text-white text-sm">Parking</span>
+                <span className="text-white text-xs">Parking</span>
               </div>
             </div>
           </div>
@@ -835,9 +829,9 @@ export function StationCardClient() {
                 viewMode === "cards"
                   ? "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
                   : "text-gray-400 hover:text-gray-200 hover:bg-gray-700/50"
-              }`}
+              } py-1 h-auto text-xs`}
             >
-              <ViewColumnsIcon className="h-4 w-4 mr-2" />
+              <ViewColumnsIcon className="h-3 w-3 mr-1" />
               Fiches
             </Button>
 
@@ -849,18 +843,18 @@ export function StationCardClient() {
                   viewMode === "map"
                     ? "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
                     : "text-gray-400 hover:text-gray-200 hover:bg-gray-700/50"
-                }`}
+                } py-1 h-auto text-xs`}
               >
-                <MapIcon className="h-4 w-4 mr-2" />
+                <MapIcon className="h-3 w-3 mr-1" />
                 Carte
               </Button>
             ) : (
               <Button
                 variant="ghost"
-                className="text-gray-500 cursor-not-allowed"
+                className="text-gray-500 cursor-not-allowed py-1 h-auto text-xs"
                 disabled
               >
-                <MapIcon className="h-4 w-4 mr-2" />
+                <MapIcon className="h-3 w-3 mr-1" />
                 Carte
               </Button>
             )}
@@ -870,10 +864,10 @@ export function StationCardClient() {
             <Button
               onClick={handleGeolocation}
               disabled={isLocating}
-              className="w-full bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white"
+              className="w-full bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-700 hover:to-cyan-800 text-white py-1 h-auto text-xs"
             >
               {isLocating ? (
-                <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"
@@ -890,7 +884,7 @@ export function StationCardClient() {
                   />
                 </svg>
               ) : (
-                <MapPin className="h-4 w-4 mr-2" />
+                <MapPin className="h-3 w-3 mr-1" />
               )}
               {isLocating ? "Localisation..." : "Me localiser"}
             </Button>
