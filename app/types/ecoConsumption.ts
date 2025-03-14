@@ -4,7 +4,7 @@ export interface WashHistory {
   id: string;
   userId: string;
   stationId: string;
-  date: Date;
+  date: Date | string;
   washType: string;
   vehicleSize: "small" | "medium" | "large";
   duration: number;
