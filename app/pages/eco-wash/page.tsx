@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { EcoCalculator } from "@/app/components/EcoCalculator";
 import { EcoHistory } from "@/app/components/EcoHistory";
 import {
@@ -47,7 +46,6 @@ export default function EcoWashPage() {
   const [washHistory, setWashHistory] = useState<WashHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
 
   useEffect(() => {
     if (status === "loading") return;
@@ -68,57 +66,41 @@ export default function EcoWashPage() {
             station.status === "active" && station.type === "STATION_LAVAGE"
         );
 
-        setStations(filteredStations);
+        // Utiliser un Set pour stocker les IDs uniques des stations
+        const stationIds = new Set();
+        const uniqueStations = filteredStations.filter((station) => {
+          if (stationIds.has(station.id)) {
+            return false;
+          }
+          stationIds.add(station.id);
+          return true;
+        });
 
-        // Charger l'historique des lavages depuis Supabase
+        setStations(uniqueStations);
+
+        // Charger l'historique des lavages via NextAuth API
         try {
-          const { data: historyDataRaw, error: historyError } = await supabase
-            .from("eco_wash_history")
-            .select(
-              `
-              *,
-              station:eco_stations(name)
-            `
-            )
-            .eq("user_id", session.user.id)
-            .order("date", { ascending: false });
+          console.log("Chargement de l'historique via NextAuth API");
 
-          if (historyError) {
-            console.error(
-              "Erreur lors du chargement de l'historique:",
-              historyError
-            );
-            toast.error(
-              "Impossible de charger l'historique des lavages. Veuillez réessayer plus tard."
-            );
-          } else if (historyDataRaw && historyDataRaw.length > 0) {
-            // Convertir les données de snake_case à camelCase
-            const historyData = historyDataRaw.map((item) => ({
-              id: item.id,
-              userId: item.user_id,
-              stationId: item.station_id,
-              washType: item.wash_type,
-              vehicleSize: item.vehicle_size,
-              duration: item.duration,
-              waterUsed: item.water_used,
-              waterSaved: item.water_saved,
-              ecoPoints: item.eco_points,
-              date: item.date,
-              station: item.station,
-            }));
+          const response = await fetch("/api/eco-wash/get-history");
 
-            // Utiliser les données de Supabase
-            setWashHistory(historyData);
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(
+              errorData.error || "Erreur lors du chargement de l'historique"
+            );
+          }
+
+          const data = await response.json();
+
+          if (data.success && data.washHistory) {
+            setWashHistory(data.washHistory);
           } else {
-            // Si aucune donnée n'est disponible, l'historique reste vide
             setWashHistory([]);
           }
-        } catch (historyErr) {
-          console.error(
-            "Erreur lors du chargement de l'historique:",
-            historyErr
-          );
-          toast.error("Erreur de connexion à Supabase.");
+        } catch (apiError) {
+          console.error("Erreur lors de l'appel à l'API NextAuth:", apiError);
+          toast.error("Impossible de charger l'historique des lavages.");
         }
       } catch (err) {
         console.error("Erreur lors du chargement des données:", err);
@@ -130,7 +112,7 @@ export default function EcoWashPage() {
     };
 
     loadData();
-  }, [session, status, supabase]);
+  }, [session, status]);
 
   const handleWashComplete = async (washData: WashData) => {
     if (!session?.user?.id || !selectedStation) {
@@ -139,117 +121,79 @@ export default function EcoWashPage() {
     }
 
     try {
-      // Enregistrer dans Supabase
+      // Enregistrer via NextAuth API
       toast.loading("Enregistrement du lavage...");
 
+      // Utiliser l'API NextAuth pour enregistrer l'historique
       try {
-        // Convertir les noms de champs en snake_case pour Supabase
-        const supabaseData = {
-          user_id: session.user.id,
-          station_id: selectedStation.id,
-          wash_type: washData.washType,
-          vehicle_size: washData.vehicleSize,
-          duration: washData.duration,
-          water_used: washData.waterUsed,
-          water_saved: washData.waterSaved,
-          eco_points: washData.ecoPoints,
-          date: new Date().toISOString(),
-        };
+        const response = await fetch("/api/eco-wash/save-history", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            stationId: selectedStation.id,
+            stationName: selectedStation.name,
+            stationAddress: selectedStation.address,
+            stationCity: selectedStation.city,
+            stationPostalCode: selectedStation.postalCode || "",
+            stationPhoneNumber: selectedStation.phoneNumber || "",
+            stationLatitude: selectedStation.latitude || 0,
+            stationLongitude: selectedStation.longitude || 0,
+            washType: washData.washType,
+            vehicleSize: washData.vehicleSize,
+            duration: washData.duration,
+            waterUsed: washData.waterUsed,
+            waterSaved: washData.waterSaved,
+            ecoPoints: washData.ecoPoints,
+          }),
+        });
 
-        // Vérifier d'abord si la station existe dans eco_stations
-        const { data: stationExists, error: stationError } = await supabase
-          .from("eco_stations")
-          .select("id")
-          .eq("id", selectedStation.id)
-          .single();
+        const result = await response.json();
 
-        // Si la station n'existe pas, l'ajouter
-        if (stationError || !stationExists) {
-          const { error: insertStationError } = await supabase
-            .from("eco_stations")
-            .insert([
-              {
-                id: selectedStation.id,
-                name: selectedStation.name,
-                address: selectedStation.address,
-                city: selectedStation.city,
-                postal_code: selectedStation.postalCode || "",
-                status: selectedStation.status,
-                type: selectedStation.type || "STATION_LAVAGE",
-                phone_number: selectedStation.phoneNumber || "",
-                description: selectedStation.description || "",
-                latitude: selectedStation.latitude || null,
-                longitude: selectedStation.longitude || null,
-              },
-            ]);
-
-          if (insertStationError) {
-            console.error(
-              "Erreur lors de l'ajout de la station:",
-              insertStationError
-            );
-            throw insertStationError;
-          }
+        if (!response.ok) {
+          throw new Error(
+            result.error || "Erreur lors de l'enregistrement de l'historique"
+          );
         }
 
-        // Insérer l'historique de lavage
-        const { data: newWashRaw, error } = await supabase
-          .from("eco_wash_history")
-          .insert([supabaseData])
-          .select("*, station:eco_stations(name)")
-          .single();
+        console.log("Historique enregistré avec succès via NextAuth API");
 
-        if (error) throw error;
+        // Mettre à jour les points via l'API NextAuth
+        await fetch("/api/user/update-points", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pointsToAdd: washData.ecoPoints }),
+        });
 
         toast.dismiss();
         toast.success("Lavage enregistré avec succès !");
 
-        // Convertir les données reçues de Supabase en format camelCase pour notre application
+        // Convertir les données reçues en format attendu par l'application
         const newWash: WashHistory = {
-          id: newWashRaw.id,
-          userId: newWashRaw.user_id,
-          stationId: newWashRaw.station_id,
-          washType: newWashRaw.wash_type,
-          vehicleSize: newWashRaw.vehicle_size as "small" | "medium" | "large",
-          duration: newWashRaw.duration,
-          waterUsed: newWashRaw.water_used,
-          waterSaved: newWashRaw.water_saved,
-          ecoPoints: newWashRaw.eco_points,
-          date: newWashRaw.date,
-          station: newWashRaw.station,
+          id: result.washHistory.id,
+          userId: result.washHistory.userId,
+          stationId: result.washHistory.stationId,
+          washType: result.washHistory.washType,
+          vehicleSize: result.washHistory.vehicleSize as
+            | "small"
+            | "medium"
+            | "large",
+          duration: result.washHistory.duration,
+          waterUsed: result.washHistory.waterUsed,
+          waterSaved: result.washHistory.waterSaved,
+          ecoPoints: result.washHistory.ecoPoints,
+          date: result.washHistory.date,
+          station: { name: selectedStation.name },
         };
 
-        // Mettre à jour les points de l'utilisateur
-        try {
-          const { error: updateError } = await supabase
-            .from("users")
-            .update({
-              eco_points: (session.user.ecoPoints || 0) + washData.ecoPoints,
-            })
-            .eq("id", session.user.id);
-
-          if (updateError) {
-            console.error(
-              "Erreur lors de la mise à jour des points:",
-              updateError
-            );
-            // Ne pas bloquer le flux si la mise à jour des points échoue
-          }
-        } catch (pointsError) {
-          console.error(
-            "Erreur lors de la mise à jour des points:",
-            pointsError
-          );
-          // Ne pas bloquer le flux si la mise à jour des points échoue
-        }
-
         setWashHistory((prev) => [newWash, ...prev]);
-      } catch (dbError) {
-        console.error("Erreur d'accès à la base de données:", dbError);
+      } catch (apiError) {
+        console.error("Erreur lors de l'appel à l'API NextAuth:", apiError);
         toast.dismiss();
-        toast.error(
-          "Erreur lors de l'enregistrement dans Supabase. Veuillez réessayer plus tard."
-        );
+        toast.error("Erreur lors de l'enregistrement du lavage");
       }
     } catch (err) {
       console.error("Erreur lors de l'enregistrement:", err);
@@ -360,15 +304,24 @@ export default function EcoWashPage() {
                   <option value="" className="text-gray-300">
                     Choisir une station
                   </option>
-                  {stations.map((station) => (
-                    <option
-                      key={station.id}
-                      value={station.id}
-                      className="text-white bg-[#2A3147]"
-                    >
-                      {station.name} - {station.address}, {station.city}
-                    </option>
-                  ))}
+                  {(() => {
+                    const uniqueIds = new Set();
+                    return stations
+                      .filter((station) => {
+                        if (uniqueIds.has(station.id)) return false;
+                        uniqueIds.add(station.id);
+                        return true;
+                      })
+                      .map((station) => (
+                        <option
+                          key={station.id}
+                          value={station.id}
+                          className="text-white bg-[#2A3147]"
+                        >
+                          {station.name} - {station.address}, {station.city}
+                        </option>
+                      ));
+                  })()}
                 </select>
                 {stations.length === 0 && (
                   <p className="text-gray-300 text-sm italic">

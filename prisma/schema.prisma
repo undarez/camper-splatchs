@@ -210,18 +210,21 @@ model Note {
 }
 
 model WashHistory {
-  id          String   @id @default(cuid())
-  userId      String
-  stationId   String
-  date        DateTime @default(now())
-  washType    String
-  vehicleSize String
-  duration    Int
-  waterUsed   Float
-  waterSaved  Float
-  ecoPoints   Int
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  station     Station  @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  id             String   @id @default(cuid())
+  userId         String
+  stationId      String?
+  date           DateTime @default(now())
+  washType       String
+  vehicleSize    String
+  duration       Int
+  waterUsed      Float
+  waterSaved     Float
+  ecoPoints      Int
+  stationName    String?
+  stationAddress String?
+  stationCity    String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  station        Station? @relation(fields: [stationId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([stationId])

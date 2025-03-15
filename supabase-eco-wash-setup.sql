@@ -48,6 +48,10 @@ CREATE TABLE public.eco_wash_history (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Créer des index pour de meilleures performances
+CREATE INDEX IF NOT EXISTS eco_wash_history_user_id_idx ON public.eco_wash_history(user_id);
+CREATE INDEX IF NOT EXISTS eco_wash_history_station_id_idx ON public.eco_wash_history(station_id);
+
 -- Accorder les permissions nécessaires
 GRANT ALL ON public.eco_stations TO authenticated;
 GRANT ALL ON public.eco_stations TO anon;
@@ -62,7 +66,24 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO service_role;
 
--- Activer RLS sur les nouvelles tables
+-- DÉSACTIVER RLS pour les tables (approche la plus simple pour commencer)
+ALTER TABLE public.eco_stations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.eco_wash_history DISABLE ROW LEVEL SECURITY;
+
+-- Insérer des stations de test pour l'éco-lavage
+INSERT INTO public.eco_stations (id, name, address, city, status, type)
+VALUES 
+  ('station_01', 'Lavatrans Dunkerque', '4116 Rue DE LOOPERSFORT PORT', 'Craywick', 'active', 'STATION_LAVAGE'),
+  ('station_02', 'Lavatrans Lille', '178, rue des Sureaux - P.A.M 59262 SAINGHIN EN MELANTOIS', 'Sainghin en Melantois', 'active', 'STATION_LAVAGE'),
+  ('station_03', 'Lavatrans Paris', '15 Avenue des Champs-Élysées', 'Paris', 'active', 'STATION_LAVAGE')
+ON CONFLICT (id) DO NOTHING;
+
+-- Commentaire: Une fois que l'application fonctionne correctement sans RLS,
+-- vous pourrez activer RLS et ajouter des politiques appropriées en utilisant
+-- le script suivant:
+
+/*
+-- Activer RLS pour les tables
 ALTER TABLE public.eco_stations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.eco_wash_history ENABLE ROW LEVEL SECURITY;
 
@@ -89,15 +110,8 @@ ON public.eco_wash_history
 FOR SELECT
 USING (auth.uid()::text = user_id);
 
--- Politique permissive pour l'insertion dans l'historique des lavages
-CREATE POLICY "Tout le monde peut ajouter à l'historique"
+CREATE POLICY "Les utilisateurs peuvent ajouter à leur propre historique"
 ON public.eco_wash_history
 FOR INSERT
-WITH CHECK (true);
-
--- Insérer des stations de test pour l'éco-lavage
-INSERT INTO public.eco_stations (id, name, address, city, status, type)
-VALUES 
-  ('station_01', 'Lavatrans Dunkerque', '4116 Rue DE LOOPERSFORT PORT', 'Craywick', 'active', 'STATION_LAVAGE'),
-  ('station_02', 'Lavatrans Lille', '178, rue des Sureaux - P.A.M 59262 SAINGHIN EN MELANTOIS', 'Sainghin en Melantois', 'active', 'STATION_LAVAGE')
-ON CONFLICT (id) DO NOTHING; 
+WITH CHECK (auth.uid()::text = user_id);
+*/ 
