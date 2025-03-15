@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/AuthOptions";
-import prisma from "../../../../lib/prisma";
 import stationsData from "../../../../data/stations.json";
 
 export async function POST(req: NextRequest) {
@@ -13,44 +12,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
 
-    console.log("Session user ID:", session.user.id);
-    console.log("Session user:", session.user);
-
-    // Vérifier que l'utilisateur existe dans la base de données
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { id: true },
-    });
-
-    console.log("User found in database:", user);
-
-    if (!user) {
-      // Essayer de trouver l'utilisateur par email
-      const userByEmail = session.user.email
-        ? await prisma.user.findUnique({
-            where: { email: session.user.email },
-            select: { id: true },
-          })
-        : null;
-
-      console.log("User found by email:", userByEmail);
-
-      if (userByEmail) {
-        // Utiliser l'ID trouvé dans la base de données
-        session.user.id = userByEmail.id;
-      } else {
-        return NextResponse.json(
-          { error: "Utilisateur non trouvé", sessionUserId: session.user.id },
-          { status: 404 }
-        );
-      }
-    }
-
     // Récupérer les données de la requête
     const data = await req.json();
     const {
       stationId,
-      stationName,
       washType,
       vehicleSize,
       duration,
@@ -87,56 +52,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Vérifier si la station existe déjà dans la base de données
-    const existingStation = await prisma.station.findUnique({
-      where: { id: stationId },
-      select: { id: true },
-    });
-
-    // Enregistrer l'historique de lavage avec les informations de la station
-    const washHistory = await prisma.washHistory.create({
-      data: {
-        userId: session.user.id,
-        stationId: existingStation ? existingStation.id : null, // Utiliser null si la station n'existe pas
-        stationName: stationName || jsonStation.name,
-        stationAddress: jsonStation.address || "",
-        stationCity: jsonStation.city || "",
-        washType,
-        vehicleSize,
-        duration,
-        waterUsed,
-        waterSaved,
-        ecoPoints,
-        date: new Date(),
+    // Créer un objet de simulation sans sauvegarder dans la base de données
+    const simulationResult = {
+      id: `sim_${Date.now()}`,
+      userId: session.user.id,
+      stationId: stationId,
+      date: new Date(),
+      washType,
+      vehicleSize,
+      duration,
+      waterUsed,
+      waterSaved,
+      ecoPoints,
+      station: {
+        id: jsonStation.id,
+        name: jsonStation.name,
+        address: jsonStation.address,
+        city: jsonStation.city,
       },
-    });
-
-    // Mettre à jour les points de l'utilisateur
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        ecoPoints: {
-          increment: ecoPoints,
+      // Ajouter des statistiques supplémentaires pour le simulateur
+      stats: {
+        waterSavedPercentage: Math.round(
+          (waterSaved / (waterUsed + waterSaved)) * 100
+        ),
+        ecoImpact: {
+          treesEquivalent: Math.round(waterSaved / 100), // Exemple: 1 arbre pour 100L d'eau économisée
+          co2Reduction: Math.round(waterSaved * 0.5), // Exemple: 0.5kg de CO2 par litre d'eau économisée
+        },
+        comparison: {
+          showers: Math.round(waterSaved / 60), // Exemple: 1 douche = 60L
+          bottlesOfWater: Math.round(waterSaved / 1.5), // Exemple: 1 bouteille = 1.5L
         },
       },
-    });
+    };
 
-    // Retourner l'historique avec les informations de la station du fichier JSON
+    // Retourner le résultat de la simulation
     return NextResponse.json({
       success: true,
-      washHistory: {
-        ...washHistory,
-        station: {
-          id: jsonStation.id,
-          name: jsonStation.name,
-          address: jsonStation.address,
-          city: jsonStation.city,
-          // Ajouter d'autres informations de la station si nécessaire
-        },
-      },
+      simulation: simulationResult,
+      message: "Simulation réussie ! Ces données ne sont pas sauvegardées.",
     });
   } catch (error) {
-    console.error("Erreur lors de l'enregistrement de l'historique:", error);
+    console.error("Erreur lors de la simulation:", error);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

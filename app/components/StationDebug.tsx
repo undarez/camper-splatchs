@@ -6,8 +6,30 @@ interface StationDebugProps {
   stationId: string;
 }
 
+interface WashLane {
+  id?: string;
+  laneNumber?: number;
+  lane_number?: number;
+  hasHighPressure?: boolean;
+  has_high_pressure?: boolean;
+  hasBusesPortique?: boolean;
+  has_buses_portique?: boolean;
+  hasRollerPortique?: boolean;
+  has_roller_portique?: boolean;
+}
+
+interface Station {
+  id: string;
+  name: string;
+  type?: string;
+  isDelisle?: boolean;
+  washLanes?: WashLane[];
+  wash_lanes?: WashLane[];
+  [key: string]: string | number | boolean | WashLane[] | undefined;
+}
+
 export default function StationDebug({ stationId }: StationDebugProps) {
-  const [stationData, setStationData] = useState<any>(null);
+  const [stationData, setStationData] = useState<Station | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -93,7 +115,7 @@ export default function StationDebug({ stationId }: StationDebugProps) {
         Array.isArray(stationData.washLanes) &&
         stationData.washLanes.length > 0 ? (
           <ul className="list-disc pl-5 space-y-1">
-            {stationData.washLanes.map((lane: any, index: number) => (
+            {stationData.washLanes.map((lane: WashLane, index: number) => (
               <li key={index}>
                 Piste {lane.laneNumber || lane.lane_number}: HP:{" "}
                 {lane.hasHighPressure || lane.has_high_pressure ? "Oui" : "Non"}
@@ -121,7 +143,7 @@ export default function StationDebug({ stationId }: StationDebugProps) {
         Array.isArray(stationData.wash_lanes) &&
         stationData.wash_lanes.length > 0 ? (
           <ul className="list-disc pl-5 space-y-1">
-            {stationData.wash_lanes.map((lane: any, index: number) => (
+            {stationData.wash_lanes.map((lane: WashLane, index: number) => (
               <li key={index}>
                 Piste {lane.laneNumber || lane.lane_number}: HP:{" "}
                 {lane.hasHighPressure || lane.has_high_pressure ? "Oui" : "Non"}

@@ -121,84 +121,68 @@ export default function EcoWashPage() {
     }
 
     try {
-      // Enregistrer via NextAuth API
-      toast.loading("Enregistrement du lavage...");
+      // Utiliser le simulateur au lieu d'enregistrer l'historique
+      toast.loading("Calcul de la simulation...");
 
-      // Utiliser l'API NextAuth pour enregistrer l'historique
-      try {
-        const response = await fetch("/api/eco-wash/save-history", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            stationId: selectedStation.id,
-            stationName: selectedStation.name,
-            stationAddress: selectedStation.address,
-            stationCity: selectedStation.city,
-            stationPostalCode: selectedStation.postalCode || "",
-            stationPhoneNumber: selectedStation.phoneNumber || "",
-            stationLatitude: selectedStation.latitude || 0,
-            stationLongitude: selectedStation.longitude || 0,
-            washType: washData.washType,
-            vehicleSize: washData.vehicleSize,
-            duration: washData.duration,
-            waterUsed: washData.waterUsed,
-            waterSaved: washData.waterSaved,
-            ecoPoints: washData.ecoPoints,
-          }),
-        });
+      const response = await fetch("/api/eco-wash/save-history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stationId: selectedStation.id,
+          washType: washData.washType,
+          vehicleSize: washData.vehicleSize,
+          duration: washData.duration,
+          waterUsed: washData.waterUsed,
+          waterSaved: washData.waterSaved,
+          ecoPoints: washData.ecoPoints,
+        }),
+      });
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (!response.ok) {
-          throw new Error(
-            result.error || "Erreur lors de l'enregistrement de l'historique"
-          );
-        }
+      if (!response.ok) {
+        throw new Error(result.error || "Erreur lors de la simulation");
+      }
 
-        console.log("Historique enregistré avec succès via NextAuth API");
+      toast.dismiss();
+      toast.success("Simulation réussie !");
 
-        // Mettre à jour les points via l'API NextAuth
-        await fetch("/api/user/update-points", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ pointsToAdd: washData.ecoPoints }),
-        });
+      // Afficher les résultats de la simulation
+      const simulationResult = result.simulation;
 
-        toast.dismiss();
-        toast.success("Lavage enregistré avec succès !");
+      // Ajouter la simulation à l'historique local (sans sauvegarder en base de données)
+      const newWash: WashHistory = {
+        id: simulationResult.id,
+        userId: session.user.id,
+        stationId: simulationResult.stationId,
+        washType: simulationResult.washType,
+        vehicleSize: simulationResult.vehicleSize as
+          | "small"
+          | "medium"
+          | "large",
+        duration: simulationResult.duration,
+        waterUsed: simulationResult.waterUsed,
+        waterSaved: simulationResult.waterSaved,
+        ecoPoints: simulationResult.ecoPoints,
+        date: new Date(simulationResult.date),
+        station: { name: selectedStation.name },
+      };
 
-        // Convertir les données reçues en format attendu par l'application
-        const newWash: WashHistory = {
-          id: result.washHistory.id,
-          userId: result.washHistory.userId,
-          stationId: result.washHistory.stationId,
-          washType: result.washHistory.washType,
-          vehicleSize: result.washHistory.vehicleSize as
-            | "small"
-            | "medium"
-            | "large",
-          duration: result.washHistory.duration,
-          waterUsed: result.washHistory.waterUsed,
-          waterSaved: result.washHistory.waterSaved,
-          ecoPoints: result.washHistory.ecoPoints,
-          date: result.washHistory.date,
-          station: { name: selectedStation.name },
-        };
+      setWashHistory((prev) => [newWash, ...prev]);
 
-        setWashHistory((prev) => [newWash, ...prev]);
-      } catch (apiError) {
-        console.error("Erreur lors de l'appel à l'API NextAuth:", apiError);
-        toast.dismiss();
-        toast.error("Erreur lors de l'enregistrement du lavage");
+      // Afficher des statistiques supplémentaires
+      if (simulationResult.stats) {
+        toast.success(
+          `Vous avez économisé ${simulationResult.waterSaved}L d'eau, soit l'équivalent de ${simulationResult.stats.comparison.showers} douches !`,
+          { duration: 5000 }
+        );
       }
     } catch (err) {
-      console.error("Erreur lors de l'enregistrement:", err);
+      console.error("Erreur lors de la simulation:", err);
       toast.dismiss();
-      toast.error("Erreur lors de l'enregistrement du lavage");
+      toast.error("Erreur lors de la simulation");
     }
   };
 

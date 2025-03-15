@@ -30,7 +30,9 @@ export function EcoHistory({ washHistory }: EcoHistoryProps) {
     <div className="space-y-6">
       {/* Résumé */}
       <div className="bg-blue-50 p-4 rounded-lg">
-        <h3 className="font-semibold mb-4">Votre Impact Écologique</h3>
+        <h3 className="font-semibold mb-4 text-cyan-600">
+          Votre Impact Écologique
+        </h3>
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-sm text-gray-600">Eau économisée (total)</p>
@@ -51,6 +53,15 @@ export function EcoHistory({ washHistory }: EcoHistoryProps) {
             </p>
           </div>
         </div>
+        <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-200">
+          <p className="text-sm text-green-800">
+            <span className="font-medium">Note :</span> Ces données sont
+            stockées uniquement dans votre navigateur et ne sont pas
+            sauvegardées sur nos serveurs. Ce simulateur vous aide à visualiser
+            votre impact écologique personnel et à contribuer à la préservation
+            de l'environnement.
+          </p>
+        </div>
       </div>
 
       {/* Badges */}
@@ -69,7 +80,9 @@ export function EcoHistory({ washHistory }: EcoHistoryProps) {
 
       {/* Historique */}
       <div className="bg-white rounded-lg shadow">
-        <h3 className="font-semibold p-4 border-b">Historique des lavages</h3>
+        <h3 className="font-semibold p-4 border-b text-cyan-600">
+          Historique des lavages
+        </h3>
         {washHistory.length === 0 ? (
           <div className="p-4 text-center text-gray-500">
             Aucun lavage enregistré pour le moment
@@ -77,14 +90,17 @@ export function EcoHistory({ washHistory }: EcoHistoryProps) {
         ) : (
           <div className="divide-y">
             {washHistory.map((wash) => (
-              <div key={wash.id} className="p-4 hover:bg-gray-50">
+              <div key={wash.id} className="p-4 hover:bg-blue-50">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium">
+                    <p className="font-medium text-gray-800">
                       {new Date(wash.date).toLocaleDateString("fr-FR", {
+                        weekday: "long",
                         day: "numeric",
                         month: "long",
                         year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </p>
                     <p className="text-sm text-gray-600">
