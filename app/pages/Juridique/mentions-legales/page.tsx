@@ -31,9 +31,9 @@ const MentionsLegales = () => {
               <p>
                 <strong>Nom :</strong> Florian Billard
                 <br />
-                <strong>Adresse email :</strong> fortuna77320@gmail.com
+                <strong>Adresse email :</strong> flobillard02200@gmail.com
                 <br />
-                <strong>Site web :</strong> https://splashcamper.vercel.app
+                <strong>Site web :</strong> https://www.splashcamper.fr
               </p>
             </div>
           </section>

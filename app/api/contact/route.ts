@@ -4,7 +4,7 @@ import { sendContactEmail } from "@/app/lib/emailService";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, message } = body;
+    const { name, email, subject, message } = body;
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -16,6 +16,7 @@ export async function POST(request: Request) {
     const result = await sendContactEmail({ name, email, message });
 
     if (!result.success) {
+      console.error("Erreur lors de l'envoi de l'email:", result.error);
       return NextResponse.json(
         { error: "Erreur lors de l'envoi de l'email" },
         { status: 500 }

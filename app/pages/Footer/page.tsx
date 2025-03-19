@@ -138,7 +138,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-blue-400/20 mt-8 pt-6 text-center text-gray-400 text-sm">
-          <p>© 2024 SplashCamper. Tous droits réservés.</p>
+          <p>© 2025 SplashCamper. Tous droits réservés.</p>
         </div>
       </div>
     </footer>

@@ -161,7 +161,7 @@ export default function AboutClient() {
             focus sur la simplicité, la communauté et l'efficacité, nous
             espérons rendre chaque voyage plus agréable et plus facile.
           </p>
-          <Link href="/components/localisationStation2">
+          <Link href="/localisationStation2">
             <button className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-blue-50 transition-colors duration-200">
               Commencer maintenant
             </button>

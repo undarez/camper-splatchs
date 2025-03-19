@@ -1,4 +1,4 @@
-"use client";
+"use server";
 
 import { createTransport } from "nodemailer";
 
