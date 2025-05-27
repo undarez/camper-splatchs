@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../../../lib/AuthOptions";
 
+// Forcer le rendu dynamique pour cette route
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     // Vérifier l'authentification
