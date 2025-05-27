@@ -15,7 +15,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons'],
   },
-  distDir: 'out',
   excludeDefaultMomentLocales: true,
   trailingSlash: false,
   poweredByHeader: false,
