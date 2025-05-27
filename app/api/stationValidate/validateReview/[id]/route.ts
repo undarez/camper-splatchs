@@ -12,6 +12,10 @@ function validateReview(content: string): boolean {
   return !FORBIDDEN_WORDS.some((word) => lowercaseContent.includes(word));
 }
 
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }

@@ -10,6 +10,12 @@ interface WashLane {
   id?: string; // Propriété optionnelle
 }
 
+// Fonction requise pour l'export statique avec des routes dynamiques
+export async function generateStaticParams() {
+  // Retourner une liste vide car les API routes ne peuvent pas être pré-générées
+  return [];
+}
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
