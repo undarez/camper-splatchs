@@ -4,9 +4,21 @@ const config: CapacitorConfig = {
   appId: "com.splashcamper.app",
   appName: "SplashCamper",
   webDir: "out",
-  server: {
-    url: "https://splashcamper.vercel.app",
-    cleartext: true,
+  plugins: {
+    SplashScreen: {
+      launchShowDuration: 2000,
+      backgroundColor: "#1E2337",
+      androidSplashResourceName: "splash",
+    },
+    CapacitorHttp: {
+      enabled: true,
+    },
+    Network: {
+      opportunistic: true,
+    },
+  },
+  android: {
+    allowMixedContent: true,
   },
 };
 

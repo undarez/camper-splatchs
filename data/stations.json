@@ -1367,6 +1367,88 @@
           "hasRollerPortique": false
         }
       ]
+    },
+    {
+      "id": "station_35",
+      "name": "Box-62",
+      "address": "2 rue de la sucrerie zac champ de gretz",
+      "city": "Verton",
+      "postalCode": "62180",
+      "latitude": 50.41128921508789,
+      "longitude": 1.6522566080093384,
+      "images": [
+        "/images/box-62/box-62-camping-car.webp",
+        "/images/box-62/station_box-62.webp"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "07.85.70.14.70",
+      "description": "Tout d'abord, notre station est équipée d'une vidange des eaux sales, vous offrant la possibilité de vous débarrasser facilement des résidus et des eaux usées de votre camping-car. Fini les tracas liés à la recherche de points de vidange appropriés, chez nous, vous pouvez effectuer cette opération sans aucun souci. En plus de la vidange des eaux sales, nous vous proposons également une vidange de cassette WC. Cette prestation pratique et hygiénique vous permet de maintenir la propreté de votre camping-car en tout temps. Notre espace camping-car offre également un service de rechargement en eau potable. Pour rendre votre expérience encore plus agréable, nous mettons à votre disposition des bornes d'électricité pour recharger les batteries de votre camping-car. Ainsi, vous pouvez bénéficier de l'électricité nécessaire pour alimenter vos appareils, éclairages, et autres équipements.",
+      "isLavaTrans": false,
+      "isDelisle": false,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "electricity": "AMP_15",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 2,
+        "manualWashPrice": 2
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
+    },
+    {
+      "id": "station_36",
+      "name": "Star-wash la Roche sur Yon",
+      "address": "12 rue andré Ampère",
+      "city": "la chaize le comte",
+      "postalCode": "85310",
+      "latitude": 46.66645812988281,
+      "longitude": -1.3365787267684937,
+      "images": [
+        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON-2.webp",
+        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON.webp"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.02.00.88.87",
+      "description": "Chez STAR WASH, vous pourrez aussi nettoyer vos camping-cars. En effet, loin d’être un simple moyen de mobilité, la caravane et/ou le camping-car est un lieu de vie à part entière. Votre santé, hygiène et bien-être dépendent notamment du lavage de votre véhicule et de sa bonne condition. C’est pour cela que la station de lavage STAR WASH met à votre disposition des passerelles de lavage placées en hauteur (sécurisation anti-dérapages). Ces dernières permettent de nettoyer les véhicules encombrants sans soucis pour une finition soignée. Hauteur : 3.20 m",
+      "isLavaTrans": false,
+      "isDelisle": false,
+      "services": {
+        "highPressure": "PORTIQUE",
+        "tirePressure": true,
+        "vacuum": true,
+        "handicapAccess": true,
+        "wasteWater": true,
+        "waterPoint": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES", "JETON"],
+        "portiquePrice": 2,
+        "manualWashPrice": 2
+      },
+      "washLanes": [
+        {
+          "laneNumber": 1,
+          "hasHighPressure": true,
+          "hasBusesPortique": false,
+          "hasRollerPortique": false
+        }
+      ]
     }
   ],
   "parkings": [
@@ -1475,6 +1557,42 @@
         "totalPlaces": 25,
         "hasWifi": false,
         "hasChargingPoint": false,
+        "waterPoint": true,
+        "wasteWater": true,
+        "wasteWaterDisposal": true,
+        "blackWaterDisposal": true,
+        "hasCctv": true,
+        "hasBarrier": true
+      }
+    },
+    {
+      "id": "parking_04",
+      "name": "Box-62 parking",
+      "address": "2 rue de la sucrerie",
+      "city": "Verton",
+      "postalCode": "62180",
+      "latitude": 50.41128921508789,
+      "longitude": 1.6522566080093384,
+      "images": [
+        "/images/box-62/box-62-camping-car.webp",
+        "/images/box-62/station_box-62.webp"
+      ],
+      "status": "active",
+      "type": "PARKING",
+      "phoneNumber": "",
+      "description": "Parking pour camping-cars situé au même emplacement que la station de lavage Box-62. Ce parking dispose de 5 emplacements pour vous accueillir dans les meilleures conditions. Sur place, vous trouverez : une aire de vidange pour les eaux grises et les WC chimiques, des bornes électriques à disposition, un point de remplissage en eau potable.",
+      "isLavaTrans": false,
+      "isDelisle": false,
+      "parkingDetails": {
+        "isPayant": false,
+        "tarif": 0.0,
+        "taxeSejour": 0.0,
+        "hasElectricity": "AMP_15",
+        "commercesProches": ["NOURRITURE", "STATION_SERVICE"],
+        "handicapAccess": true,
+        "totalPlaces": 5,
+        "hasWifi": false,
+        "hasChargingPoint": true,
         "waterPoint": true,
         "wasteWater": true,
         "wasteWaterDisposal": true,
