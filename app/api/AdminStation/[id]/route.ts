@@ -4,6 +4,12 @@ import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/AuthOptions";
 import { HighPressureType } from "@prisma/client";
 
+// Fonction requise pour l'export statique avec des routes dynamiques
+export async function generateStaticParams() {
+  // Retourner une liste vide car les API routes ne peuvent pas être pré-générées
+  return [];
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }

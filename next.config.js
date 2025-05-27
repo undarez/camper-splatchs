@@ -23,13 +23,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // Exclure les API routes lors de l'export statique
-  exportPathMap: async function (defaultPathMap) {
-    const pathMap = { ...defaultPathMap };
-    // Supprimer les routes API dynamiques qui ne sont pas compatibles avec l'export statique
-    delete pathMap['/api/AdminStation/[id]'];
-    return pathMap;
-  },
   // Configurer les routes pour que MapView soit toujours rendu côté client
   async rewrites() {
     return [
