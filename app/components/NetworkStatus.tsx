@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Network } from "@capacitor/network";
+import type { PluginListenerHandle } from "@capacitor/core";
 
 export function NetworkStatus() {
   const [isOnline, setIsOnline] = useState(true);
@@ -23,12 +24,16 @@ export function NetworkStatus() {
     checkNetworkStatus();
 
     // Écouteurs d'événements pour les changements de connectivité
-    const networkListener = Network.addListener(
-      "networkStatusChange",
-      (status) => {
-        setIsOnline(status.connected);
-      }
-    );
+    let listenerHandle: PluginListenerHandle | null = null;
+    const setupListener = async () => {
+      listenerHandle = await Network.addListener(
+        "networkStatusChange",
+        (status) => {
+          setIsOnline(status.connected);
+        }
+      );
+    };
+    setupListener();
 
     // Support de base pour le web en cas de problème avec Capacitor
     const handleOnline = () => setIsOnline(true);
@@ -39,7 +44,7 @@ export function NetworkStatus() {
 
     return () => {
       // Nettoyage
-      networkListener.remove();
+      if (listenerHandle) listenerHandle.remove();
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
