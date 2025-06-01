@@ -88,6 +88,8 @@ export default function MapViewClient() {
                 ) / station.reviews.length
               : 0,
             isDelisle: (station as { isDelisle?: boolean }).isDelisle ?? false,
+            isCosmeticar:
+              (station as { isCosmeticar?: boolean }).isCosmeticar ?? false,
           })
         ) as StationWithDetails[];
         setStations(convertedStations);
@@ -108,6 +110,8 @@ export default function MapViewClient() {
       stations={stations.map((station) => ({
         ...station,
         isDelisle: (station as { isDelisle?: boolean }).isDelisle ?? false,
+        isCosmeticar:
+          (station as { isCosmeticar?: boolean }).isCosmeticar ?? false,
       }))}
       getMarkerIcon={async (station) => {
         // Utiliser un import dynamique au lieu de require
@@ -126,7 +130,14 @@ export default function MapViewClient() {
 
         try {
           if (station.type === "STATION_LAVAGE") {
-            if (station.isDelisle) {
+            if (station.isCosmeticar) {
+              return await createIcon({
+                iconUrl: "/images/version_2000_logo-cosmeticar.png",
+                iconSize: [35, 35],
+                iconAnchor: [17, 35],
+                popupAnchor: [1, -34],
+              });
+            } else if (station.isDelisle) {
               return await createIcon({
                 iconUrl: "/images/delisle/logo-delisle.png",
                 iconSize: [35, 35],

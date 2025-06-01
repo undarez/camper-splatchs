@@ -20,6 +20,7 @@ type Station = Omit<PrismaStation, "iconType" | "userId"> & {
   updatedAt: Date;
   userId: string;
   isDelisle?: boolean;
+  isCosmeticar?: boolean;
   services: {
     id: string;
     highPressure: HighPressureType;

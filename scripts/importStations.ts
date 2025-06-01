@@ -33,7 +33,7 @@ interface Station {
   phoneNumber: string;
   description: string;
   isLavaTrans: boolean;
-  isCosmeticar: boolean;
+  isCosmeticar?: boolean;
   services: {
     highPressure: string;
     tirePressure: boolean;
@@ -62,7 +62,7 @@ interface Parking {
   phoneNumber: string | null;
   description: string;
   isLavaTrans: boolean;
-  isCosmeticar: boolean;
+  isCosmeticar?: boolean;
   parkingDetails: {
     isPayant: boolean;
     tarif: string | number | null;

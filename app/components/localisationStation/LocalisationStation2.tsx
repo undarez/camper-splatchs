@@ -26,6 +26,7 @@ interface Station {
   updatedAt: Date;
   isLavaTrans: boolean;
   isDelisle: boolean;
+  isCosmeticar: boolean;
   authorId: string;
   encryptedName: string | null;
   encryptedAddress: string | null;
@@ -95,6 +96,7 @@ export function convertStationsToOptionalFields(
     updatedAt: station.updatedAt,
     isLavaTrans: station.isLavaTrans,
     isDelisle: station.isDelisle ?? false,
+    isCosmeticar: station.isCosmeticar ?? false,
     authorId: station.authorId,
     encryptedName: station.encryptedName,
     encryptedAddress: station.encryptedAddress,
