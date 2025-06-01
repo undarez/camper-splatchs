@@ -63,6 +63,7 @@ type StationWithWashLanes = Prisma.StationGetPayload<{
 
 interface StationWithRelations extends Station {
   isDelisle: boolean;
+  isCosmeticar: boolean;
   services: {
     id: string;
     highPressure: "NONE" | "PASSERELLE" | "ECHAFAUDAGE" | "PORTIQUE";
@@ -153,6 +154,7 @@ export async function GET(
         const formattedStation = {
           ...stationData,
           isDelisle: isDelisleStation, // Forcer à true pour les stations Delisle
+          isCosmeticar: stationData.isCosmeticar || false,
           phone_number: stationData.phoneNumber,
           postal_code: stationData.postalCode,
           services: stationData.services
@@ -319,6 +321,7 @@ export async function GET(
     const stationWithRelations = {
       ...station,
       isDelisle: station.isDelisle ?? false,
+      isCosmeticar: station.isCosmeticar ?? false,
       washLanes: station.washLanes || [],
     } as StationWithRelations;
 
@@ -340,6 +343,7 @@ export async function GET(
     const response = {
       ...stationWithRelations,
       isDelisle: station.isDelisle === true,
+      isCosmeticar: station.isCosmeticar === true,
       phone_number: station.phoneNumber,
       postal_code: station.postalCode,
       services: station.services

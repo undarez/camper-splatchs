@@ -38,6 +38,7 @@ interface StationData {
   commercesProches: string[];
   // Nouveaux champs pour Delisle
   isDelisle: boolean;
+  isCosmeticar: boolean;
   portiquePrice: string;
   manualWashPrice: string;
   washLanes: WashLane[];
@@ -272,6 +273,25 @@ export default function AddStationModal({
                 />
                 <label htmlFor="is-delisle" className="text-gray-300 text-sm">
                   Station Delisle
+                </label>
+              </div>
+
+              {/* Option Cosméticar */}
+              <div className="flex items-center mb-2">
+                <input
+                  id="is-cosmeticar"
+                  type="checkbox"
+                  checked={formData.isCosmeticar}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isCosmeticar: e.target.checked })
+                  }
+                  className="mr-2 h-4 w-4"
+                />
+                <label
+                  htmlFor="is-cosmeticar"
+                  className="text-gray-300 text-sm"
+                >
+                  Station Cosméticar
                 </label>
               </div>
 

@@ -297,6 +297,10 @@ export function StationCardClient() {
       iconUrl = "/images/delisle/logo-delisle.png";
       iconSize = [35, 35];
       iconAnchor = [17, 35];
+    } else if (station.isCosmeticar) {
+      iconUrl = "/images/version_2000_logo-cosmeticar.png";
+      iconSize = [35, 35];
+      iconAnchor = [17, 35];
     } else if (station.type === "STATION_LAVAGE") {
       iconUrl = "/images/logo.png";
       iconSize = [35, 35];
@@ -310,7 +314,9 @@ export function StationCardClient() {
       popupAnchor: [1, -34],
       className: `station-marker ${
         station.type === "PARKING" ? "parking" : "station-lavage"
-      } ${station.isDelisle ? "delisle" : ""}`,
+      } ${station.isDelisle ? "delisle" : ""} ${
+        station.isCosmeticar ? "cosmeticar" : ""
+      }`,
     });
   };
 
@@ -348,6 +354,9 @@ export function StationCardClient() {
           }
           .station-marker.delisle {
             --glow-color: #FF6B00;
+          }
+          .station-marker.cosmeticar {
+            --glow-color: #8B5CF6;
           }
           .station-marker:hover {
             transform: scale(1.1);
@@ -620,6 +629,18 @@ export function StationCardClient() {
                     <span className="text-white">Station Delisle</span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 flex items-center justify-center bg-[#8B5CF6]/20 rounded-lg">
+                      <Image
+                        src="/images/version_2000_logo-cosmeticar.png"
+                        alt="Station Cosméticar"
+                        className="w-6 h-6 filter drop-shadow-[0_0_4px_#8B5CF6] rounded-none"
+                        width={24}
+                        height={24}
+                      />
+                    </div>
+                    <span className="text-white">Station Cosméticar</span>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <div className="w-8 h-8 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
                       <Image
                         src="/images/logo.png"
@@ -794,6 +815,18 @@ export function StationCardClient() {
                 <span className="text-white text-xs">Delisle</span>
               </div>
               <div className="flex items-center gap-1">
+                <div className="w-4 h-4 flex items-center justify-center bg-[#8B5CF6]/20 rounded-sm">
+                  <Image
+                    src="/images/version_2000_logo-cosmeticar.png"
+                    alt="Station Cosméticar"
+                    className="w-3 h-3 filter drop-shadow-[0_0_4px_#8B5CF6] rounded-none"
+                    width={12}
+                    height={12}
+                  />
+                </div>
+                <span className="text-white text-xs">Cosméticar</span>
+              </div>
+              <div className="flex items-center gap-1">
                 <div className="w-4 h-4 flex items-center justify-center bg-[#40E0D0]/20 rounded-sm">
                   <Image
                     src="/images/logo.png"
@@ -803,7 +836,7 @@ export function StationCardClient() {
                     height={12}
                   />
                 </div>
-                <span className="text-white text-xs">Station</span>
+                <span className="text-white text-xs">Station de lavage</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-4 h-4 flex items-center justify-center bg-[#8B00FF]/20 rounded-sm">

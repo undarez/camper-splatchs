@@ -60,6 +60,7 @@ export async function POST(request: Request) {
       status: StationStatus.en_attente,
       type: data.type as StationType,
       isDelisle: data.isDelisle || false,
+      isCosmeticar: data.isCosmeticar || false,
       author: { connect: { id: user.id } },
       user: { connect: { id: user.id } },
     };

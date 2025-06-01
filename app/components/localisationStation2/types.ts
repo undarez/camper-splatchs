@@ -27,6 +27,7 @@ export interface StationData {
   totalPlaces: number;
   hasWifi: boolean;
   hasChargingPoint: boolean;
+  isCosmeticar: boolean;
   phoneNumber?: string;
   description?: string;
 }

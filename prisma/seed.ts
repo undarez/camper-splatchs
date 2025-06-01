@@ -10,6 +10,72 @@ import stationsData from "../data/stations.json";
 
 const prisma = new PrismaClient();
 
+// Types pour les données JSON avec champs optionnels
+interface StationDataWithOptional {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  type: string;
+  phoneNumber: string;
+  description: string;
+  isLavaTrans: boolean;
+  isDelisle?: boolean;
+  isCosmeticar?: boolean;
+  services?: {
+    highPressure: string;
+    tirePressure: boolean;
+    vacuum: boolean;
+    handicapAccess: boolean;
+    wasteWater: boolean;
+    waterPoint: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    electricity: string;
+    paymentMethods: string[];
+  };
+}
+
+interface ParkingDataWithOptional {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  images: string[];
+  status: string;
+  type: string;
+  phoneNumber: string;
+  description: string;
+  isLavaTrans: boolean;
+  isDelisle?: boolean;
+  isCosmeticar?: boolean;
+  parkingDetails: {
+    isPayant: boolean;
+    tarif: string | number | null;
+    taxeSejour: string | number | null;
+    hasElectricity: string;
+    commercesProches: string[];
+    handicapAccess: boolean;
+    totalPlaces: number;
+    hasWifi: boolean;
+    hasChargingPoint: boolean;
+    waterPoint: boolean;
+    wasteWater: boolean;
+    wasteWaterDisposal: boolean;
+    blackWaterDisposal: boolean;
+    hasCctv: boolean;
+    hasBarrier: boolean;
+  };
+}
+
 async function main() {
   console.log("Début du seeding...");
 
@@ -33,7 +99,7 @@ async function main() {
   console.log("Utilisateur admin créé:", admin.id);
 
   // Ajouter les stations
-  for (const station of stationsData.stations) {
+  for (const station of stationsData.stations as StationDataWithOptional[]) {
     const createdStation = await prisma.station.create({
       data: {
         name: station.name,
@@ -49,6 +115,7 @@ async function main() {
         description: station.description,
         isLavaTrans: station.isLavaTrans,
         isDelisle: station.isDelisle || false,
+        isCosmeticar: station.isCosmeticar || false,
         author: {
           connect: { id: admin.id },
         },
@@ -78,7 +145,7 @@ async function main() {
   }
 
   // Ajouter les parkings
-  for (const parking of stationsData.parkings) {
+  for (const parking of stationsData.parkings as ParkingDataWithOptional[]) {
     const createdParking = await prisma.station.create({
       data: {
         name: parking.name,
@@ -94,14 +161,21 @@ async function main() {
         description: parking.description,
         isLavaTrans: parking.isLavaTrans,
         isDelisle: parking.isDelisle || false,
+        isCosmeticar: parking.isCosmeticar || false,
         author: {
           connect: { id: admin.id },
         },
         parkingDetails: {
           create: {
             isPayant: parking.parkingDetails.isPayant,
-            tarif: parking.parkingDetails.tarif,
-            taxeSejour: parking.parkingDetails.taxeSejour,
+            tarif:
+              typeof parking.parkingDetails.tarif === "string"
+                ? parseFloat(parking.parkingDetails.tarif) || null
+                : parking.parkingDetails.tarif,
+            taxeSejour:
+              typeof parking.parkingDetails.taxeSejour === "string"
+                ? parseFloat(parking.parkingDetails.taxeSejour) || null
+                : parking.parkingDetails.taxeSejour,
             hasElectricity: parking.parkingDetails
               .hasElectricity as ElectricityType,
             commercesProches: parking.parkingDetails.commercesProches,

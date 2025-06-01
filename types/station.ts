@@ -25,6 +25,7 @@ export interface StationWithDetails {
   updatedAt: Date;
   isLavaTrans: boolean;
   isDelisle: boolean;
+  isCosmeticar: boolean;
   authorId: string;
   encryptedName: string | null;
   encryptedAddress: string | null;

@@ -43,6 +43,8 @@ interface FormDataType {
   hasChargingPoint?: boolean;
   totalPlaces?: number;
   hasWifi?: boolean;
+  isLavaTrans?: boolean;
+  isCosmeticar?: boolean;
   author?: {
     name: string;
     email: string;
@@ -78,7 +80,6 @@ interface FormDataType {
     wasteWaterDisposal: boolean;
     blackWaterDisposal: boolean;
   };
-  isLavaTrans?: boolean;
   phoneNumber?: string;
   description?: string;
 }
@@ -306,6 +307,7 @@ export default function AddPointModal({
         },
         images: uploadedImages,
         isLavaTrans: formData.isLavaTrans,
+        isCosmeticar: formData.isCosmeticar,
       };
 
       console.log("Données envoyées:", dataToSubmit);
@@ -360,6 +362,7 @@ export default function AddPointModal({
         tarif: "",
         paymentMethods: [],
         isLavaTrans: false,
+        isCosmeticar: false,
       });
     }
   }, [isOpen, onFormDataChange]);
@@ -427,6 +430,7 @@ export default function AddPointModal({
                     maxVehicleLength: "",
                     paymentMethods: [],
                     isLavaTrans: false,
+                    isCosmeticar: false,
                   })
                 }
               >
@@ -545,8 +549,13 @@ export default function AddPointModal({
                       type="radio"
                       id="iconType-standard"
                       name="iconType"
-                      checked={!formData.isLavaTrans}
-                      onChange={() => onFormDataChange({ isLavaTrans: false })}
+                      checked={!formData.isLavaTrans && !formData.isCosmeticar}
+                      onChange={() =>
+                        onFormDataChange({
+                          isLavaTrans: false,
+                          isCosmeticar: false,
+                        })
+                      }
                       className="text-blue-500 focus:ring-blue-500"
                     />
                     <div className="flex items-center gap-2">
@@ -572,24 +581,55 @@ export default function AddPointModal({
                       id="iconType-lavatrans"
                       name="iconType"
                       checked={formData.isLavaTrans}
-                      onChange={() => onFormDataChange({ isLavaTrans: true })}
+                      onChange={() =>
+                        onFormDataChange({
+                          isLavaTrans: true,
+                          isCosmeticar: false,
+                        })
+                      }
                       className="text-blue-500 focus:ring-blue-500"
                     />
                     <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 flex items-center justify-center bg-[#40E0D0]/20 rounded-lg">
-                        <Image
-                          src="/images/article-lavatrans/lavatransicon-article.webp"
-                          alt="Station LavaTrans"
-                          width={25}
-                          height={25}
-                          className="filter drop-shadow-[0_0_4px_#40E0D0]"
-                        />
-                      </div>
-                      <span
-                        id="lavatrans-label"
-                        className="text-gray-300 text-sm"
-                      >
-                        Station LavaTrans
+                      <Image
+                        src="/images/article-lavatrans/lavatrans-mascotte.png"
+                        alt="LavaTrans"
+                        width={30}
+                        height={30}
+                        className="filter drop-shadow-[0_0_4px_#40E0D0] p-1 bg-[#40E0D0]/20 rounded-lg"
+                      />
+                      <span id="lavatrans-label" className="text-sm">
+                        LavaTrans
+                      </span>
+                    </div>
+                  </label>
+                  <label
+                    className="flex items-center gap-2 cursor-pointer"
+                    htmlFor="iconType-cosmeticar"
+                    aria-labelledby="cosmeticar-label"
+                  >
+                    <input
+                      type="radio"
+                      id="iconType-cosmeticar"
+                      name="iconType"
+                      checked={formData.isCosmeticar === true}
+                      onChange={() =>
+                        onFormDataChange({
+                          isCosmeticar: true,
+                          isLavaTrans: false,
+                        })
+                      }
+                      className="text-blue-500 focus:ring-blue-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src="/images/version_2000_logo-cosmeticar.png"
+                        alt="Cosméticar"
+                        width={30}
+                        height={30}
+                        className="filter drop-shadow-[0_0_4px_#8B5CF6] p-1 bg-[#8B5CF6]/20 rounded-lg"
+                      />
+                      <span id="cosmeticar-label" className="text-sm">
+                        Cosméticar
                       </span>
                     </div>
                   </label>

@@ -92,7 +92,7 @@ export default function StationCard({
             <p className="text-gray-400 text-sm">Aucune image disponible</p>
           </div>
         )}
-        {(station.isLavaTrans || station.isDelisle) && (
+        {(station.isLavaTrans || station.isDelisle || station.isCosmeticar) && (
           <div className="absolute top-2 left-2 flex gap-1">
             {station.isLavaTrans && (
               <div className="bg-cyan-500/80 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
@@ -102,6 +102,11 @@ export default function StationCard({
             {station.isDelisle && (
               <div className="bg-orange-500/80 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
                 Delisle
+              </div>
+            )}
+            {station.isCosmeticar && (
+              <div className="bg-purple-500/80 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                Cosméticar
               </div>
             )}
           </div>
@@ -124,7 +129,31 @@ export default function StationCard({
                   Delisle
                 </span>
               )}
+              {station.isCosmeticar && (
+                <span className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full text-xs">
+                  Cosméticar
+                </span>
+              )}
             </div>
+            {station.isCosmeticar && (
+              <div className="mt-2 p-2 bg-gradient-to-r from-purple-500/10 to-purple-600/10 border border-purple-500/30 rounded-lg">
+                <div className="flex items-center gap-1 mb-1">
+                  <svg
+                    className="w-3 h-3 text-purple-400"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                  </svg>
+                  <span className="text-xs font-semibold text-purple-400">
+                    Service à domicile
+                  </span>
+                </div>
+                <p className="text-xs text-gray-300">
+                  Rayon 20km • Code "SPLASHCAMPER10" = -10%
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-1">
             <StarIcon className="h-5 w-5 text-yellow-400" />

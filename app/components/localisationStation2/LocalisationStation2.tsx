@@ -92,6 +92,7 @@ const defaultFormData: StationData = {
   totalPlaces: 0,
   hasWifi: false,
   hasChargingPoint: false,
+  isCosmeticar: false,
   phoneNumber: "",
   description: "",
 };
@@ -694,6 +695,31 @@ export default function LocalisationStation2() {
             ? `
             <div class="border-t border-gray-700 pt-4 mt-4">
               <h4 class="text-sm font-bold text-white mb-3">Services disponibles</h4>
+              ${
+                station.isCosmeticar
+                  ? `
+                  <div class="bg-gradient-to-r from-purple-500/20 to-purple-600/20 border border-purple-500/30 rounded-lg p-3 mb-3">
+                    <h5 class="text-sm font-bold text-purple-400 mb-2 flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                      Service Cosméticar à domicile
+                    </h5>
+                    <div class="space-y-2 text-xs">
+                      <p class="text-gray-300">
+                        🏠 Service à domicile dans un rayon de <span class="font-semibold text-purple-400">20 km</span>
+                      </p>
+                      <p class="text-gray-300">
+                        💰 Tarifs à voir avec Cosméticar
+                      </p>
+                      <div class="bg-green-500/20 border border-green-500/30 rounded p-2 mt-2">
+                        <p class="text-green-400 font-semibold">🎉 Code "SPLASHCAMPER10" = -10%</p>
+                      </div>
+                    </div>
+                  </div>
+                  `
+                  : ""
+              }
               <div class="grid grid-cols-2 gap-3">
                 ${
                   station.services.highPressure !== "NONE"
@@ -1184,6 +1210,20 @@ export default function LocalisationStation2() {
                     </div>
                     <span className="text-gray-300 text-sm">
                       Station Delisle
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-12 h-12 flex items-center justify-center bg-[#8B5CF6]/20 rounded-lg">
+                      <Image
+                        src="/images/version_2000_logo-cosmeticar.png"
+                        alt="Station Cosméticar"
+                        width={45}
+                        height={45}
+                        className="filter drop-shadow-[0_0_4px_#8B5CF6]"
+                      />
+                    </div>
+                    <span className="text-gray-300 text-sm">
+                      Station Cosméticar
                     </span>
                   </div>
                   <div className="flex items-center gap-2">

@@ -178,6 +178,7 @@ interface StationWithDetails {
   phone_number: string | null;
   isDelisle?: boolean;
   isLavaTrans?: boolean;
+  isCosmeticar?: boolean;
   services?: {
     id: string;
     high_pressure?: string;
@@ -344,6 +345,9 @@ export default function StationDetail({ params }: StationDetailProps) {
           isDelisle:
             data.isDelisle === true ||
             (data.name && data.name.includes("Delisle")),
+          isCosmeticar:
+            data.isCosmeticar === true ||
+            (data.name && data.name.includes("Cosméticar")),
           services: data.services
             ? {
                 ...data.services,
@@ -621,6 +625,117 @@ export default function StationDetail({ params }: StationDetailProps) {
                 height={120}
                 className="object-contain"
               />
+            </div>
+          )}
+
+          {/* Logo Cosméticar pour les stations Cosméticar */}
+          {(station.isCosmeticar ||
+            (station.name && station.name.includes("Cosméticar"))) && (
+            <div className="flex justify-center my-6">
+              <Image
+                src="/images/version_2000_logo-cosmeticar.png"
+                alt="Logo Cosméticar"
+                width={280}
+                height={120}
+                className="object-contain"
+              />
+            </div>
+          )}
+
+          {/* Informations spécifiques Cosméticar */}
+          {(station.isCosmeticar ||
+            (station.name && station.name.includes("Cosméticar"))) && (
+            <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 border border-purple-500/30 rounded-lg p-6 my-6">
+              <h3 className="text-xl font-bold text-purple-400 mb-4 flex items-center gap-2">
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+                Service Cosméticar à domicile
+              </h3>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg
+                      className="w-4 h-4 text-purple-400"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white mb-1">
+                      Service à domicile
+                    </h4>
+                    <p className="text-gray-300 text-sm">
+                      Cosméticar se déplace chez vous dans un rayon de{" "}
+                      <span className="font-semibold text-purple-400">
+                        20 km
+                      </span>{" "}
+                      autour de cette station pour nettoyer votre camping-car.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg
+                      className="w-4 h-4 text-purple-400"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 7L12 10.41 10.59 9 12 7.59 13.41 9zm-.71 3h-1.4l-.14 4h1.68l-.14-4zm-.7 5.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white mb-1">
+                      Tarification
+                    </h4>
+                    <p className="text-gray-300 text-sm">
+                      Tarifs à voir directement avec{" "}
+                      <span className="font-semibold text-purple-400">
+                        Cosméticar
+                      </span>
+                      . Contactez-les pour un devis personnalisé.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 border border-green-500/30 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <svg
+                        className="w-4 h-4 text-green-400"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-green-400 mb-1">
+                        🎉 Offre spéciale SplashCamper
+                      </h4>
+                      <p className="text-gray-300 text-sm">
+                        Prononcez le code{" "}
+                        <span className="font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded">
+                          "SPLASHCAMPER10"
+                        </span>{" "}
+                        et obtenez{" "}
+                        <span className="font-semibold text-green-400">
+                          10% de réduction
+                        </span>{" "}
+                        sur votre prestation !
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

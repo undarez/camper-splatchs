@@ -1449,6 +1449,39 @@
           "hasRollerPortique": false
         }
       ]
+    },
+    {
+      "id": "station_37",
+      "name": "Cosmeticar Villefranche-sur-Saône",
+      "address": "ce déplace au domicile",
+      "city": "Villefranche-sur-Saône",
+      "postalCode": "69400",
+      "latitude": 45.98454284667969,
+      "longitude": 4.721123218536377,
+      "images": [
+        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON-2.webp",
+        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON.webp"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.85.33.42.98",
+      "description": "Découvrez le charme unique de CosmétiCar Villefranche-sur-Saône, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
     }
   ],
   "parkings": [
