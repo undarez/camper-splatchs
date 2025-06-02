@@ -1484,6 +1484,107 @@
         "portiquePrice": null,
         "manualWashPrice": null
       }
+    },
+    {
+      "id": "station_38",
+      "name": "Cosmeticar Lyon Ouest",
+      "address": "ce déplace au domicile",
+      "city": "ecully",
+      "postalCode": "69130",
+      "latitude": 45.7754498,
+      "longitude": 4.7785644,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.60.11.04.50",
+      "description": "Découvrez le charme unique de CosmétiCar Lyon Ouest, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
+    },
+    {
+      "id": "station_39",
+      "name": "Cosmeticar Lyon Nord-est",
+      "address": "ce déplace au domicile",
+      "city": "Lyon",
+      "postalCode": "69005",
+      "latitude": 45.7578137,
+      "longitude": 4.8320114,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.60.11.04.50",
+      "description": "Découvrez le charme unique de CosmétiCar Lyon Ouest, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
+    },
+    {
+      "id": "station_39",
+      "name": "Cosmeticar Lyon Sud",
+      "address": "ce déplace au domicile",
+      "city": "Lyon",
+      "postalCode": "69200",
+      "latitude": 45.7578137,
+      "longitude": 4.8320114,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.60.11.04.50",
+      "description": "Découvrez le charme unique de CosmétiCar Lyon Ouest, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
     }
   ],
   "parkings": [
