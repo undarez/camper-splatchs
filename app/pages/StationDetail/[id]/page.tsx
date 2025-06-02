@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import LoadingScreen from "@/app/components/Loader/LoadingScreen/page";
 import NavigationButton from "@/app/pages/MapComponent/NavigationGpsButton/NavigationButton";
-import { Carousel } from "@/app/components/ui/carousel";
 import { Badge } from "@/app/components/ui/badge";
 import {
   Droplet,
@@ -820,26 +819,152 @@ export default function StationDetail({ params }: StationDetailProps) {
         {/* Photos - placées juste après les pistes de lavage */}
         {station.images && station.images.length > 0 && (
           <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            <h2 className="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+              <svg
+                className="w-5 h-5 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
               Photos de la station
+              <span className="text-sm font-normal text-gray-500">
+                ({station.images.length} photo
+                {station.images.length > 1 ? "s" : ""})
+              </span>
             </h2>
-            <div className="space-y-2">
-              <Carousel className="w-full">
+
+            {station.images.length === 1 ? (
+              // Une seule image - affichage centré et grand
+              <div className="flex justify-center">
+                <div className="relative w-full max-w-4xl aspect-[16/10] rounded-xl overflow-hidden shadow-lg group cursor-pointer">
+                  <Image
+                    src={station.images[0]}
+                    alt={`${station.name}`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                </div>
+              </div>
+            ) : station.images.length === 2 ? (
+              // Deux images - disposition côte à côte
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {station.images.map((image, index) => (
                   <div
                     key={index}
-                    className="relative aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden h-[200px] md:h-[250px]"
+                    className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-lg group cursor-pointer"
                   >
                     <Image
                       src={image}
                       alt={`${station.name} ${index + 1}`}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      priority={index === 0}
                     />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   </div>
                 ))}
-              </Carousel>
-            </div>
+              </div>
+            ) : station.images.length === 3 ? (
+              // Trois images - une grande à gauche, deux petites à droite
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[400px] md:h-[500px]">
+                <div className="relative rounded-xl overflow-hidden shadow-lg group cursor-pointer">
+                  <Image
+                    src={station.images[0]}
+                    alt={`${station.name} 1`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                </div>
+                <div className="grid grid-rows-2 gap-4">
+                  {station.images.slice(1, 3).map((image, index) => (
+                    <div
+                      key={index + 1}
+                      className="relative rounded-xl overflow-hidden shadow-lg group cursor-pointer"
+                    >
+                      <Image
+                        src={image}
+                        alt={`${station.name} ${index + 2}`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              // Quatre images ou plus - grille avec image principale
+              <div className="space-y-4">
+                {/* Image principale */}
+                <div className="relative w-full aspect-[21/9] md:aspect-[21/8] rounded-xl overflow-hidden shadow-lg group cursor-pointer">
+                  <Image
+                    src={station.images[0]}
+                    alt={`${station.name} - Photo principale`}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 90vw"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-800">
+                    Photo principale
+                  </div>
+                </div>
+
+                {/* Grille des autres images */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {station.images.slice(1, 9).map((image, index) => (
+                    <div
+                      key={index + 1}
+                      className="relative aspect-square rounded-lg overflow-hidden shadow-md group cursor-pointer"
+                    >
+                      <Image
+                        src={image}
+                        alt={`${station.name} ${index + 2}`}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+                      {index === 7 && station.images.length > 9 && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                          <span className="text-white text-lg font-semibold">
+                            +{station.images.length - 9}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bouton pour voir toutes les photos si plus de 9 */}
+                {station.images.length > 9 && (
+                  <div className="text-center pt-4">
+                    <Button
+                      variant="outline"
+                      className="bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700"
+                    >
+                      Voir toutes les photos ({station.images.length})
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
