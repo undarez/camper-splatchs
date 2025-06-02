@@ -1418,8 +1418,8 @@
       "latitude": 46.66645812988281,
       "longitude": -1.3365787267684937,
       "images": [
-        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON-2.webp",
-        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON.webp"
+        "/images/starwash_rochesuryon/roche_suryon.webp",
+        "/images/starwash_rochesuryon/roche_suryon2.webp"
       ],
       "status": "active",
       "type": "STATION_LAVAGE",
@@ -1459,8 +1459,10 @@
       "latitude": 45.98454284667969,
       "longitude": 4.721123218536377,
       "images": [
-        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON-2.webp",
-        "/images/star-wash/star-wash-la-roche-sur-yon/STAR-WASH-STATION-DE-LAVAGE-LA-ROCHE-SUR-YON.webp"
+        "/images/cosmeticar/carr.jpg",
+        "/images/cosmeticar/d_sinfection_car.jpg",
+        "/images/cosmeticar/face.png",
+        "/images/cosmeticar/lustrage.jpg"
       ],
       "status": "active",
       "type": "STATION_LAVAGE",

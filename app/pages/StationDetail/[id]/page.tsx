@@ -669,12 +669,12 @@ export default function StationDetail({ params }: StationDetailProps) {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">
+                    <h4 className="font-semibold text-gray-800 mb-1">
                       Service à domicile
                     </h4>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-gray-700 text-sm">
                       Cosméticar se déplace chez vous dans un rayon de{" "}
-                      <span className="font-semibold text-purple-400">
+                      <span className="font-semibold text-purple-600">
                         20 km
                       </span>{" "}
                       autour de cette station pour nettoyer votre camping-car.
@@ -693,12 +693,12 @@ export default function StationDetail({ params }: StationDetailProps) {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">
+                    <h4 className="font-semibold text-gray-800 mb-1">
                       Tarification
                     </h4>
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-gray-700 text-sm">
                       Tarifs à voir directement avec{" "}
-                      <span className="font-semibold text-purple-400">
+                      <span className="font-semibold text-purple-600">
                         Cosméticar
                       </span>
                       . Contactez-les pour un devis personnalisé.
@@ -718,16 +718,16 @@ export default function StationDetail({ params }: StationDetailProps) {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-green-400 mb-1">
+                      <h4 className="font-semibold text-green-600 mb-1">
                         🎉 Offre spéciale SplashCamper
                       </h4>
-                      <p className="text-gray-300 text-sm">
+                      <p className="text-gray-700 text-sm">
                         Prononcez le code{" "}
-                        <span className="font-bold text-green-400 bg-green-500/20 px-2 py-1 rounded">
+                        <span className="font-bold text-green-600 bg-green-100 px-2 py-1 rounded">
                           "SPLASHCAMPER10"
                         </span>{" "}
                         et obtenez{" "}
-                        <span className="font-semibold text-green-400">
+                        <span className="font-semibold text-green-600">
                           10% de réduction
                         </span>{" "}
                         sur votre prestation !
