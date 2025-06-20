@@ -1824,6 +1824,176 @@
         "portiquePrice": null,
         "manualWashPrice": null
       }
+    },
+    {
+      "id": "station_49",
+      "name": "Cosmeticar Mâcon",
+      "address": "ce déplace au domicile",
+      "city": "Feillens",
+      "postalCode": "01570",
+      "latitude": 46.3360148,
+      "longitude": 4.8875665,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "07.57.81.83.50",
+      "description": "Découvrez le charme unique de CosmétiCar Mâcon, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
+    },
+    {
+      "id": "station_50",
+      "name": "Cosmeticar Chambéry",
+      "address": "ce déplace au domicile",
+      "city": "Chambéry",
+      "postalCode": "73000",
+      "latitude": 45.5696916,
+      "longitude": 5.9260787,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.21.61.53.64",
+      "description": "Découvrez le charme unique de CosmétiCar Chambéry, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
+    },
+    {
+      "id": "station_51",
+      "name": "Cosmeticar Rennes Nord-Ouest",
+      "address": "ce déplace au domicile",
+      "city": "21 rue de la trémelière",
+      "postalCode": "35650",
+      "latitude": 48.103878021240234,
+      "longitude": -1.8024239540100098,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "07.63.74.77.87",
+      "description": "Découvrez le charme unique de CosmétiCar Rennes Nord-Ouest, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
+    },
+    {
+      "id": "station_52",
+      "name": "Cosmeticar Challans-Noirmoutier",
+      "address": "ce déplace au domicile",
+      "city": "41 Chemin de la Garenne La barre-de-Monts",
+      "postalCode": "85550",
+      "latitude": 46.887821197509766,
+      "longitude": -2.1300289630889893,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "06.03.48.24.44",
+      "description": "Découvrez le charme unique de CosmétiCar Challans-Noirmoutier, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
+    },
+    {
+      "id": "station_53",
+      "name": "Cosmeticar Toulouse Nord-ouest",
+      "address": "ce déplace au domicile",
+      "city": "Beauzelle",
+      "postalCode": "31700",
+      "latitude": 43.6684669,
+      "longitude": 1.3794761,
+      "images": [
+        "/images/cosmeticar/pinceau.png",
+        "/images/cosmeticar/vitre.png",
+        "/images/cosmeticar/aspirateur.png"
+      ],
+      "status": "active",
+      "type": "STATION_LAVAGE",
+      "phoneNumber": "07.77.26.15.81",
+      "description": "Découvrez le charme unique de CosmétiCar Beauzelle, votre complice pour un lavage auto sans eau et sans souci. Où que vous soyez – à la maison, au bureau ou même sur un parking – notre service vient à vous, apportant une touche de propreté et d'élégance à votre quotidien, tout en préservant notre belle planète.",
+      "isLavaTrans": false,
+      "isCosmeticar": true,
+      "services": {
+        "highPressure": "PASSERELLE",
+        "tirePressure": true,
+        "vacuum": false,
+        "handicapAccess": true,
+        "wasteWater": false,
+        "waterPoint": true,
+        "wasteWaterDisposal": false,
+        "blackWaterDisposal": false,
+        "electricity": "Aucun",
+        "paymentMethods": ["CARTE_BANCAIRE", "ESPECES"],
+        "portiquePrice": null,
+        "manualWashPrice": null
+      }
     }
   ],
   "parkings": [
